@@ -1,0 +1,47 @@
+[
+  {
+    "id": "store-mumbai-01",
+    "organizationId": "org-demo-001",
+    "regionId": "region-west",
+    "regionCode": "WEST",
+    "regionName": "West India",
+    "code": "MUM-001",
+    "name": "Mumbai Central Store",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "postalCode": "400013",
+    "country": "India",
+    "imageUrl": "/images/stores/store-main.webp",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "store-pune-01",
+    "organizationId": "org-demo-001",
+    "regionId": "region-west",
+    "regionCode": "WEST",
+    "regionName": "West India",
+    "code": "PUN-001",
+    "name": "Pune City Store",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "postalCode": "411005",
+    "country": "India",
+    "imageUrl": "/images/stores/store-main.webp",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "store-delhi-01",
+    "organizationId": "org-demo-001",
+    "regionId": "region-north",
+    "regionCode": "NORTH",
+    "regionName": "North India",
+    "code": "DEL-001",
+    "name": "Delhi Central Store",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "postalCode": "110017",
+    "country": "India",
+    "imageUrl": "/images/stores/store-main.webp",
+    "status": "ACTIVE"
+  }
+]

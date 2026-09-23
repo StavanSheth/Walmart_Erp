@@ -1,0 +1,18 @@
+[
+  {
+    "id": "partner-001",
+    "organizationId": "org-demo-001",
+    "code": "SUP-001",
+    "type": "SUPPLIER",
+    "name": "Demo Consumer Goods Supply",
+    "contactPerson": "Nikhil Shah",
+    "email": "supplier@example.local",
+    "phone": "+91 9000020001",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "gstin": "27AAAAA0000A1Z5",
+    "creditLimit": 500000.00,
+    "outstanding": 125000.00,
+    "isActive": true
+  }
+]

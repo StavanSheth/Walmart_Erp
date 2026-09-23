@@ -1,0 +1,71 @@
+{
+  "organization": {
+    "id": "org-demo-001",
+    "name": "Walmart ERP Demo",
+    "legalName": "Walmart ERP Demo Pvt Ltd",
+    "currency": "INR",
+    "timezone": "Asia/Kolkata",
+    "locale": "en-IN"
+  },
+  "roles": [
+    { "id": "role-admin", "name": "Administrator", "description": "Full access" },
+    { "id": "role-manager", "name": "Store Manager", "description": "Operational access" },
+    { "id": "role-analyst", "name": "Analyst", "description": "Dashboard/report access" }
+  ],
+  "users": [
+    { "id": "user-admin-001", "name": "Aarav Mehta", "email": "admin@walmart-erp.local", "phone": "+91 9000000001", "role": "Administrator" },
+    { "id": "user-manager-001", "name": "Riya Shah", "email": "manager@walmart-erp.local", "phone": "+91 9000000002", "role": "Store Manager" },
+    { "id": "user-analyst-001", "name": "Kabir Patel", "email": "analyst@walmart-erp.local", "phone": "+91 9000000003", "role": "Analyst" }
+  ],
+  "regions": [
+    { "id": "region-west", "name": "West India", "code": "WEST" },
+    { "id": "region-north", "name": "North India", "code": "NORTH" }
+  ],
+  "stores": [
+    { "id": "store-mumbai-01", "code": "MUM-001", "name": "Mumbai Central Store", "city": "Mumbai", "regionCode": "WEST" },
+    { "id": "store-pune-01", "code": "PUN-001", "name": "Pune City Store", "city": "Pune", "regionCode": "WEST" },
+    { "id": "store-delhi-01", "code": "DEL-001", "name": "Delhi Central Store", "city": "New Delhi", "regionCode": "NORTH" }
+  ],
+  "inventory": [
+    { "storeId": "store-mumbai-01", "productId": "prod-001", "onHand": 320, "reserved": 10, "damaged": 0 },
+    { "storeId": "store-mumbai-01", "productId": "prod-002", "onHand": 145, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-mumbai-01", "productId": "prod-003", "onHand": 42, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-mumbai-01", "productId": "prod-004", "onHand": 88, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-pune-01", "productId": "prod-001", "onHand": 210, "reserved": 10, "damaged": 0 },
+    { "storeId": "store-pune-01", "productId": "prod-002", "onHand": 95, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-pune-01", "productId": "prod-003", "onHand": 18, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-pune-01", "productId": "prod-004", "onHand": 65, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-delhi-01", "productId": "prod-001", "onHand": 275, "reserved": 10, "damaged": 0 },
+    { "storeId": "store-delhi-01", "productId": "prod-002", "onHand": 120, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-delhi-01", "productId": "prod-003", "onHand": 31, "reserved": 3, "damaged": 0 },
+    { "storeId": "store-delhi-01", "productId": "prod-004", "onHand": 72, "reserved": 3, "damaged": 0 }
+  ],
+  "customer": {
+    "id": "customer-001",
+    "code": "CUS-001",
+    "name": "Rahul Mehta",
+    "email": "rahul@example.local",
+    "phone": "+91 9000030001",
+    "type": "RETAIL"
+  },
+  "salesOrder": {
+    "id": "sale-001",
+    "orderNumber": "SO-2026-0001",
+    "status": "COMPLETED",
+    "totalAmount": 2965.64,
+    "paymentStatus": "PAID"
+  },
+  "purchaseOrder": {
+    "id": "po-001",
+    "orderNumber": "PO-2026-0001",
+    "status": "RECEIVED",
+    "totalAmount": 66080.00
+  },
+  "accounts": [
+    { "code": "1010", "name": "Bank", "type": "ASSET" },
+    { "code": "1200", "name": "Inventory", "type": "ASSET" },
+    { "code": "4000", "name": "Sales Revenue", "type": "REVENUE" },
+    { "code": "5000", "name": "Cost of Goods Sold", "type": "EXPENSE" },
+    { "code": "2000", "name": "Accounts Payable", "type": "LIABILITY" }
+  ]
+}
