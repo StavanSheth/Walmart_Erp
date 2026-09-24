@@ -18,9 +18,11 @@
     "prisma:validate": "npm run prisma:validate --workspace=backend",
     "prisma:generate": "npm run prisma:generate --workspace=backend",
     "verify:phase1": "npm run prisma:validate --workspace=backend && npm run prisma:generate --workspace=backend && npm run typecheck --workspace=backend && npm run typecheck --workspace=frontend && npm run lint --workspace=backend && npm run lint --workspace=frontend && npm run test --workspace=backend && npm run test --workspace=frontend && npm run build --workspace=backend && npm run build --workspace=frontend",
-    "verify:runtime": "tsx scripts/verify-servers.ts"
+    "verify:runtime": "tsx scripts/verify-servers.ts",
+    "seed": "npm run seed --workspace=backend"
   },
   "devDependencies": {
+    "@esbuild/linux-x64": "^0.28.2",
     "concurrently": "^9.1.2",
     "tsx": "^4.19.3"
   }
