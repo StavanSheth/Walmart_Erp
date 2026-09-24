@@ -118,8 +118,10 @@ export function DashboardKPIGrid({
         {/* 1. Total Products */}
         <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
-              📦
+            <div className="w-10 h-10 rounded-xl bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 backdrop-blur-md shadow-xs">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
@@ -142,8 +144,10 @@ export function DashboardKPIGrid({
         {/* 2. In Stock (Units) */}
         <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
-              🟢
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 shrink-0 backdrop-blur-md shadow-xs">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
@@ -166,8 +170,10 @@ export function DashboardKPIGrid({
         {/* 3. Low Stock Items */}
         <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/35 flex items-center justify-center text-amber-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
-              ⚠️
+            <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/35 flex items-center justify-center text-amber-200 shrink-0 backdrop-blur-md shadow-xs">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
@@ -190,8 +196,10 @@ export function DashboardKPIGrid({
         {/* 4. Out of Stock */}
         <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
-              🚫
+            <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 shrink-0 backdrop-blur-md shadow-xs">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
@@ -214,8 +222,10 @@ export function DashboardKPIGrid({
         {/* 5. Total Store Locations */}
         <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
-              🏪
+            <div className="w-10 h-10 rounded-xl bg-blue-600/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 backdrop-blur-md shadow-xs">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
@@ -242,8 +252,10 @@ export function DashboardKPIGrid({
       <div className="grid grid-cols-2 gap-3 md:hidden">
         {/* 1. Total Sales (Today) */}
         <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-sm mb-2 backdrop-blur-md">
-            🛒
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 shrink-0 mb-2 backdrop-blur-md">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
           </div>
           <div>
             <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
@@ -261,8 +273,10 @@ export function DashboardKPIGrid({
 
         {/* 2. Total Orders */}
         <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-sm mb-2 backdrop-blur-md">
-            📄
+          <div className="w-8 h-8 rounded-lg bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 mb-2 backdrop-blur-md">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
           </div>
           <div>
             <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
@@ -280,8 +294,10 @@ export function DashboardKPIGrid({
 
         {/* 3. Active Stores */}
         <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-purple-500/25 border border-purple-400/35 flex items-center justify-center text-purple-200 text-sm mb-2 backdrop-blur-md">
-            🏬
+          <div className="w-8 h-8 rounded-lg bg-purple-500/25 border border-purple-400/35 flex items-center justify-center text-purple-200 shrink-0 mb-2 backdrop-blur-md">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
           </div>
           <div>
             <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
@@ -299,8 +315,10 @@ export function DashboardKPIGrid({
 
         {/* 4. Total Inventory Value */}
         <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-sm mb-2 backdrop-blur-md">
-            📦
+          <div className="w-8 h-8 rounded-lg bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 shrink-0 mb-2 backdrop-blur-md">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
           </div>
           <div>
             <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">

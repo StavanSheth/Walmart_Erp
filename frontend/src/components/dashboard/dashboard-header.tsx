@@ -68,7 +68,9 @@ export function DashboardHeader({
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
             {/* Date Badge */}
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md border border-white/25 text-white shadow-xs">
-              <span className="text-xs">📅</span>
+              <svg className="w-3.5 h-3.5 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <span>{formattedDate}</span>
             </span>
 

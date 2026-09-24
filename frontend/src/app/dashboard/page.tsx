@@ -69,7 +69,7 @@ export default function DashboardPage() {
         )}
 
         {/* 2. KPI Grid (5 liquid glass cards on Desktop, 2x2 cards on Mobile) */}
-        <div className="pt-3 sm:pt-5 lg:pt-7">
+        <div className="pt-10 sm:pt-16 lg:pt-24">
           <DashboardKPIGrid
             summary={data?.summary}
             mobileSummary={data?.mobileSummary}
@@ -85,7 +85,7 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         {/* DESKTOP LAYOUT (md:block) */}
         {/* ======================================================== */}
-        <div className="hidden md:block space-y-5 sm:space-y-6 pt-3 sm:pt-4">
+        <div className="hidden md:block space-y-4 sm:space-y-5">
           {/* Row 2: Sales Overview (5/12) + Inventory Distribution (4/12) + Store Performance (3/12) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
             <div className="lg:col-span-5 xl:col-span-5 h-full min-h-[290px] sm:min-h-[305px]">
@@ -137,7 +137,7 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         {/* MOBILE LAYOUT (md:hidden) */}
         {/* ======================================================== */}
-        <div className="md:hidden space-y-4 pt-3 sm:pt-4">
+        <div className="md:hidden space-y-4">
           {/* Sales Overview Mobile Chart */}
           <SalesOverviewChart
             salesOverview={data?.salesOverview}

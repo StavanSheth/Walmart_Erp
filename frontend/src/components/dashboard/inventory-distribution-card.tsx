@@ -39,17 +39,17 @@ export function InventoryDistributionCard({
         <span className="text-xs text-slate-400 font-medium shrink-0">Status</span>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 my-auto py-1 min-w-0">
-        {/* Donut Chart with Centered Total Units - Green slice on right side */}
-        <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0">
+      <div className="flex items-center justify-between sm:justify-around gap-3 sm:gap-6 my-auto py-1 min-w-0">
+        {/* Donut Chart with Centered Total Units - Green slice on right side, scaled to fit card */}
+        <div className="relative w-36 h-36 sm:w-40 sm:h-40 lg:w-44 lg:h-44 shrink-0 mx-auto sm:mx-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={36}
-                outerRadius={50}
+                innerRadius={48}
+                outerRadius={68}
                 paddingAngle={3}
                 dataKey="value"
                 strokeWidth={0}
@@ -65,19 +65,19 @@ export function InventoryDistributionCard({
 
           {/* Donut Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-sm sm:text-base font-black text-slate-900 tabular-nums leading-tight">
+            <span className="text-base sm:text-lg lg:text-xl font-black text-slate-900 tabular-nums leading-tight">
               {formatNumber(data.totalUnits)}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
               Total Units
             </span>
           </div>
         </div>
 
         {/* Legend & Breakdown */}
-        <div className="space-y-1.5 sm:space-y-2 w-auto text-xs font-semibold shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5">
+        <div className="space-y-2 sm:space-y-2.5 w-auto text-xs sm:text-sm font-semibold shrink-0">
+          <div className="flex items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
               <span className="text-slate-700">In Stock</span>
             </div>
@@ -86,8 +86,8 @@ export function InventoryDistributionCard({
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
               <span className="text-slate-700">Low Stock</span>
             </div>
@@ -96,8 +96,8 @@ export function InventoryDistributionCard({
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
               <span className="text-slate-700">Out of Stock</span>
             </div>
