@@ -60,12 +60,8 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         {/* Desktop Global Search Bar */}
         <div className="hidden md:block w-72 lg:w-96">
           <GlobalSearchTrigger
-            className={cn(
-              "w-full",
-              isDashboard
-                ? "bg-white/15 border-white/20 text-white placeholder:text-white/70 hover:bg-white/20 backdrop-blur-md"
-                : ""
-            )}
+            isDashboard={isDashboard}
+            className="w-full"
           />
         </div>
 

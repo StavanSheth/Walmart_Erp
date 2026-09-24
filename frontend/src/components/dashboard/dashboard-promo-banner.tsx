@@ -7,19 +7,20 @@ import { ASSETS } from "@/lib/assets";
 
 export function DashboardPromoBanner() {
   return (
-    <div className="relative overflow-hidden rounded-2xl glass-card border border-white/20 shadow-xl">
-      {/* Background twilight image with overlay */}
+    <div className="relative overflow-hidden rounded-2xl bg-[#001E38] border border-white/10 shadow-xl">
+      {/* Background store banner image with dark gradient overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={ASSETS.dashboard.banner}
-          alt="Walmart Supercenter Logistics"
+          src={ASSETS.banners.store}
+          alt="Walmart Logistics & Store Network"
           fill
+          unoptimized
           sizes="(max-width: 1536px) 100vw, 1536px"
           className="object-cover object-center"
           priority
         />
         {/* Gradients to keep text crisp and match desktop screenshot */}
-        <div className="absolute inset-0 bg-linear-to-r from-[#001E38]/95 via-[#00284e]/85 to-[#001e38]/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#001E38]/95 via-[#00284e]/85 to-[#001e38]/70" />
       </div>
 
       {/* Banner Content */}

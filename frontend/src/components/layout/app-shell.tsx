@@ -22,19 +22,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">
-          {/* Top 20-30% Banner Image (ONLY at top of main content on Dashboard, behind header, search, and greeting) */}
+          {/* Top 20-30% Banner Image (ONLY at top of main content on Dashboard, behind header, search, greeting, and KPI cards) */}
           {isDashboard && (
-            <div className="absolute top-0 left-0 right-0 h-[290px] sm:h-[330px] lg:h-[360px] overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-0 left-0 right-0 h-[460px] sm:h-[480px] lg:h-[500px] overflow-hidden pointer-events-none z-0">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
                 fill
                 priority
+                unoptimized
                 sizes="(max-width: 1536px) 100vw, 1536px"
-                className="object-cover object-top"
+                className="object-cover object-[center_35%]"
               />
-              {/* Atmospheric overlay: dark navy at top for search/icons contrast, fading into normal #F4F6F9 at bottom */}
-              <div className="absolute inset-0 bg-linear-to-b from-[#031B33]/85 via-[#04244B]/75 to-[#F4F6F9]" />
+              {/* Dark navy overlay on left behind search bar and greeting text, leaving store building visible on right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#021526]/90 via-[#021526]/40 to-transparent" />
+              {/* Subtle top shade for header controls contrast */}
+              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-[#021526]/60 to-transparent" />
+              {/* Bottom smooth fade into normal #F4F6F9 canvas right below the KPI cards */}
+              <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent" />
             </div>
           )}
 

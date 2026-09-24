@@ -11,20 +11,19 @@ export const ASSETS = {
     sparkWhite: "/brand/logo/walmart-spark-white.svg"
   },
   dashboard: {
-    background: "/images/banners/walmart-twilight-supercenter.png",
-    banner: "/images/banners/walmart-twilight-supercenter.png",
-    promo: "/images/banners/walmart-twilight-supercenter.png"
+    background: "/images/banners/walmart-supercenter-twilight.png",
+    banner: "/images/banners/walmart-supercenter-twilight.png",
+    promo: "/images/banners/walmart-supercenter-twilight.png"
   },
   banners: {
     store: "/images/banners/store-banner.webp",
-    twilight: "/images/banners/walmart-twilight-supercenter.png"
+    twilight: "/images/banners/walmart-supercenter-twilight.png"
   },
   stores: {
     main: "/images/stores/store-main.webp",
     sidebar: "/images/stores/store-sidebar.webp"
   },
   navigation: {
-    /* Reserved slot for user-supplied artwork per brand center rules (file currently optional/pending user supply) */
     mobileBottomRight: "/images/navigation/mobile-nav-bottom-right.webp"
   }
 } as const;
