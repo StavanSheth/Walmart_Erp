@@ -1,0 +1,53 @@
+import * as React from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+
+export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+  name: string;
+  src?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+export function Avatar({ name, src, size = "md", className, ...props }: AvatarProps) {
+  const [imageError, setImageError] = React.useState(false);
+
+  // Extract initials
+  const initials = name
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  const sizeClasses = {
+    sm: "w-7 h-7 text-xs",
+    md: "w-9 h-9 text-xs",
+    lg: "w-11 h-11 text-sm font-semibold"
+  };
+
+  return (
+    <div
+      className={cn(
+        "relative inline-flex items-center justify-center shrink-0 rounded-full font-semibold select-none overflow-hidden border border-slate-200 shadow-xs",
+        sizeClasses[size],
+        className
+      )}
+      {...props}
+    >
+      {src && !imageError ? (
+        <Image
+          src={src}
+          alt={name}
+          fill
+          onError={() => setImageError(true)}
+          className="object-cover"
+        />
+      ) : (
+        <span className="w-full h-full flex items-center justify-center bg-walmart-blue text-white">
+          {initials || "U"}
+        </span>
+      )}
+    </div>
+  );
+}
