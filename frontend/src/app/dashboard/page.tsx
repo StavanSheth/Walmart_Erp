@@ -86,15 +86,15 @@ export default function DashboardPage() {
         {/* DESKTOP LAYOUT (md:block) */}
         {/* ======================================================== */}
         <div className="hidden md:block space-y-4 sm:space-y-5">
-          {/* Row 2: Sales Overview (5/12) + Inventory Distribution (4/12) + Store Performance (3/12) */}
+          {/* Row 2: Sales Overview (6/12) + Inventory Distribution (3/12) + Store Performance (3/12) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
-            <div className="lg:col-span-5 xl:col-span-5 h-full min-h-[290px] sm:min-h-[305px]">
+            <div className="lg:col-span-6 xl:col-span-6 h-full min-h-[290px] sm:min-h-[305px]">
               <SalesOverviewChart
                 salesOverview={data?.salesOverview}
                 isLoading={isLoading}
               />
             </div>
-            <div className="lg:col-span-4 xl:col-span-4 h-full min-h-[290px] sm:min-h-[305px]">
+            <div className="lg:col-span-3 xl:col-span-3 h-full min-h-[290px] sm:min-h-[305px]">
               <InventoryDistributionCard
                 data={data?.inventoryDistribution}
                 isLoading={isLoading}
@@ -108,15 +108,15 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Row 3: Recent Inventory Activity (5/12) + Top Categories (4/12) + Alerts & Notifications (3/12) */}
+          {/* Row 3: Recent Inventory Activity (6/12) + Top Categories (3/12) + Alerts & Notifications (3/12) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
-            <div className="lg:col-span-5 xl:col-span-5 h-full min-h-[290px] sm:min-h-[305px]">
+            <div className="lg:col-span-6 xl:col-span-6 h-full min-h-[290px] sm:min-h-[305px]">
               <RecentInventoryActivity
                 activities={data?.recentInventoryActivity}
                 isLoading={isLoading}
               />
             </div>
-            <div className="lg:col-span-4 xl:col-span-4 h-full min-h-[290px] sm:min-h-[305px]">
+            <div className="lg:col-span-3 xl:col-span-3 h-full min-h-[290px] sm:min-h-[305px]">
               <TopCategoriesCard
                 categories={data?.topCategories}
                 isLoading={isLoading}
