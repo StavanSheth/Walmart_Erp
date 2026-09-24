@@ -115,4 +115,29 @@ describe("Frontend API Client & Error Unit Tests", () => {
     assert.equal(simpleErr.statusCode, undefined);
     assert.equal(simpleErr.data, undefined);
   });
+
+  // 6. Non-JSON response handling
+  test("6. Non-JSON response: converts JSON parse failure to ApiError without crashing", async () => {
+    const originalFetch = globalThis.fetch;
+    try {
+      globalThis.fetch = async () =>
+        new Response("Not valid json", {
+          status: 200,
+          headers: { "Content-Type": "text/plain" }
+        });
+
+      const client = new ApiClient("http://localhost:4000/api");
+      await assert.rejects(
+        async () => client.request("/invalid-json"),
+        (err: unknown) => {
+          assert.ok(err instanceof ApiError);
+          assert.equal(err.message, "Failed to parse response JSON");
+          assert.equal(err.statusCode, 200);
+          return true;
+        }
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });

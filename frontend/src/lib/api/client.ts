@@ -63,7 +63,11 @@ export class ApiClient {
       );
     }
 
-    return (await response.json()) as T;
+    try {
+      return (await response.json()) as T;
+    } catch {
+      throw new ApiError("Failed to parse response JSON", response.status);
+    }
   }
 
   /**

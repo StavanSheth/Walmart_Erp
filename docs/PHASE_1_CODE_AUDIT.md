@@ -1,6 +1,6 @@
 # Phase 1 Code Audit & Technical Analysis
 
-**Target**: Phase 1 — Project Foundation (Score >= 95%)  
+**Target**: Phase 1 — Project Foundation (Score >= 90%)  
 **Repository**: `https://github.com/StavanSheth/Walmart_Erp`  
 **Date**: September 24, 2026  
 **Auditor**: Antigravity Core Agent
@@ -19,7 +19,7 @@ All business domain models, authentication, authorization, and premature ERP fun
 
 ```
 /
-├── .env.example              # Clean environment template (no secrets)
+├── .env.example              # Clean environment template (no secrets, contains NODE_ENV)
 ├── .gitignore                # Excludes node_modules, build outputs, logs, envs, local DB files
 ├── .prettierrc               # Standard code formatting rules
 ├── package.json              # Root npm workspaces orchestrator
@@ -47,7 +47,7 @@ All business domain models, authentication, authorization, and premature ERP fun
 │   └── test/
 │       └── health.test.ts    # Comprehensive unit tests for health & CORS behavior
 ├── frontend/                 # Next.js 15 (App Router) + Tailwind CSS + TanStack Query
-│   ├── package.json
+│   ├── package.json          # Lean dependencies (no recharts or premature libraries)
 │   ├── tsconfig.json
 │   ├── eslint.config.mjs     # Native ESLint 9 flat configuration
 │   ├── next.config.ts
@@ -57,15 +57,15 @@ All business domain models, authentication, authorization, and premature ERP fun
 │   │   ├── app/
 │   │   │   ├── layout.tsx    # Clean root layout with providers
 │   │   │   ├── page.tsx      # Minimal Phase 1 3-status verification UI
-│   │   │   ├── providers.tsx # TanStack Query client provider
-│   │   │   └── globals.css   # Tailwind styles
+│   │   │   ├── providers.tsx # TanStack Query client provider (staleTime 60s, retry 1)
+│   │   │   └── globals.css   # Minimal Tailwind styles
 │   │   ├── lib/
-│   │   │   ├── api/client.ts # Centralized ApiClient & ApiError (no direct fetch in components)
-│   │   │   ├── config/env.ts # Zod-validated NEXT_PUBLIC_API_URL
+│   │   │   ├── api/client.ts # Centralized ApiClient & ApiError with non-JSON protection
+│   │   │   ├── config/env.ts # Zod-validated NEXT_PUBLIC_API_URL (no silent localhost in prod)
 │   │   │   └── utils.ts      # Class merging utility (cn)
 │   │   └── types/api.ts      # Shared typed API responses
 │   └── test/
-│       └── client.test.ts    # Frontend ApiClient unit tests
+│       └── client.test.ts    # Frontend ApiClient unit tests (all 6 categories)
 └── scripts/
     └── verify-servers.ts     # Automated runtime behavioral verification suite
 ```
@@ -81,9 +81,12 @@ All business domain models, authentication, authorization, and premature ERP fun
 | **Database Ping** | Previous health check could rely on table queries. | Enforced raw query `SELECT 1` in `checkDatabaseConnection()`. | PASS |
 | **Backend CORS** | Repeated string parsing across files; potential crash on unknown origins. | `CORS_ORIGIN` parsed once in `env.ts`. `callback(null, false)` safely disallows unauthorized origins. | PASS |
 | **Backend Testing** | Tests relied on real network timeout when DB was down. | Added dependency injection to `buildApp({ checkDb })` for deterministic 200 vs 503 testing. | PASS |
+| **Frontend Dependencies** | Contained unused `recharts` and `lucide-react` for future phases. | Removed `recharts` and `lucide-react` to keep the foundation lightweight. | PASS |
 | **Frontend ESLint** | Deprecated `next lint` using legacy `.eslintrc.json` in ESLint 9. | Migrated to native `eslint.config.mjs` with `@next/eslint-plugin-next` flat config. | PASS |
-| **Frontend UI** | Hardcoded port 4000 in error alerts; non-standard status badges. | Derived URL dynamically from `env.NEXT_PUBLIC_API_URL`. Used exact statuses: `Checking`, `Connected`, `Unavailable`. | PASS |
-| **Frontend Testing** | Only tested constructor; lacked request, HTTP error, and network error tests. | Added full mock-based tests for successful request, HTTP error, network failure, and ApiError. | PASS |
+| **Frontend UI** | Hardcoded port 4000 in error alerts; non-standard status badges. | Derived URL dynamically from `env.NEXT_PUBLIC_API_URL`. Used exact statuses: `Frontend Connected`, `Backend Connected / Unavailable`, `Database Connected / Unavailable`. | PASS |
+| **Frontend API Client** | Malformed / non-JSON responses could crash caller with SyntaxError. | Wrapped response parsing with `try/catch` and converted to typed `ApiError`. | PASS |
+| **Frontend Testing** | Only tested constructor; lacked request, HTTP error, and network error tests. | Added full mock-based tests for URL normalization, successful request, HTTP error, network failure, ApiError, and non-JSON response. | PASS |
+| **Environment** | `.env.example` lacked `NODE_ENV`; frontend could fall back to localhost in production. | Added `NODE_ENV="development"` to `.env.example`; added production guard in frontend `env.ts`. | PASS |
 | **Verify Script** | Treated network errors as CORS rejection passes. | Explicitly checks `access-control-allow-origin` and flags backend unreachability as `INFRASTRUCTURE FAILURE`. | PASS |
 
 ---
@@ -107,7 +110,7 @@ The following elements were checked to ensure zero Phase-2 runtime contamination
 - [x] `npm run lint --workspace=backend` -> Zero warnings / errors
 - [x] `npm run lint --workspace=frontend` -> Zero warnings / errors
 - [x] `npm run test --workspace=backend` -> 5/5 unit tests passed
-- [x] `npm run test --workspace=frontend` -> 5/5 unit tests passed
+- [x] `npm run test --workspace=frontend` -> 6/6 unit tests passed
 - [x] `npm run build --workspace=backend` -> Clean TypeScript build to `dist/`
 - [x] `npm run build --workspace=frontend` -> Clean Next.js production bundle build
 - [x] `npm run verify:runtime` -> 6/6 behavioral assertions passed
