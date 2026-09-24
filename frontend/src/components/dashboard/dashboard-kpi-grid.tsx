@@ -1,76 +1,268 @@
 "use client";
 
 import * as React from "react";
-import { KPICard } from "@/components/ui/card";
-import { StoreIcon, PackageIcon, ArrowUpDownIcon } from "@/components/ui/icons";
 import { formatCurrency, formatNumber } from "@/lib/format";
-import type { DashboardSummary } from "@/types/dashboard";
+import type { DesktopSummary, MobileSummary } from "@/types/dashboard";
+import { Skeleton } from "@/components/common/loading-state";
 
 export interface DashboardKPIGridProps {
-  summary?: DashboardSummary;
+  summary?: DesktopSummary;
+  mobileSummary?: MobileSummary;
   isLoading?: boolean;
 }
 
-export function DashboardKPIGrid({ summary, isLoading = false }: DashboardKPIGridProps) {
-  if (isLoading || !summary) {
+function MiniSparkline({ color = "#0071DC" }: { color?: string }) {
+  return (
+    <svg className="w-14 sm:w-16 h-6 shrink-0" viewBox="0 0 64 24" fill="none">
+      <path
+        d="M2 18 C 12 14, 22 21, 34 11 C 44 3, 52 15, 62 5"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function DashboardKPIGrid({
+  summary,
+  mobileSummary,
+  isLoading = false
+}: DashboardKPIGridProps) {
+  if (isLoading || !summary || !mobileSummary) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <KPICard key={i} title="Loading..." value="---" isLoading />
-        ))}
+      <div>
+        {/* Desktop Skeleton */}
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="p-4 rounded-2xl glass-card space-y-3">
+              <Skeleton className="w-8 h-8 rounded-xl" />
+              <Skeleton className="w-24 h-4 rounded" />
+              <Skeleton className="w-32 h-7 rounded" />
+            </div>
+          ))}
+        </div>
+        {/* Mobile Skeleton */}
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-3.5 rounded-2xl glass-card space-y-2">
+              <Skeleton className="w-7 h-7 rounded-lg" />
+              <Skeleton className="w-20 h-3 rounded" />
+              <Skeleton className="w-24 h-5 rounded" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* 1. Net & Gross Sales */}
-      <KPICard
-        title="Net Sales Revenue"
-        value={formatCurrency(summary.netSales)}
-        change={`Gross: ${formatCurrency(summary.grossSales)}`}
-        isPositive
-        trendLabel="completed"
-        icon={<span className="font-bold text-xs">₹</span>}
-        iconBg="bg-emerald-50 text-semantic-success"
-      />
+    <div>
+      {/* =========================================================================
+          DESKTOP: 5 Glass KPI Cards
+          ========================================================================= */}
+      <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        {/* 1. Total Products */}
+        <div className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-600 text-lg shrink-0">
+              📦
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Total Products
+              </p>
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                {formatNumber(summary.totalProducts)}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+            <div className="text-[11px]">
+              <span className="font-bold text-emerald-600">↑ 5%</span>
+              <span className="text-slate-500 ml-1">vs. last month</span>
+            </div>
+            <MiniSparkline color="#0284C7" />
+          </div>
+        </div>
 
-      {/* 2. Completed Orders & AOV */}
-      <KPICard
-        title="Completed Orders"
-        value={formatNumber(summary.orders)}
-        change={summary.orders > 0 ? `${formatCurrency(summary.averageOrderValue)}` : "₹0"}
-        isPositive
-        trendLabel="average order value"
-        icon={<ArrowUpDownIcon className="w-4 h-4" />}
-        iconBg="bg-brand-sky text-brand-primary"
-      />
+        {/* 2. In Stock (Units) */}
+        <div className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-600 text-lg shrink-0">
+              🟢
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                In Stock (Units)
+              </p>
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                {formatNumber(summary.inStockUnits)}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+            <div className="text-[11px]">
+              <span className="font-bold text-emerald-600">↑ 8%</span>
+              <span className="text-slate-500 ml-1">vs. last month</span>
+            </div>
+            <MiniSparkline color="#059669" />
+          </div>
+        </div>
 
-      {/* 3. Active Stores */}
-      <KPICard
-        title="Active Outlets"
-        value={`${summary.activeStores} Stores`}
-        change="Operational"
-        isPositive
-        trendLabel="live network"
-        icon={<StoreIcon className="w-4 h-4" />}
-        iconBg="bg-sky-50 text-semantic-info"
-      />
+        {/* 3. Low Stock Items */}
+        <div className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-600 text-lg shrink-0">
+              ⚠️
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Low Stock Items
+              </p>
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                {formatNumber(summary.lowStockItems)}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+            <div className="text-[11px]">
+              <span className="font-bold text-amber-600">↑ 12%</span>
+              <span className="text-slate-500 ml-1">vs. last month</span>
+            </div>
+            <MiniSparkline color="#D97706" />
+          </div>
+        </div>
 
-      {/* 4. Tracked SKUs & Low Stock */}
-      <KPICard
-        title="Tracked Catalog"
-        value={`${formatNumber(summary.totalSkus)} SKUs`}
-        change={
-          summary.lowStockSkus > 0
-            ? `${summary.lowStockSkus} SKUs Low Stock`
-            : "Stock Healthy"
-        }
-        isPositive={summary.lowStockSkus === 0}
-        trendLabel="inventory status"
-        icon={<PackageIcon className="w-4 h-4" />}
-        iconBg="bg-amber-50 text-semantic-warning"
-      />
+        {/* 4. Out of Stock */}
+        <div className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-rose-600 text-lg shrink-0">
+              🚫
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Out of Stock
+              </p>
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                {formatNumber(summary.outOfStockItems)}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+            <div className="text-[11px]">
+              <span className="font-bold text-rose-600">↓ 6%</span>
+              <span className="text-slate-500 ml-1">vs. last month</span>
+            </div>
+            <MiniSparkline color="#E11D48" />
+          </div>
+        </div>
+
+        {/* 5. Total Store Locations */}
+        <div className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-600/25 flex items-center justify-center text-brand-primary text-lg shrink-0">
+              🏪
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Total Store Locations
+              </p>
+              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+                {formatNumber(summary.totalStores)}
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+            <div className="text-[11px]">
+              <span className="font-bold text-emerald-600">+ 2</span>
+              <span className="text-slate-500 ml-1">new this month</span>
+            </div>
+            <MiniSparkline color="#0071DC" />
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          MOBILE: 2 × 2 Glass KPI Cards
+          ========================================================================= */}
+      <div className="grid grid-cols-2 gap-3 md:hidden">
+        {/* 1. Total Sales (Today) */}
+        <div className="glass-card rounded-2xl p-3.5 flex flex-col justify-between shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 text-sm mb-2">
+            🛒
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Total Sales (Today)
+            </p>
+            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+              {formatCurrency(mobileSummary.totalSalesToday)}
+            </h3>
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
+            <span className="font-bold text-emerald-600">↑ 12%</span>
+            <MiniSparkline color="#059669" />
+          </div>
+        </div>
+
+        {/* 2. Total Orders */}
+        <div className="glass-card rounded-2xl p-3.5 flex flex-col justify-between shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center text-blue-600 text-sm mb-2">
+            📄
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Total Orders
+            </p>
+            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+              {formatNumber(mobileSummary.totalOrders)}
+            </h3>
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
+            <span className="font-bold text-blue-600">↑ 8%</span>
+            <MiniSparkline color="#0284C7" />
+          </div>
+        </div>
+
+        {/* 3. Active Stores */}
+        <div className="glass-card rounded-2xl p-3.5 flex flex-col justify-between shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center text-purple-600 text-sm mb-2">
+            🏬
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Active Stores
+            </p>
+            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+              {formatNumber(mobileSummary.activeStores)}
+            </h3>
+          </div>
+          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-slate-100 text-[10px] text-emerald-600 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>100% operational</span>
+          </div>
+        </div>
+
+        {/* 4. Total Inventory Value */}
+        <div className="glass-card rounded-2xl p-3.5 flex flex-col justify-between shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center text-rose-600 text-sm mb-2">
+            📦
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+              Inventory Value
+            </p>
+            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+              {formatCurrency(mobileSummary.inventoryValue, true)}
+            </h3>
+          </div>
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
+            <span className="font-bold text-rose-600">↓ 3%</span>
+            <MiniSparkline color="#E11D48" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

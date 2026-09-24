@@ -6,7 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/common/loading-state";
 import { PackageIcon, AlertCircleIcon, CheckIcon } from "@/components/ui/icons";
 import { formatCurrency, formatNumber } from "@/lib/format";
-import type { InventorySummary } from "@/types/dashboard";
+export interface InventorySummary {
+  inventoryValue: number;
+  totalUnits: number;
+  totalProducts: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+}
 
 export interface InventorySummaryCardProps {
   inventory?: InventorySummary;

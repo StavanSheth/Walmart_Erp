@@ -10,125 +10,192 @@ import {
   ResponsiveContainer,
   CartesianGrid
 } from "recharts";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/common/loading-state";
 import { EmptyState } from "@/components/common/empty-state";
-import { formatCurrency, formatShortDate, formatNumber } from "@/lib/format";
-import type { SalesTrendPoint } from "@/types/dashboard";
+import { formatCurrency, formatShortDate } from "@/lib/format";
+import type { SalesOverviewData } from "@/types/dashboard";
 
 export interface SalesOverviewChartProps {
-  salesTrend?: SalesTrendPoint[];
+  data?: SalesOverviewData;
+  salesOverview?: SalesOverviewData;
   isLoading?: boolean;
 }
 
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{
+    name: string;
     value: number;
-    payload: SalesTrendPoint;
+    color: string;
   }>;
   label?: string;
 }
 
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
-    const data = payload[0].payload;
     return (
-      <div className="rounded-lg border border-border bg-surface p-3 shadow-md text-xs space-y-1 z-50">
-        <p className="font-semibold text-slate-800">{formatShortDate(label || data.date)}</p>
-        <p className="text-brand-primary font-medium">
-          Sales: <span className="font-bold tabular-nums">{formatCurrency(data.sales)}</span>
-        </p>
-        <p className="text-slate-500">
-          Orders: <span className="tabular-nums font-medium">{formatNumber(data.orders)}</span>
-        </p>
+      <div className="rounded-xl border border-white/70 bg-white/95 p-3 shadow-lg text-xs space-y-1 z-50 backdrop-blur-md">
+        <p className="font-bold text-slate-800">{formatShortDate(label || "")}</p>
+        {payload.map((entry) => (
+          <div key={entry.name} className="flex items-center gap-2">
+            <span
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-slate-600 capitalize">{entry.name}:</span>
+            <span className="font-bold text-slate-900 tabular-nums">
+              {formatCurrency(entry.value)}
+            </span>
+          </div>
+        ))}
       </div>
     );
   }
   return null;
 }
 
-export function SalesOverviewChart({ salesTrend, isLoading = false }: SalesOverviewChartProps) {
-  if (isLoading) {
+export function SalesOverviewChart({ data, salesOverview, isLoading = false }: SalesOverviewChartProps) {
+  const chartData = salesOverview || data;
+  const [selectedRange, setSelectedRange] = React.useState("30d");
+
+  if (isLoading || !chartData) {
     return (
-      <Card>
-        <CardHeader>
-          <div className="h-4 w-40 bg-slate-200/80 rounded anim-pulse" />
-          <div className="h-3 w-64 bg-slate-200/80 rounded anim-pulse mt-1" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-[280px] w-full" rounded="lg" />
-        </CardContent>
-      </Card>
+      <div className="p-5 rounded-2xl glass-card space-y-3">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-5 w-32 rounded" />
+          <Skeleton className="h-7 w-24 rounded-full" />
+        </div>
+        <Skeleton className="h-8 w-44 rounded" />
+        <Skeleton className="h-[220px] w-full rounded-xl" />
+      </div>
     );
   }
 
-  const hasData = salesTrend && salesTrend.length > 0;
+  // Combine sales and purchases into one chart series
+  const combinedPoints = chartData.sales.map((sPoint) => {
+    const pPoint = chartData.purchases.find((p) => p.date === sPoint.date);
+    return {
+      date: sPoint.date,
+      sales: sPoint.amount,
+      purchases: pPoint?.amount ?? 0
+    };
+  });
+
+  const hasData = combinedPoints.length > 0;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <CardTitle className="text-sm sm:text-base font-semibold text-slate-900">
-            Sales Revenue Trend
-          </CardTitle>
-          <CardDescription>
-            Daily completed sales and order volume over time.
-          </CardDescription>
+    <div className="p-4 sm:p-5 rounded-2xl glass-card flex flex-col justify-between shadow-lg">
+      {/* Header with Title & Selector */}
+      <div className="flex items-center justify-between pb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-brand-primary text-base">📊</span>
+          <h3 className="text-sm sm:text-base font-bold text-slate-900">
+            Sales Overview
+          </h3>
         </div>
-      </CardHeader>
-      <CardContent>
-        {!hasData ? (
-          <EmptyState
-            title="No sales recorded"
-            description="No completed orders found for the selected store or date range."
-            className="py-12"
-          />
-        ) : (
-          <div className="w-full h-[280px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={salesTrend}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0071DC" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#0071DC" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(val) => formatShortDate(val)}
-                  stroke="#94A3B8"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={{ stroke: "#E2E8F0" }}
-                />
-                <YAxis
-                  tickFormatter={(val) => formatCurrency(val, true)}
-                  stroke="#94A3B8"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  width={55}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Area
-                  type="monotone"
-                  dataKey="sales"
-                  stroke="#0071DC"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#salesGradient)"
-                  activeDot={{ r: 5, fill: "#0071DC", stroke: "#FFFFFF", strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+
+        <div className="relative inline-flex items-center">
+          <select
+            value={selectedRange}
+            onChange={(e) => setSelectedRange(e.target.value)}
+            className="pl-3 pr-6 py-1 text-xs font-semibold rounded-full border border-slate-200/80 bg-white/80 text-slate-700 hover:border-slate-300 focus:outline-none appearance-none cursor-pointer shadow-xs"
+          >
+            <option value="30d">Last 30 Days</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="all">All Period</option>
+          </select>
+          <span className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</span>
+        </div>
+      </div>
+
+      {/* Main Headline Metric & Legend */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-2">
+        <div className="flex items-baseline gap-2.5">
+          <span className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">
+            {formatCurrency(chartData.totalSales)}
+          </span>
+          <div className="inline-flex items-center gap-1 text-xs">
+            <span className="font-bold text-emerald-600">↑ {chartData.changePercent}%</span>
+            <span className="text-slate-500 font-medium hidden xs:inline">vs. previous period</span>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center gap-4 text-xs font-semibold">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0071DC]" />
+            <span className="text-slate-700">Sales</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#00B5E2]" />
+            <span className="text-slate-700">Purchases</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Recharts Area Visualization */}
+      {!hasData ? (
+        <EmptyState
+          title="No sales recorded"
+          description="No completed orders found for this timeframe."
+          className="py-10"
+        />
+      ) : (
+        <div className="w-full h-[220px] sm:h-[240px] mt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={combinedPoints} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#0071DC" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#0071DC" stopOpacity={0.0} />
+                </linearGradient>
+                <linearGradient id="purchasesGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#00B5E2" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#00B5E2" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(val) => formatShortDate(val)}
+                stroke="#94A3B8"
+                fontSize={10}
+                tickLine={false}
+                axisLine={{ stroke: "#E2E8F0" }}
+              />
+              <YAxis
+                tickFormatter={(val) => formatCurrency(val, true)}
+                stroke="#94A3B8"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+                width={45}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="sales"
+                name="Sales"
+                stroke="#0071DC"
+                strokeWidth={2.5}
+                fillOpacity={1}
+                fill="url(#salesGrad)"
+                activeDot={{ r: 5, fill: "#0071DC", stroke: "#FFF", strokeWidth: 2 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="purchases"
+                name="Purchases"
+                stroke="#00B5E2"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#purchasesGrad)"
+                activeDot={{ r: 4, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </div>
   );
 }

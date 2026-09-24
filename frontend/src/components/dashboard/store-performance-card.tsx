@@ -1,103 +1,85 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ResponsiveTable, type Column } from "@/components/common/responsive-table";
-import { formatCurrency, formatNumber } from "@/lib/format";
-import type { StorePerformance } from "@/types/dashboard";
+import type { StorePerformanceItem } from "@/types/dashboard";
 
 export interface StorePerformanceCardProps {
-  stores?: StorePerformance[];
+  stores?: StorePerformanceItem[];
   isLoading?: boolean;
 }
 
 export function StorePerformanceCard({ stores = [], isLoading = false }: StorePerformanceCardProps) {
-  const columns: Column<StorePerformance>[] = [
-    {
-      key: "storeName",
-      header: "Store Outlet",
-      render: (item) => (
-        <div>
-          <span className="font-semibold text-slate-900 text-xs sm:text-sm">
-            {item.storeName}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "sales",
-      header: "Net Revenue",
-      align: "right",
-      isNumeric: true,
-      render: (item) => (
-        <span className="font-bold text-slate-900 tabular-nums text-xs sm:text-sm">
-          {formatCurrency(item.sales)}
-        </span>
-      )
-    },
-    {
-      key: "orders",
-      header: "Orders",
-      align: "right",
-      isNumeric: true,
-      render: (item) => (
-        <span className="tabular-nums text-slate-600 text-xs sm:text-sm font-medium">
-          {formatNumber(item.orders)}
-        </span>
-      )
-    },
-    {
-      key: "averageOrderValue",
-      header: "Avg Order Value",
-      align: "right",
-      isNumeric: true,
-      render: (item) => (
-        <span className="tabular-nums text-slate-600 text-xs sm:text-sm">
-          {formatCurrency(item.averageOrderValue)}
-        </span>
-      )
-    }
-  ];
+  const topStores = stores.slice(0, 5);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm sm:text-base font-semibold text-slate-900">
-          Store Performance Breakdown
-        </CardTitle>
-        <CardDescription>
-          Sales volume and ticket sizes ranked across operational outlets.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveTable
-          data={stores}
-          columns={columns}
-          keyExtractor={(item) => item.storeId}
-          isLoading={isLoading}
-          mobileView="card"
-          density="compact"
-          emptyTitle="No store sales found"
-          emptyDescription="There are no completed sales recorded for stores under this filter."
-          renderMobileCard={(item) => (
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="font-semibold text-slate-900 text-xs sm:text-sm">
-                  {item.storeName}
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  {formatNumber(item.orders)} orders • AOV {formatCurrency(item.averageOrderValue)}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="font-bold text-slate-900 text-xs sm:text-sm tabular-nums">
-                  {formatCurrency(item.sales)}
-                </span>
-              </div>
+    <div className="glass-card rounded-2xl p-5 flex flex-col justify-between h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+          Store Performance
+        </h3>
+        <div className="relative">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white/70 hover:bg-white/90 border border-slate-200/70 rounded-lg shadow-sm transition"
+          >
+            <span>Top 5 Stores</span>
+            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-4 py-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="animate-pulse flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-slate-200/70" />
+              <div className="h-4 bg-slate-200/70 rounded w-1/3" />
+              <div className="flex-1 h-2.5 bg-slate-200/70 rounded-full" />
+              <div className="w-8 h-4 bg-slate-200/70 rounded" />
             </div>
-          )}
-        />
-      </CardContent>
-    </Card>
+          ))}
+        </div>
+      ) : topStores.length === 0 ? (
+        <div className="py-8 text-center text-xs text-slate-500">
+          No store performance data available
+        </div>
+      ) : (
+        <div className="space-y-3.5 my-auto">
+          {topStores.map((store, index) => {
+            const rank = store.rank || index + 1;
+            const pct = Math.round(store.relativePercentage || 0);
+
+            return (
+              <div key={store.storeId || index} className="flex items-center gap-3">
+                {/* Rank badge */}
+                <div className="w-6 h-6 rounded-full bg-blue-100/90 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                  {rank}
+                </div>
+
+                {/* Store Name */}
+                <div className="w-32 sm:w-44 text-xs sm:text-sm font-semibold text-slate-800 truncate" title={store.storeName}>
+                  {store.storeName}
+                </div>
+
+                {/* Progress bar */}
+                <div className="flex-1 bg-slate-100/80 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-linear-to-r from-blue-500 to-[#0071DC] h-full rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                  />
+                </div>
+
+                {/* Percentage */}
+                <div className="w-9 text-right text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
+                  {pct}%
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

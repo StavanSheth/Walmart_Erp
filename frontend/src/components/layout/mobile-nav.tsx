@@ -19,12 +19,12 @@ export function MobileBottomNav({ className }: { className?: string }) {
     <nav
       aria-label="Mobile Bottom Navigation"
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-dropdown bg-surface/95 backdrop-blur-md border-t border-border px-3 py-1 md:hidden shadow-lg",
-        "h-16 pb-[env(safe-area-inset-bottom,0px)]",
+        "fixed bottom-3 left-4 right-4 z-dropdown md:hidden",
+        "glass-nav rounded-2xl px-2 py-1.5 shadow-2xl",
         className
       )}
     >
-      <div className="flex items-center justify-around h-full">
+      <div className="flex items-center justify-around">
         {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
           const isMore = item.name === "More";
           const isActive =
@@ -38,10 +38,10 @@ export function MobileBottomNav({ className }: { className?: string }) {
                 key={item.name}
                 type="button"
                 onClick={() => setMobileDrawerOpen(true)}
-                className="flex flex-col items-center justify-center p-1 rounded-md text-slate-500 hover:text-brand-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-slate-500 hover:text-brand-primary transition-all focus-visible:outline-none"
               >
-                <NavIconByName name={item.iconName} className="w-5 h-5" />
-                <span className="text-[10px] font-medium mt-0.5">More</span>
+                <NavIconByName name={item.iconName} className="w-5 h-5 text-slate-600" />
+                <span className="text-[10px] font-medium text-slate-600 mt-0.5">More</span>
               </button>
             );
           }
@@ -52,17 +52,24 @@ export function MobileBottomNav({ className }: { className?: string }) {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center justify-center p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+                "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 focus-visible:outline-none",
                 isActive
-                  ? "text-brand-primary font-bold"
+                  ? "bg-brand-sky text-brand-primary font-bold shadow-xs scale-105"
                   : "text-slate-500 hover:text-slate-900"
               )}
             >
               <NavIconByName
                 name={item.iconName}
-                className={cn("w-5 h-5", isActive && "text-brand-primary")}
+                className={cn("w-5 h-5", isActive ? "text-brand-primary" : "text-slate-600")}
               />
-              <span className="text-[10px] font-medium mt-0.5">{item.name}</span>
+              <span
+                className={cn(
+                  "text-[10px] mt-0.5",
+                  isActive ? "text-brand-primary font-bold" : "text-slate-600 font-medium"
+                )}
+              >
+                {item.name}
+              </span>
             </Link>
           );
         })}
@@ -83,7 +90,7 @@ export function MobileDrawer() {
       side="left"
     >
       <div className="space-y-6">
-        {/* Active Store Widget (Without gradients) */}
+        {/* Active Store Widget */}
         <div className="relative rounded-xl overflow-hidden h-28 border border-border shadow-xs">
           <Image
             src={ASSETS.stores.sidebar}
@@ -115,7 +122,7 @@ export function MobileDrawer() {
 
             return (
               <Link
-                key={item.href}
+                key={item.name}
                 href={item.href}
                 onClick={() => setMobileDrawerOpen(false)}
                 className={cn(

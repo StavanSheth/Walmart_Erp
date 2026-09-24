@@ -1,51 +1,108 @@
-export interface DashboardSummary {
-  grossSales: number;
-  netSales: number;
-  orders: number;
-  averageOrderValue: number;
+export interface DesktopSummary {
+  totalProducts: number;
+  inStockUnits: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+  totalStores: number;
+}
+
+export interface MobileSummary {
+  totalSalesToday: number;
+  totalOrders: number;
   activeStores: number;
-  totalSkus: number;
-  lowStockSkus: number;
+  inventoryValue: number;
 }
 
-export interface SalesTrendPoint {
+export interface ChartSeriesPoint {
   date: string;
-  sales: number;
+  amount: number;
   orders: number;
 }
 
-export interface StorePerformance {
+export interface SalesOverviewData {
+  totalSales: number;
+  previousPeriodSales: number;
+  changePercent: number;
+  sales: ChartSeriesPoint[];
+  purchases: ChartSeriesPoint[];
+}
+
+export interface InventoryDistributionData {
+  totalUnits: number;
+  inStock: number;
+  inStockPercentage: number;
+  lowStock: number;
+  lowStockPercentage: number;
+  outOfStock: number;
+  outOfStockPercentage: number;
+  inTransit: number;
+  inTransitPercentage: number;
+}
+
+export interface OrderFulfillmentData {
+  fulfilled: number;
+  pending: number;
+  cancelled: number;
+  fulfillmentRate: number;
+}
+
+export interface StorePerformanceItem {
+  rank: number;
   storeId: string;
   storeName: string;
   sales: number;
   orders: number;
   averageOrderValue: number;
+  relativePercentage: number;
 }
 
-export interface InventorySummary {
-  totalProducts: number;
-  totalUnits: number;
-  inventoryValue: number;
-  lowStockCount: number;
-  outOfStockCount: number;
-}
-
-export interface RecentSale {
-  orderId: string;
-  orderNumber: string;
+export interface RecentInventoryActivityItem {
+  id: string;
+  productName: string;
   storeName: string;
+  activityType: string;
+  activityLabel: string;
+  quantity: number;
+  time: string;
+  statusColor: "success" | "warning" | "danger" | "info";
+}
+
+export interface TopCategoryItem {
+  categoryId: string;
+  categoryName: string;
+  stockValue: number;
+  relativePercentage: number;
+}
+
+export interface DashboardAlertItem {
+  id: string;
+  title: string;
+  type: "warning" | "danger" | "info" | "success";
+  timestamp: string;
+}
+
+export interface RecentTransactionItem {
+  id: string;
+  orderNumber: string;
+  productName: string;
   customerName: string;
+  storeName: string;
   total: number;
   status: string;
   createdAt: string;
 }
 
 export interface DashboardOverviewData {
-  summary: DashboardSummary;
-  salesTrend: SalesTrendPoint[];
-  storePerformance: StorePerformance[];
-  inventorySummary: InventorySummary;
-  recentSales: RecentSale[];
+  summary: DesktopSummary;
+  mobileSummary: MobileSummary;
+  salesOverview: SalesOverviewData;
+  inventoryDistribution: InventoryDistributionData;
+  orderFulfillment: OrderFulfillmentData;
+  storePerformance: StorePerformanceItem[];
+  recentInventoryActivity: RecentInventoryActivityItem[];
+  topCategories: TopCategoryItem[];
+  alerts: DashboardAlertItem[];
+  recentTransactions: RecentTransactionItem[];
 }
 
 export interface DashboardOverviewResponse {

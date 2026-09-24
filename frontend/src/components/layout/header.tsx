@@ -10,24 +10,36 @@ import { UserMenu } from "./user-menu";
 import { MenuIcon, SearchIcon, SparkIcon } from "../ui/icons";
 import { cn } from "@/lib/cn";
 
-export function Header({ className }: { className?: string }) {
+export interface HeaderProps {
+  className?: string;
+  isDashboard?: boolean;
+}
+
+export function Header({ className, isDashboard = true }: HeaderProps) {
   const { setMobileDrawerOpen, setSearchOpen } = useShell();
 
   return (
     <header
       className={cn(
-        "sticky top-0 z-header flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8",
-        "glass-subtle border-b border-border shadow-xs",
+        "sticky top-0 z-header flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 transition-colors duration-200",
+        isDashboard
+          ? "glass-header border-b border-white/10 text-white"
+          : "glass-subtle border-b border-border shadow-xs text-slate-900",
         className
       )}
     >
-      {/* Left: Mobile hamburger & Brand / Desktop Breadcrumbs */}
+      {/* Left: Mobile hamburger & Brand / Desktop Search */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
           onClick={() => setMobileDrawerOpen(true)}
           aria-label="Open mobile navigation menu"
-          className="flex md:hidden items-center justify-center p-2 rounded-md text-slate-600 hover:bg-surface-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+          className={cn(
+            "flex md:hidden items-center justify-center p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+            isDashboard
+              ? "text-white/80 hover:bg-white/10"
+              : "text-slate-600 hover:bg-surface-muted"
+          )}
         >
           <MenuIcon className="w-5 h-5" />
         </button>
@@ -35,36 +47,69 @@ export function Header({ className }: { className?: string }) {
         {/* Mobile brand spark logo */}
         <div className="flex md:hidden items-center gap-2 shrink-0">
           <SparkIcon className="w-5 h-5" />
-          <span className="text-sm font-bold tracking-tight text-brand-navy">Walmart</span>
+          <span
+            className={cn(
+              "text-sm font-bold tracking-tight",
+              isDashboard ? "text-white" : "text-brand-navy"
+            )}
+          >
+            Walmart
+          </span>
         </div>
 
-        {/* Desktop Breadcrumbs */}
-        <div className="hidden md:block truncate">
-          <Breadcrumbs />
+        {/* Desktop Global Search Bar */}
+        <div className="hidden md:block w-72 lg:w-96">
+          <GlobalSearchTrigger
+            className={cn(
+              "w-full",
+              isDashboard
+                ? "bg-white/10 border-white/15 text-white placeholder:text-white/60 hover:bg-white/15"
+                : ""
+            )}
+          />
         </div>
+
+        {/* Desktop Breadcrumbs (fallback if not dashboard) */}
+        {!isDashboard && (
+          <div className="hidden lg:block truncate ml-4">
+            <Breadcrumbs />
+          </div>
+        )}
       </div>
 
-      {/* Right: Search, Store Selector, Notifications, User Menu */}
+      {/* Right: Store Selector, Weather Widget, Notifications, User Menu */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        {/* Search trigger (desktop full, mobile icon button) */}
-        <div className="hidden sm:block w-44 md:w-56 lg:w-64">
-          <GlobalSearchTrigger className="w-full" />
-        </div>
-
         {/* Mobile Search Icon Button */}
         <button
           type="button"
           onClick={() => setSearchOpen(true)}
           aria-label="Search ERP"
-          className="flex sm:hidden items-center justify-center w-9 h-9 rounded-md border border-border bg-surface text-slate-600 hover:bg-surface-subtle transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+          className={cn(
+            "flex md:hidden items-center justify-center w-9 h-9 rounded-md transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+            isDashboard
+              ? "bg-white/10 border border-white/15 text-white hover:bg-white/20"
+              : "border border-border bg-surface text-slate-600 hover:bg-surface-subtle"
+          )}
         >
           <SearchIcon className="w-4 h-4" />
         </button>
 
         {/* Store Selector (Desktop & Tablet) */}
-        <div className="hidden md:block">
+        <div className="hidden sm:block">
           <StoreSelector />
         </div>
+
+        {/* Weather Widget (Desktop) */}
+        {isDashboard && (
+          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white text-xs">
+            <span className="text-base">☀️</span>
+            <div className="leading-tight">
+              <span className="font-bold">26°C</span>
+              <span className="text-slate-300 ml-1">New York, NY</span>
+              <p className="text-[10px] text-slate-400">Clear Skies</p>
+            </div>
+          </div>
+        )}
 
         {/* Notifications Dropdown */}
         <NotificationMenu />

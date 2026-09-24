@@ -5,16 +5,22 @@ import { PageContainer } from "@/components/common/page-container";
 import { ErrorState } from "@/components/common/error-state";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardKPIGrid } from "@/components/dashboard/dashboard-kpi-grid";
+import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions";
 import { SalesOverviewChart } from "@/components/dashboard/sales-overview-chart";
+import { InventoryDistributionCard } from "@/components/dashboard/inventory-distribution-card";
+import { OrderFulfillmentCard } from "@/components/dashboard/order-fulfillment-card";
 import { StorePerformanceCard } from "@/components/dashboard/store-performance-card";
-import { InventorySummaryCard } from "@/components/dashboard/inventory-summary-card";
+import { RecentInventoryActivity } from "@/components/dashboard/recent-inventory-activity";
+import { TopCategoriesCard } from "@/components/dashboard/top-categories-card";
+import { DashboardAlerts } from "@/components/dashboard/dashboard-alerts";
 import { RecentSalesTable } from "@/components/dashboard/recent-sales-table";
+import { DashboardPromoBanner } from "@/components/dashboard/dashboard-promo-banner";
 import { useDashboardOverview } from "@/hooks/use-dashboard";
 import type { DashboardQueryParams } from "@/types/dashboard";
 
 export default function DashboardPage() {
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | undefined>(undefined);
-  const [selectedDateRange, setSelectedDateRange] = React.useState<string>("all");
+  const [selectedDateRange, setSelectedDateRange] = React.useState<string>("30d");
 
   const queryParams = React.useMemo<DashboardQueryParams>(() => {
     const params: DashboardQueryParams = {};
@@ -38,8 +44,8 @@ export default function DashboardPage() {
 
   return (
     <PageContainer>
-      <div className="space-y-6">
-        {/* Dashboard Header with filter bar and responsive banner */}
+      <div className="space-y-5 pb-20 md:pb-6">
+        {/* 1. Dashboard Header / Hero with filters & greeting */}
         <DashboardHeader
           selectedStoreId={selectedStoreId}
           onStoreChange={setSelectedStoreId}
@@ -62,34 +68,97 @@ export default function DashboardPage() {
           />
         )}
 
-        {/* Key Performance Indicators Grid */}
-        <DashboardKPIGrid summary={data?.summary} isLoading={isLoading} />
+        {/* 2. KPI Grid (5 cards on Desktop, 2x2 cards on Mobile) */}
+        <DashboardKPIGrid
+          summary={data?.summary}
+          mobileSummary={data?.mobileSummary}
+          isLoading={isLoading}
+        />
 
-        {/* Analytics & Performance Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Column: Sales Trend & Recent Sales */}
-          <div className="lg:col-span-2 space-y-6">
-            <SalesOverviewChart
-              salesTrend={data?.salesTrend}
+        {/* 3. Mobile Quick Actions Row (Inventory, Stores, Partners, Reports) */}
+        <div className="md:hidden">
+          <DashboardQuickActions />
+        </div>
+
+        {/* ======================================================== */}
+        {/* DESKTOP LAYOUT (md:block) */}
+        {/* ======================================================== */}
+        <div className="hidden md:block space-y-5">
+          {/* Row 2: Sales Overview (5/12) + Inventory Distribution (3/12) + Store Performance (4/12) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            <div className="lg:col-span-5 h-full">
+              <SalesOverviewChart
+                salesOverview={data?.salesOverview}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="lg:col-span-3 h-full">
+              <InventoryDistributionCard
+                data={data?.inventoryDistribution}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="lg:col-span-4 h-full">
+              <StorePerformanceCard
+                stores={data?.storePerformance}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Row 3: Recent Inventory Activity (4/12) + Top Categories (4/12) + Alerts & Notifications (4/12) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            <div className="lg:col-span-4 h-full">
+              <RecentInventoryActivity
+                activities={data?.recentInventoryActivity}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="lg:col-span-4 h-full">
+              <TopCategoriesCard
+                categories={data?.topCategories}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="lg:col-span-4 h-full">
+              <DashboardAlerts
+                alerts={data?.alerts}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Row 4: Promotional Glass Banner */}
+          <DashboardPromoBanner />
+        </div>
+
+        {/* ======================================================== */}
+        {/* MOBILE LAYOUT (md:hidden) */}
+        {/* ======================================================== */}
+        <div className="md:hidden space-y-4">
+          {/* Sales Overview Mobile Chart */}
+          <SalesOverviewChart
+            salesOverview={data?.salesOverview}
+            isLoading={isLoading}
+          />
+
+          {/* Inventory Status & Order Fulfillment in 2 cols or 1 col on small mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InventoryDistributionCard
+              data={data?.inventoryDistribution}
               isLoading={isLoading}
             />
-            <RecentSalesTable
-              sales={data?.recentSales}
+            <OrderFulfillmentCard
+              data={data?.orderFulfillment}
               isLoading={isLoading}
             />
           </div>
 
-          {/* Secondary Column: Inventory Health & Store Breakdown */}
-          <div className="space-y-6">
-            <InventorySummaryCard
-              inventory={data?.inventorySummary}
-              isLoading={isLoading}
-            />
-            <StorePerformanceCard
-              stores={data?.storePerformance}
-              isLoading={isLoading}
-            />
-          </div>
+          {/* Recent Transactions List Card */}
+          <RecentSalesTable
+            transactions={data?.recentTransactions}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </PageContainer>

@@ -1,11 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { BannerImage } from "@/components/common/responsive-image";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { RefreshCwIcon, StoreIcon, FilterIcon, SparkIcon } from "@/components/ui/icons";
 import { useShell } from "@/context/shell-context";
+import { SearchIcon, StoreIcon, FilterIcon, RefreshCwIcon } from "@/components/ui/icons";
 
 export interface DashboardHeaderProps {
   selectedStoreId?: string;
@@ -24,88 +21,118 @@ export function DashboardHeader({
   onRefresh,
   isFetching = false
 }: DashboardHeaderProps) {
-  const { stores } = useShell();
+  const { stores, setSearchOpen } = useShell();
+
+  // Current formatted date matching screenshot style: Mon, 22 Sep 2026
+  const formattedDate = React.useMemo(() => {
+    return new Intl.DateTimeFormat("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }).format(new Date());
+  }, []);
 
   return (
-    <div className="space-y-4">
-      {/* Title & Filter Bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-              Dashboard
-            </h1>
-            <Badge variant="spark" className="hidden sm:inline-flex">
-              <SparkIcon className="w-3 h-3 mr-1" />
-              Live DB Slice
-            </Badge>
+    <div className="space-y-3 sm:space-y-4">
+      {/* Mobile Glass Search Bar (matches mobile screenshot) */}
+      <div className="block md:hidden">
+        <div
+          onClick={() => setSearchOpen(true)}
+          className="flex items-center justify-between px-4 py-3 rounded-2xl bg-white/20 hover:bg-white/25 backdrop-blur-md border border-white/30 text-white cursor-pointer shadow-lg transition"
+        >
+          <div className="flex items-center gap-2.5 text-white/80 text-xs">
+            <SearchIcon className="w-4 h-4 text-white/70" />
+            <span className="truncate">Search products, stores, reports...</span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Executive retail operations summary and key performance indicators.
-          </p>
-        </div>
-
-        {/* Action Controls & Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Store Selector Filter */}
-          <div className="relative inline-flex items-center">
-            <StoreIcon className="w-3.5 h-3.5 absolute left-2.5 text-slate-400 pointer-events-none" />
-            <select
-              aria-label="Filter by store"
-              value={selectedStoreId || ""}
-              onChange={(e) => onStoreChange(e.target.value || undefined)}
-              className="pl-8 pr-7 py-1.5 text-xs font-medium rounded-md border border-border bg-surface text-slate-800 hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-primary appearance-none cursor-pointer shadow-xs transition-colors"
-            >
-              <option value="">All Stores ({stores.length})</option>
-              {stores.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-            <span className="absolute right-2 pointer-events-none text-slate-400 text-[10px]">▼</span>
-          </div>
-
-          {/* Date Range Filter */}
-          <div className="relative inline-flex items-center">
-            <FilterIcon className="w-3.5 h-3.5 absolute left-2.5 text-slate-400 pointer-events-none" />
-            <select
-              aria-label="Filter by date range"
-              value={selectedDateRange}
-              onChange={(e) => onDateRangeChange(e.target.value)}
-              className="pl-8 pr-7 py-1.5 text-xs font-medium rounded-md border border-border bg-surface text-slate-800 hover:border-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-primary appearance-none cursor-pointer shadow-xs transition-colors"
-            >
-              <option value="all">All Available Period</option>
-              <option value="90d">Last 90 Days</option>
-              <option value="30d">Last 30 Days</option>
-            </select>
-            <span className="absolute right-2 pointer-events-none text-slate-400 text-[10px]">▼</span>
-          </div>
-
-          {/* Refresh Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isFetching}
-            className="text-xs h-8 px-2.5"
-            title="Refresh dashboard metrics"
-          >
-            <RefreshCwIcon
-              className={`w-3.5 h-3.5 mr-1.5 ${isFetching ? "animate-spin text-brand-primary" : ""}`}
-            />
-            <span className="hidden xs:inline">Refresh</span>
-          </Button>
+          <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
         </div>
       </div>
 
-      {/* Centralized Responsive Store Banner Component */}
-      <BannerImage
-        title="Walmart India Retail ERP"
-        subtitle="Centralized retail operations management covering inventory replenishment, POS sales, multi-store logistics, and financial ledger."
-        tag="Omnichannel Supercenter Network"
-        priority
-      />
+      {/* Main Hero Header Section */}
+      <div className="relative py-2 sm:py-4 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        {/* Left Greeting & Date */}
+        <div className="space-y-2 max-w-2xl text-white">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl sm:text-3xl">👋</span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">
+              Good Morning, Stavan!
+            </h1>
+          </div>
+          <p className="text-xs sm:text-sm text-blue-100 font-medium drop-shadow-xs">
+            Here&apos;s what&apos;s happening across your Walmart ERP today.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {/* Date Badge */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md border border-white/25 text-white shadow-xs">
+              <span className="text-xs">📅</span>
+              <span>{formattedDate}</span>
+            </span>
+
+            {/* Store Filter Control */}
+            <div className="relative inline-flex items-center">
+              <StoreIcon className="w-3.5 h-3.5 absolute left-3 text-white/70 pointer-events-none" />
+              <select
+                aria-label="Filter store"
+                value={selectedStoreId || ""}
+                onChange={(e) => onStoreChange(e.target.value || undefined)}
+                className="pl-8.5 pr-7 py-1 text-xs font-semibold rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition"
+              >
+                <option value="" className="text-slate-900 bg-white">All Stores ({stores.length})</option>
+                {stores.map((s) => (
+                  <option key={s.id} value={s.id} className="text-slate-900 bg-white">
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <span className="absolute right-2.5 pointer-events-none text-white/70 text-[9px]">▼</span>
+            </div>
+
+            {/* Date Range Selector */}
+            <div className="relative inline-flex items-center">
+              <FilterIcon className="w-3.5 h-3.5 absolute left-3 text-white/70 pointer-events-none" />
+              <select
+                aria-label="Filter range"
+                value={selectedDateRange}
+                onChange={(e) => onDateRangeChange(e.target.value)}
+                className="pl-8.5 pr-7 py-1 text-xs font-semibold rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition"
+              >
+                <option value="30d" className="text-slate-900 bg-white">Last 30 Days</option>
+                <option value="90d" className="text-slate-900 bg-white">Last 90 Days</option>
+                <option value="all" className="text-slate-900 bg-white">All Period</option>
+              </select>
+              <span className="absolute right-2.5 pointer-events-none text-white/70 text-[9px]">▼</span>
+            </div>
+
+            {/* Refresh trigger */}
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={isFetching}
+              aria-label="Refresh metrics"
+              className="inline-flex items-center justify-center p-1.5 rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 shadow-xs transition active:scale-95"
+              title="Refresh metrics"
+            >
+              <RefreshCwIcon
+                className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-blue-300" : ""}`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Right Slogan (matching desktop and mobile screenshots) */}
+        <div className="hidden sm:block text-right text-white max-w-xs self-end">
+          <p className="text-xs font-bold text-white/90 leading-tight">
+            People. Products.
+          </p>
+          <p className="text-sm font-extrabold text-[#FFC220] tracking-tight">
+            A Better Tomorrow.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

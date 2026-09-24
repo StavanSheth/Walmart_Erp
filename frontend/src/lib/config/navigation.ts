@@ -11,45 +11,62 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     name: "Inventory",
     href: "/inventory",
     iconName: "inventory",
-    description: "Stock levels, replenishment alerts, and movements",
-    badge: "12"
+    description: "Stocks & Products"
   },
   {
     name: "Stores",
     href: "/stores",
     iconName: "stores",
-    description: "Store network, regional performance, and registers"
+    description: "Store Management"
   },
   {
-    name: "Partners & Customers",
+    name: "Wholesalers / Retailers / Customers",
     href: "/partners",
     iconName: "partners",
-    description: "Suppliers, vendors, and retail customer database"
+    description: "Partners & Customers"
   },
   {
-    name: "General Ledger",
+    name: "Purchases",
+    href: "/ledger",
+    iconName: "purchases",
+    description: "Procurement"
+  },
+  {
+    name: "Sales",
+    href: "/dashboard",
+    iconName: "sales",
+    description: "Order Management"
+  },
+  {
+    name: "Suppliers",
+    href: "/partners",
+    iconName: "suppliers",
+    description: "Vendor Relations"
+  },
+  {
+    name: "Ledger",
     href: "/ledger",
     iconName: "ledger",
-    description: "Chart of accounts, journal entries, and balance sheet"
+    description: "Accounts & Transactions"
   },
   {
     name: "Reports",
     href: "/reports",
     iconName: "reports",
-    description: "Financial analytics, GST summary, and audit reports"
+    description: "Analytics & Insights"
   },
   {
     name: "Settings",
     href: "/settings",
     iconName: "settings",
-    description: "Tenant configuration, tax codes, and preferences"
+    description: "System Configuration"
   }
 ];
 
 export const MOBILE_BOTTOM_NAV_ITEMS: { name: string; href: string; iconName: string }[] = [
-  { name: "Home", href: "/dashboard", iconName: "dashboard" },
+  { name: "Dashboard", href: "/dashboard", iconName: "dashboard" },
   { name: "Inventory", href: "/inventory", iconName: "inventory" },
   { name: "Stores", href: "/stores", iconName: "stores" },
-  { name: "Reports", href: "/reports", iconName: "reports" },
+  { name: "Partners", href: "/partners", iconName: "partners" },
   { name: "More", href: "#more", iconName: "more" }
 ];
