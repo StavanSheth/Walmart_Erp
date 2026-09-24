@@ -9,6 +9,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate"
   },

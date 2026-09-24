@@ -2,7 +2,7 @@
   "name": "walmart-erp",
   "version": "0.1.0",
   "private": true,
-  "description": "Walmart-style ERP MVP project foundation",
+  "description": "Walmart ERP MVP Project Foundation",
   "workspaces": [
     "frontend",
     "backend"
@@ -12,7 +12,9 @@
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend"
+    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
+    "typecheck": "npm run typecheck --workspace=backend && npm run typecheck --workspace=frontend",
+    "test": "npm run test --workspace=backend && npm run test --workspace=frontend"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

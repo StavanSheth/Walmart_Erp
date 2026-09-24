@@ -1,122 +1,120 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
-import { env } from "@/lib/config/env";
-import { Activity, CheckCircle2, XCircle, RefreshCw, Database, Server, Laptop } from "lucide-react";
+import { apiClient, ApiError } from "@/lib/api/client";
+import type { HealthResponse } from "@/types/api";
 
 export default function HomePage() {
   const { data, error, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["backend-health"],
-    queryFn: () => apiClient.getHealth()
+    queryKey: ["health-check"],
+    queryFn: () => apiClient.getHealth(),
+    retry: 1
   });
 
+  // Extract health info from successful 200 response or 503 degraded error response
+  let healthInfo: HealthResponse | null = data ?? null;
+  if (!healthInfo && error instanceof ApiError && error.data && typeof error.data === "object") {
+    const errorBody = error.data as Partial<HealthResponse>;
+    if (errorBody.service === "walmart-erp-backend") {
+      healthInfo = errorBody as HealthResponse;
+    }
+  }
+
+  const isBackendRunning = Boolean(healthInfo?.service === "walmart-erp-backend");
+  const isDatabaseOk = healthInfo?.database === "ok";
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-12">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 space-y-8">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 mb-2">
-              Phase 1 Foundation
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-4 text-center">
+          <h1 className="text-2xl font-bold tracking-tight">Walmart ERP</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Phase 1 Foundation Verification
+          </p>
+        </div>
+
+        {/* Connectivity Status List */}
+        <div className="space-y-3">
+          {/* Frontend Status */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+            <span className="text-sm font-medium">Frontend</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              OK
             </span>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Walmart ERP MVP
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Production-ready infrastructure &amp; connectivity verification
-            </p>
           </div>
+
+          {/* Backend Status */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+            <span className="text-sm font-medium">Backend</span>
+            {isLoading ? (
+              <span className="text-xs text-slate-400 animate-pulse">Checking...</span>
+            ) : isBackendRunning ? (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                OK
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                Unavailable
+              </span>
+            )}
+          </div>
+
+          {/* Database Status */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+            <span className="text-sm font-medium">Database</span>
+            {isLoading ? (
+              <span className="text-xs text-slate-400 animate-pulse">Checking...</span>
+            ) : isDatabaseOk ? (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                OK
+              </span>
+            ) : isBackendRunning ? (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                Unavailable
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                Unavailable
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* State Alerts */}
+        {isLoading && (
+          <div className="text-center text-xs text-slate-500 py-2">
+            Verifying service health...
+          </div>
+        )}
+
+        {!isLoading && !isBackendRunning && error && (
+          <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-xs text-rose-700 dark:text-rose-300">
+            <strong>Backend Unreachable:</strong> Ensure Fastify is running on port 4000.
+          </div>
+        )}
+
+        {!isLoading && isBackendRunning && !isDatabaseOk && (
+          <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-800 dark:text-amber-300">
+            <strong>Database Offline:</strong> Backend verified PostgreSQL is unreachable on port 5432. Start PostgreSQL to connect.
+          </div>
+        )}
+
+        {!isLoading && isBackendRunning && isDatabaseOk && (
+          <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-xs text-emerald-800 dark:text-emerald-300">
+            <strong>All Systems Operational:</strong> Frontend, Fastify, and PostgreSQL are connected.
+          </div>
+        )}
+
+        {/* Action Button */}
+        <div className="pt-2">
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
-            title="Re-check backend health"
+            className="w-full py-2 px-4 rounded-lg text-sm font-medium bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
-            Refresh
+            {isFetching ? "Checking..." : "Retry Connection"}
           </button>
-        </div>
-
-        {/* Architecture Flow */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-            <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-400">
-              <Laptop className="w-6 h-6" />
-            </div>
-            <div className="text-sm font-semibold">Frontend</div>
-            <div className="text-xs text-slate-500">Next.js :3000</div>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-            <div className="flex justify-center mb-2 text-indigo-600 dark:text-indigo-400">
-              <Server className="w-6 h-6" />
-            </div>
-            <div className="text-sm font-semibold">Backend</div>
-            <div className="text-xs text-slate-500">Fastify :4000</div>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
-            <div className="flex justify-center mb-2 text-emerald-600 dark:text-emerald-400">
-              <Database className="w-6 h-6" />
-            </div>
-            <div className="text-sm font-semibold">Database</div>
-            <div className="text-xs text-slate-500">PostgreSQL + Prisma</div>
-          </div>
-        </div>
-
-        {/* Live Connectivity Test */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
-              <Activity className="w-4 h-4 text-blue-500" />
-              Backend Health Check Status
-            </h2>
-            <span className="text-xs text-slate-400 font-mono">
-              GET {env.NEXT_PUBLIC_API_URL}/health
-            </span>
-          </div>
-
-          <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
-            {isLoading ? (
-              <div className="flex items-center gap-3 text-slate-500">
-                <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
-                <span className="text-sm">Connecting to Fastify backend...</span>
-              </div>
-            ) : data?.status === "ok" ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span>Backend connection successful!</span>
-                </div>
-                <div className="text-xs text-slate-600 dark:text-slate-400">
-                  Service: <strong className="font-mono">{data.service}</strong> | Status: <strong className="font-mono text-emerald-600 dark:text-emerald-400">{data.status}</strong>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-medium">
-                  <XCircle className="w-5 h-5" />
-                  <span>Backend connection unreachable</span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {error instanceof Error ? error.message : "Ensure the backend server is running on port 4000."}
-                </p>
-              </div>
-            )}
-
-            {data && (
-              <div className="pt-2">
-                <div className="text-xs text-slate-400 mb-1">Raw Response:</div>
-                <pre className="text-xs font-mono bg-white dark:bg-slate-950 p-3 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 overflow-x-auto">
-                  {JSON.stringify(data, null, 2)}
-                </pre>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Phase 1 Completion Note */}
-        <div className="text-xs text-slate-400 dark:text-slate-500 text-center">
-          Phase 1 Foundation • Clean architecture • Zero business module leaks
         </div>
       </div>
     </main>

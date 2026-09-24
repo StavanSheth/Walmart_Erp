@@ -1,10 +1,5 @@
 import { env } from "../config/env";
-
-export interface HealthResponse {
-  success: boolean;
-  service: string;
-  status: string;
-}
+import type { HealthResponse } from "@/types/api";
 
 export class ApiError extends Error {
   constructor(
@@ -14,17 +9,18 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = "ApiError";
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
-class ApiClient {
-  private baseUrl: string;
+export class ApiClient {
+  private readonly baseUrl: string;
 
-  constructor() {
-    this.baseUrl = env.NEXT_PUBLIC_API_URL;
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || env.NEXT_PUBLIC_API_URL;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
     const headers: HeadersInit = {
@@ -63,8 +59,10 @@ class ApiClient {
     }
   }
 
-  // Phase 1: Health Check Connectivity
-  async getHealth(): Promise<HealthResponse> {
+  /**
+   * Phase 1 Health Endpoint verification
+   */
+  public async getHealth(): Promise<HealthResponse> {
     return this.request<HealthResponse>("/health");
   }
 }
