@@ -17,10 +17,9 @@ import { cn } from "@/lib/cn";
 
 export interface SidebarProps {
   className?: string;
-  isDashboard?: boolean;
 }
 
-export function Sidebar({ className, isDashboard = true }: SidebarProps) {
+export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar } = useShell();
 
@@ -29,9 +28,7 @@ export function Sidebar({ className, isDashboard = true }: SidebarProps) {
       aria-label="Main Navigation"
       className={cn(
         "relative flex-col h-screen transition-all duration-200 z-header select-none shrink-0",
-        isDashboard
-          ? "glass-sidebar text-white"
-          : "bg-brand-navy text-white border-r border-slate-800",
+        "bg-[#0B1E36] text-white border-r border-slate-800/80 shadow-xl",
         sidebarCollapsed ? "md:w-20 lg:w-20" : "md:w-20 lg:w-64",
         className
       )}

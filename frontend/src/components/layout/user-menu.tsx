@@ -6,7 +6,7 @@ import { UserIcon, SettingsIcon, LogOutIcon, ChevronDownIcon } from "../ui/icons
 import { Dropdown } from "../ui/dropdown";
 import { cn } from "@/lib/cn";
 
-export function UserMenu({ className }: { className?: string }) {
+export function UserMenu({ className, isDashboard = false }: { className?: string; isDashboard?: boolean }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -17,15 +17,35 @@ export function UserMenu({ className }: { className?: string }) {
         onOpenChange={setIsOpen}
         contentClassName="w-56 p-1.5"
         trigger={
-          <div className="flex items-center gap-2 p-1 rounded-md hover:bg-surface-muted transition-colors">
-            <Avatar name="Admin User" size="sm" />
+          <div
+            className={cn(
+              "flex items-center gap-2 p-1 rounded-full transition-colors cursor-pointer",
+              isDashboard ? "hover:bg-white/10" : "hover:bg-surface-muted rounded-md"
+            )}
+          >
+            <Avatar name="Stavan Sheth" size="sm" />
             <div className="hidden xl:flex flex-col text-left">
-              <span className="text-xs font-semibold text-slate-800 leading-tight">Admin User</span>
-              <span className="text-[10px] text-slate-400">Retail Operations</span>
+              <span
+                className={cn(
+                  "text-xs font-semibold leading-tight",
+                  isDashboard ? "text-white" : "text-slate-800"
+                )}
+              >
+                Stavan Sheth
+              </span>
+              <span
+                className={cn(
+                  "text-[10px]",
+                  isDashboard ? "text-blue-200" : "text-slate-400"
+                )}
+              >
+                Admin
+              </span>
             </div>
             <ChevronDownIcon
               className={cn(
-                "hidden xl:block w-3.5 h-3.5 text-slate-400 transition-transform duration-150",
+                "hidden xl:block w-3.5 h-3.5 transition-transform duration-150",
+                isDashboard ? "text-white/70" : "text-slate-400",
                 isOpen && "rotate-180 text-brand-primary"
               )}
             />

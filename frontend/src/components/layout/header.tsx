@@ -23,7 +23,7 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
       className={cn(
         "sticky top-0 z-header flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 transition-colors duration-200",
         isDashboard
-          ? "glass-header border-b border-white/10 text-white"
+          ? "bg-transparent border-b border-white/10 text-white"
           : "glass-subtle border-b border-border shadow-xs text-slate-900",
         className
       )}
@@ -63,7 +63,7 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
             className={cn(
               "w-full",
               isDashboard
-                ? "bg-white/10 border-white/15 text-white placeholder:text-white/60 hover:bg-white/15"
+                ? "bg-white/15 border-white/20 text-white placeholder:text-white/70 hover:bg-white/20 backdrop-blur-md"
                 : ""
             )}
           />
@@ -85,9 +85,9 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           onClick={() => setSearchOpen(true)}
           aria-label="Search ERP"
           className={cn(
-            "flex md:hidden items-center justify-center w-9 h-9 rounded-md transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+            "flex md:hidden items-center justify-center w-9 h-9 rounded-full transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
             isDashboard
-              ? "bg-white/10 border border-white/15 text-white hover:bg-white/20"
+              ? "bg-white/15 border border-white/20 text-white hover:bg-white/25 backdrop-blur-md"
               : "border border-border bg-surface text-slate-600 hover:bg-surface-subtle"
           )}
         >
@@ -96,26 +96,26 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
 
         {/* Store Selector (Desktop & Tablet) */}
         <div className="hidden sm:block">
-          <StoreSelector />
+          <StoreSelector isDashboard={isDashboard} />
         </div>
 
         {/* Weather Widget (Desktop) */}
         {isDashboard && (
-          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white text-xs">
+          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 text-white text-xs backdrop-blur-md">
             <span className="text-base">☀️</span>
             <div className="leading-tight">
               <span className="font-bold">26°C</span>
-              <span className="text-slate-300 ml-1">New York, NY</span>
-              <p className="text-[10px] text-slate-400">Clear Skies</p>
+              <span className="text-blue-100 ml-1">New York, NY</span>
+              <p className="text-[10px] text-blue-200">Clear Skies</p>
             </div>
           </div>
         )}
 
         {/* Notifications Dropdown */}
-        <NotificationMenu />
+        <NotificationMenu isDashboard={isDashboard} />
 
         {/* User / Avatar Dropdown */}
-        <UserMenu />
+        <UserMenu isDashboard={isDashboard} />
       </div>
     </header>
   );

@@ -7,7 +7,7 @@ import { Dropdown } from "../ui/dropdown";
 import { cn } from "@/lib/cn";
 import type { StoreInfo } from "@/types/store";
 
-export function StoreSelector({ className }: { className?: string }) {
+export function StoreSelector({ className, isDashboard = false }: { className?: string; isDashboard?: boolean }) {
   const { currentStore, setCurrentStore, stores } = useShell();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -24,30 +24,43 @@ export function StoreSelector({ className }: { className?: string }) {
         onOpenChange={setIsOpen}
         contentClassName="w-72 sm:w-80 p-2"
         trigger={
-          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-md border border-border bg-surface hover:bg-surface-subtle transition-colors shadow-xs text-left">
-            <div className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-sky text-brand-primary shrink-0">
-              <StoreIcon className="w-4 h-4" />
+          isDashboard ? (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md transition-colors shadow-xs cursor-pointer text-xs font-medium">
+              <StoreIcon className="w-3.5 h-3.5 text-white/90" />
+              <span className="truncate max-w-[130px] font-semibold">{currentStore.name}</span>
+              <ChevronDownIcon
+                className={cn(
+                  "w-3.5 h-3.5 text-white/80 transition-transform duration-150 shrink-0",
+                  isOpen && "rotate-180"
+                )}
+              />
             </div>
-            <div className="flex flex-col min-w-0 pr-1 text-left">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-slate-900 truncate max-w-[130px] sm:max-w-[160px]">
-                  {currentStore.name}
-                </span>
-                <span className="text-[10px] font-mono tabular-nums px-1 rounded bg-surface-muted text-slate-500 font-medium">
-                  {currentStore.code}
+          ) : (
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-md border border-border bg-surface hover:bg-surface-subtle transition-colors shadow-xs text-left">
+              <div className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-sky text-brand-primary shrink-0">
+                <StoreIcon className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col min-w-0 pr-1 text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-slate-900 truncate max-w-[130px] sm:max-w-[160px]">
+                    {currentStore.name}
+                  </span>
+                  <span className="text-[10px] font-mono tabular-nums px-1 rounded bg-surface-muted text-slate-500 font-medium">
+                    {currentStore.code}
+                  </span>
+                </div>
+                <span className="text-[11px] text-slate-500 truncate max-w-[150px]">
+                  {currentStore.city}, {currentStore.state}
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 truncate max-w-[150px]">
-                {currentStore.city}, {currentStore.state}
-              </span>
+              <ChevronDownIcon
+                className={cn(
+                  "w-3.5 h-3.5 text-slate-400 transition-transform duration-150 shrink-0",
+                  isOpen && "rotate-180 text-brand-primary"
+                )}
+              />
             </div>
-            <ChevronDownIcon
-              className={cn(
-                "w-3.5 h-3.5 text-slate-400 transition-transform duration-150 shrink-0",
-                isOpen && "rotate-180 text-brand-primary"
-              )}
-            />
-          </div>
+          )
         }
       >
         <div className="px-2.5 py-1.5 border-b border-border-subtle mb-1">
