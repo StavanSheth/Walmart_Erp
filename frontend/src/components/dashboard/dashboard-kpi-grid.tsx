@@ -11,15 +11,68 @@ export interface DashboardKPIGridProps {
   isLoading?: boolean;
 }
 
-function MiniSparkline({ color = "#0071DC" }: { color?: string }) {
+interface StockSparklineProps {
+  trend?: "up" | "down" | "surge" | "steady";
+  color?: string;
+  id?: string;
+  className?: string;
+}
+
+/**
+ * Stock-style ticker sparkline with gradient area fill underneath and live price point
+ */
+function StockSparkline({
+  trend = "up",
+  color = "#0071DC",
+  id,
+  className = "w-16 sm:w-20 h-7"
+}: StockSparklineProps) {
+  const reactId = React.useId().replace(/:/g, "");
+  const gradId = `spark-${reactId}-${id || ""}`;
+
+  let linePath = "M 2 18 C 14 16, 20 22, 32 12 C 42 4, 52 14, 62 4";
+  let areaPath = "M 2 18 C 14 16, 20 22, 32 12 C 42 4, 52 14, 62 4 L 62 26 L 2 26 Z";
+  let endX = 62;
+  let endY = 4;
+
+  if (trend === "down") {
+    linePath = "M 2 6 C 14 8, 22 4, 34 14 C 44 22, 54 16, 62 20";
+    areaPath = "M 2 6 C 14 8, 22 4, 34 14 C 44 22, 54 16, 62 20 L 62 26 L 2 26 Z";
+    endX = 62;
+    endY = 20;
+  } else if (trend === "surge") {
+    linePath = "M 2 20 C 14 18, 24 16, 34 10 C 44 8, 52 6, 62 3";
+    areaPath = "M 2 20 C 14 18, 24 16, 34 10 C 44 8, 52 6, 62 3 L 62 26 L 2 26 Z";
+    endX = 62;
+    endY = 3;
+  } else if (trend === "steady") {
+    linePath = "M 2 14 C 14 18, 24 8, 34 16 C 44 10, 52 16, 62 12";
+    areaPath = "M 2 14 C 14 18, 24 8, 34 16 C 44 10, 52 16, 62 12 L 62 26 L 2 26 Z";
+    endX = 62;
+    endY = 12;
+  }
+
   return (
-    <svg className="w-14 sm:w-16 h-6 shrink-0" viewBox="0 0 64 24" fill="none">
+    <svg className={`${className} shrink-0 overflow-visible`} viewBox="0 0 64 26" fill="none">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.45" />
+          <stop offset="70%" stopColor={color} stopOpacity="0.12" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.0" />
+        </linearGradient>
+      </defs>
+      {/* Stock Gradient Area */}
+      <path d={areaPath} fill={`url(#${gradId})`} />
+      {/* Stock Line Stroke */}
       <path
-        d="M2 18 C 12 14, 22 21, 34 11 C 44 3, 52 15, 62 5"
+        d={linePath}
         stroke={color}
         strokeWidth="2.2"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
+      {/* End Ticker Point */}
+      <circle cx={endX} cy={endY} r="2" fill={color} />
     </svg>
   );
 }
@@ -82,7 +135,7 @@ export function DashboardKPIGrid({
               <span className="font-bold text-emerald-600">↑ 5%</span>
               <span className="text-slate-500 ml-1">vs. last month</span>
             </div>
-            <MiniSparkline color="#0284C7" />
+            <StockSparkline trend="up" color="#0284C7" id="products" />
           </div>
         </div>
 
@@ -106,7 +159,7 @@ export function DashboardKPIGrid({
               <span className="font-bold text-emerald-600">↑ 8%</span>
               <span className="text-slate-500 ml-1">vs. last month</span>
             </div>
-            <MiniSparkline color="#059669" />
+            <StockSparkline trend="surge" color="#059669" id="instock" />
           </div>
         </div>
 
@@ -130,7 +183,7 @@ export function DashboardKPIGrid({
               <span className="font-bold text-amber-600">↑ 12%</span>
               <span className="text-slate-500 ml-1">vs. last month</span>
             </div>
-            <MiniSparkline color="#D97706" />
+            <StockSparkline trend="steady" color="#D97706" id="lowstock" />
           </div>
         </div>
 
@@ -154,7 +207,7 @@ export function DashboardKPIGrid({
               <span className="font-bold text-rose-600">↓ 6%</span>
               <span className="text-slate-500 ml-1">vs. last month</span>
             </div>
-            <MiniSparkline color="#E11D48" />
+            <StockSparkline trend="down" color="#E11D48" id="outofstock" />
           </div>
         </div>
 
@@ -178,7 +231,7 @@ export function DashboardKPIGrid({
               <span className="font-bold text-emerald-600">+ 2</span>
               <span className="text-slate-500 ml-1">new this month</span>
             </div>
-            <MiniSparkline color="#0071DC" />
+            <StockSparkline trend="up" color="#0071DC" id="stores" />
           </div>
         </div>
       </div>
@@ -202,7 +255,7 @@ export function DashboardKPIGrid({
           </div>
           <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
             <span className="font-bold text-emerald-600">↑ 12%</span>
-            <MiniSparkline color="#059669" />
+            <StockSparkline trend="surge" color="#059669" id="m-sales" className="w-14 h-5" />
           </div>
         </div>
 
@@ -221,7 +274,7 @@ export function DashboardKPIGrid({
           </div>
           <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
             <span className="font-bold text-blue-600">↑ 8%</span>
-            <MiniSparkline color="#0284C7" />
+            <StockSparkline trend="up" color="#0284C7" id="m-orders" className="w-14 h-5" />
           </div>
         </div>
 
@@ -259,7 +312,7 @@ export function DashboardKPIGrid({
           </div>
           <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
             <span className="font-bold text-rose-600">↓ 3%</span>
-            <MiniSparkline color="#E11D48" />
+            <StockSparkline trend="down" color="#E11D48" id="m-val" className="w-14 h-5" />
           </div>
         </div>
       </div>

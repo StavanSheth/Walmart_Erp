@@ -69,7 +69,7 @@ export function Sidebar({ className }: SidebarProps) {
         {MAIN_NAV_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            (item.href !== "/dashboard" && item.href !== "/" && pathname.startsWith(item.href));
 
           const navContent = (
             <Link
@@ -77,7 +77,7 @@ export function Sidebar({ className }: SidebarProps) {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "group relative flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150",
+                "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
                 isActive
                   ? "bg-brand-primary text-white shadow-md font-semibold"
@@ -94,19 +94,14 @@ export function Sidebar({ className }: SidebarProps) {
                 />
               </div>
 
-              {/* Label & Description: hidden on tablet and collapsed desktop */}
+              {/* Section Name: hidden on tablet and collapsed desktop */}
               <div
                 className={cn(
-                  "min-w-0 flex-1 flex flex-col",
-                  sidebarCollapsed ? "hidden" : "hidden lg:flex"
+                  "min-w-0 flex-1 truncate",
+                  sidebarCollapsed ? "hidden" : "hidden lg:block"
                 )}
               >
                 <span className="truncate leading-tight">{item.name}</span>
-                {item.description && (
-                  <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-normal truncate leading-tight">
-                    {item.description}
-                  </span>
-                )}
               </div>
             </Link>
           );

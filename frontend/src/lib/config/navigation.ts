@@ -4,62 +4,37 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
   {
     name: "Dashboard",
     href: "/dashboard",
-    iconName: "dashboard",
-    description: "Executive KPIs, sales trends, and store summary"
+    iconName: "dashboard"
   },
   {
     name: "Inventory",
     href: "/inventory",
-    iconName: "inventory",
-    description: "Stocks & Products"
+    iconName: "inventory"
   },
   {
     name: "Stores",
     href: "/stores",
-    iconName: "stores",
-    description: "Store Management"
+    iconName: "stores"
   },
   {
     name: "Wholesalers / Retailers / Customers",
     href: "/partners",
-    iconName: "partners",
-    description: "Partners & Customers"
-  },
-  {
-    name: "Purchases",
-    href: "/ledger",
-    iconName: "purchases",
-    description: "Procurement"
-  },
-  {
-    name: "Sales",
-    href: "/dashboard",
-    iconName: "sales",
-    description: "Order Management"
-  },
-  {
-    name: "Suppliers",
-    href: "/partners",
-    iconName: "suppliers",
-    description: "Vendor Relations"
+    iconName: "partners"
   },
   {
     name: "Ledger",
     href: "/ledger",
-    iconName: "ledger",
-    description: "Accounts & Transactions"
+    iconName: "ledger"
   },
   {
     name: "Reports",
     href: "/reports",
-    iconName: "reports",
-    description: "Analytics & Insights"
+    iconName: "reports"
   },
   {
     name: "Settings",
     href: "/settings",
-    iconName: "settings",
-    description: "System Configuration"
+    iconName: "settings"
   }
 ];
 
