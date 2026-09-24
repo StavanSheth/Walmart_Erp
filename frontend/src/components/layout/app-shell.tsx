@@ -22,9 +22,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">
-          {/* Top Banner Image (Visible till KPI cards end, behind header, greeting, and liquid glass KPI cards) */}
+          {/* Top Banner Image (Visible till KPI cards end; all other cards sit cleanly below the banner) */}
           {isDashboard && (
-            <div className="absolute top-0 left-0 right-0 h-[450px] sm:h-[480px] lg:h-[510px] xl:h-[520px] overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-0 left-0 right-0 h-[395px] sm:h-[405px] lg:h-[390px] xl:h-[400px] overflow-hidden pointer-events-none z-0">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
 
               {/* Bottom smooth fade into normal #F4F6F9 canvas right where the KPI cards end */}
-              <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent" />
             </div>
           )}
 
