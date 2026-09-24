@@ -68,14 +68,12 @@ export default function DashboardPage() {
           />
         )}
 
-        {/* 2. KPI Grid (5 cards on Desktop, 2x2 cards on Mobile) - positioned a little below the banner */}
-        <div className="pt-2 sm:pt-4">
-          <DashboardKPIGrid
-            summary={data?.summary}
-            mobileSummary={data?.mobileSummary}
-            isLoading={isLoading}
-          />
-        </div>
+        {/* 2. KPI Grid (5 liquid glass cards on Desktop, 2x2 cards on Mobile) */}
+        <DashboardKPIGrid
+          summary={data?.summary}
+          mobileSummary={data?.mobileSummary}
+          isLoading={isLoading}
+        />
 
         {/* 3. Mobile Quick Actions Row (Inventory, Stores, Partners, Reports) */}
         <div className="md:hidden">

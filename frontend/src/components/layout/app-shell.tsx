@@ -22,9 +22,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">
-          {/* Top Banner Image (ONLY behind header, search, and greeting - KPI cards sit below banner) */}
+          {/* Top Banner Image (Visible till KPI cards end, behind header, greeting, and liquid glass KPI cards) */}
           {isDashboard && (
-            <div className="absolute top-0 left-0 right-0 h-[210px] sm:h-[230px] lg:h-[250px] overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-0 left-0 right-0 h-[420px] sm:h-[440px] lg:h-[470px] xl:h-[480px] overflow-hidden pointer-events-none z-0">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
@@ -36,10 +36,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               />
               {/* Subtle translucent dark wash for text contrast with NO solid background block */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent" />
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/35 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
 
-              {/* Bottom smooth fade into normal #F4F6F9 canvas right above the KPI cards */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/80 to-transparent" />
+              {/* Bottom smooth fade into normal #F4F6F9 canvas right where the KPI cards end */}
+              <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent" />
             </div>
           )}
 

@@ -116,122 +116,122 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* 1. Total Products */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-primary text-lg shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               📦
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
                 Total Products
               </p>
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+              <h3 className="text-xl lg:text-2xl font-black text-white tabular-nums leading-tight drop-shadow-sm">
                 {formatNumber(summary.totalProducts)}
               </h3>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
             <div className="text-[11px]">
-              <span className="font-bold text-emerald-600">↑ 5%</span>
-              <span className="text-slate-500 ml-1">vs. last month</span>
+              <span className="font-bold text-emerald-400">↑ 5%</span>
+              <span className="text-blue-100/80 ml-1">vs. last month</span>
             </div>
-            <StockSparkline trend="up" color="#0071DC" id="products" />
+            <StockSparkline trend="up" color="#38BDF8" id="products" />
           </div>
         </div>
 
         {/* 2. In Stock (Units) */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-lg shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🟢
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
                 In Stock (Units)
               </p>
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+              <h3 className="text-xl lg:text-2xl font-black text-white tabular-nums leading-tight drop-shadow-sm">
                 {formatNumber(summary.inStockUnits)}
               </h3>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
             <div className="text-[11px]">
-              <span className="font-bold text-emerald-600">↑ 8%</span>
-              <span className="text-slate-500 ml-1">vs. last month</span>
+              <span className="font-bold text-emerald-400">↑ 8%</span>
+              <span className="text-blue-100/80 ml-1">vs. last month</span>
             </div>
-            <StockSparkline trend="surge" color="#059669" id="instock" />
+            <StockSparkline trend="surge" color="#34D399" id="instock" />
           </div>
         </div>
 
         {/* 3. Low Stock Items */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-lg shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/35 flex items-center justify-center text-amber-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               ⚠️
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
                 Low Stock Items
               </p>
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+              <h3 className="text-xl lg:text-2xl font-black text-white tabular-nums leading-tight drop-shadow-sm">
                 {formatNumber(summary.lowStockItems)}
               </h3>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
             <div className="text-[11px]">
-              <span className="font-bold text-amber-600">↑ 12%</span>
-              <span className="text-slate-500 ml-1">vs. last month</span>
+              <span className="font-bold text-amber-400">↑ 12%</span>
+              <span className="text-blue-100/80 ml-1">vs. last month</span>
             </div>
-            <StockSparkline trend="steady" color="#D97706" id="lowstock" />
+            <StockSparkline trend="steady" color="#FBBF24" id="lowstock" />
           </div>
         </div>
 
         {/* 4. Out of Stock */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-lg shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🚫
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
                 Out of Stock
               </p>
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+              <h3 className="text-xl lg:text-2xl font-black text-white tabular-nums leading-tight drop-shadow-sm">
                 {formatNumber(summary.outOfStockItems)}
               </h3>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
             <div className="text-[11px]">
-              <span className="font-bold text-rose-600">↓ 6%</span>
-              <span className="text-slate-500 ml-1">vs. last month</span>
+              <span className="font-bold text-rose-400">↓ 6%</span>
+              <span className="text-blue-100/80 ml-1">vs. last month</span>
             </div>
-            <StockSparkline trend="down" color="#E11D48" id="outofstock" />
+            <StockSparkline trend="down" color="#FB7185" id="outofstock" />
           </div>
         </div>
 
         {/* 5. Total Store Locations */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 flex flex-col justify-between shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-primary text-lg shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🏪
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-blue-100 uppercase tracking-wider truncate">
                 Total Store Locations
               </p>
-              <h3 className="text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight">
+              <h3 className="text-xl lg:text-2xl font-black text-white tabular-nums leading-tight drop-shadow-sm">
                 {formatNumber(summary.totalStores)}
               </h3>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
             <div className="text-[11px]">
-              <span className="font-bold text-emerald-600">+ 2</span>
-              <span className="text-slate-500 ml-1">new this month</span>
+              <span className="font-bold text-emerald-400">+ 2</span>
+              <span className="text-blue-100/80 ml-1">new this month</span>
             </div>
-            <StockSparkline trend="up" color="#0071DC" id="stores" />
+            <StockSparkline trend="up" color="#38BDF8" id="stores" />
           </div>
         </div>
       </div>
@@ -241,78 +241,78 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="grid grid-cols-2 gap-3 md:hidden">
         {/* 1. Total Sales (Today) */}
-        <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 flex flex-col justify-between shadow-xs text-slate-900">
-          <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-sm mb-2">
+        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-sm mb-2 backdrop-blur-md">
             🛒
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
               Total Sales (Today)
             </p>
-            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
               {formatCurrency(mobileSummary.totalSalesToday)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
-            <span className="font-bold text-emerald-600">↑ 12%</span>
-            <StockSparkline trend="surge" color="#059669" id="m-sales" className="w-14 h-5" />
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
+            <span className="font-bold text-emerald-400">↑ 12%</span>
+            <StockSparkline trend="surge" color="#34D399" id="m-sales" className="w-14 h-5" />
           </div>
         </div>
 
         {/* 2. Total Orders */}
-        <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 flex flex-col justify-between shadow-xs text-slate-900">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-primary text-sm mb-2">
+        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-sm mb-2 backdrop-blur-md">
             📄
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
               Total Orders
             </p>
-            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
               {formatNumber(mobileSummary.totalOrders)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
-            <span className="font-bold text-blue-600">↑ 8%</span>
-            <StockSparkline trend="up" color="#0071DC" id="m-orders" className="w-14 h-5" />
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
+            <span className="font-bold text-blue-400">↑ 8%</span>
+            <StockSparkline trend="up" color="#38BDF8" id="m-orders" className="w-14 h-5" />
           </div>
         </div>
 
         {/* 3. Active Stores */}
-        <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 flex flex-col justify-between shadow-xs text-slate-900">
-          <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-sm mb-2">
+        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+          <div className="w-8 h-8 rounded-lg bg-purple-500/25 border border-purple-400/35 flex items-center justify-center text-purple-200 text-sm mb-2 backdrop-blur-md">
             🏬
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
               Active Stores
             </p>
-            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
               {formatNumber(mobileSummary.activeStores)}
             </h3>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-slate-100 text-[10px] text-emerald-600 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-white/15 text-[10px] text-emerald-400 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>100% operational</span>
           </div>
         </div>
 
         {/* 4. Total Inventory Value */}
-        <div className="bg-white rounded-2xl p-3.5 border border-slate-200/80 flex flex-col justify-between shadow-xs text-slate-900">
-          <div className="w-8 h-8 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-sm mb-2">
+        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+          <div className="w-8 h-8 rounded-lg bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-sm mb-2 backdrop-blur-md">
             📦
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
               Inventory Value
             </p>
-            <h3 className="text-lg font-black text-slate-900 tabular-nums mt-0.5">
+            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
               {formatCurrency(mobileSummary.inventoryValue, true)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-100 text-[10px]">
-            <span className="font-bold text-rose-600">↓ 3%</span>
-            <StockSparkline trend="down" color="#E11D48" id="m-val" className="w-14 h-5" />
+          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
+            <span className="font-bold text-rose-400">↓ 3%</span>
+            <StockSparkline trend="down" color="#FB7185" id="m-val" className="w-14 h-5" />
           </div>
         </div>
       </div>

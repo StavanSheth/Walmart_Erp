@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useShell } from "@/context/shell-context";
 import { MAIN_NAV_ITEMS } from "@/lib/config/navigation";
+import { ASSETS } from "@/lib/assets";
 import {
   NavIconByName,
   SparkIcon,
@@ -124,16 +126,29 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Bottom Promo Card: "Stronger Communities Everyday." */}
       {!sidebarCollapsed && (
         <div className="hidden lg:block px-3 py-2 shrink-0">
-          <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <SparkIcon className="w-5 h-5 text-emerald-400" />
-              <div className="text-[10px] leading-tight text-slate-300">
-                <span className="font-semibold text-white block">Stronger</span>
+          <div className="relative overflow-hidden p-3 rounded-xl border border-white/15 flex items-center justify-between shadow-md group">
+            {/* Centered slice of the banner image - showing only the centered portion that fits */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={ASSETS.dashboard.banner}
+                alt="Walmart Supercenter"
+                fill
+                unoptimized
+                sizes="240px"
+                className="object-cover object-center scale-110"
+              />
+              <div className="absolute inset-0 bg-[#091D34]/75 backdrop-blur-[2px]" />
+            </div>
+
+            <div className="relative z-10 flex items-center gap-2 min-w-0">
+              <SparkIcon className="w-5 h-5 text-emerald-400 shrink-0" />
+              <div className="text-[10px] leading-tight text-slate-200">
+                <span className="font-bold text-white block">Stronger</span>
                 Communities Everyday.
               </div>
             </div>
-            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/20 transition-colors cursor-pointer">
-              <ChevronRightIcon className="w-3.5 h-3.5" />
+            <div className="relative z-10 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors cursor-pointer shrink-0 shadow-xs">
+              <ChevronRightIcon className="w-4 h-4" />
             </div>
           </div>
         </div>
