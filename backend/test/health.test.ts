@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { buildApp } from "../src/app.js";
 
 describe("Backend Health Endpoint Unit & Behavior Tests", () => {
-  test("GET /api/health returns 200 and healthy response when database is connected", async () => {
+  // 1. GET /api/health → database healthy
+  test("1. GET /api/health returns 200 and healthy response when database is connected", async () => {
     const app = buildApp({
       checkDb: async () => true
     });
@@ -26,7 +27,8 @@ describe("Backend Health Endpoint Unit & Behavior Tests", () => {
     await app.close();
   });
 
-  test("GET /api/health returns 503 and degraded response when database is disconnected", async () => {
+  // 2. GET /api/health → database unavailable
+  test("2. GET /api/health returns 503 and degraded response when database is disconnected", async () => {
     const app = buildApp({
       checkDb: async () => false
     });
@@ -49,7 +51,8 @@ describe("Backend Health Endpoint Unit & Behavior Tests", () => {
     await app.close();
   });
 
-  test("GET /api/nonexistent returns standardized 404 error response", async () => {
+  // 3. 404 response
+  test("3. GET /api/nonexistent returns standardized 404 error response", async () => {
     const app = buildApp();
     const response = await app.inject({
       method: "GET",
@@ -67,10 +70,10 @@ describe("Backend Health Endpoint Unit & Behavior Tests", () => {
     await app.close();
   });
 
-  test("CORS correctly allows authorized origins and disallows unauthorized origins", async () => {
+  // 4. authorized CORS
+  test("4. Authorized CORS origin receives Access-Control-Allow-Origin header", async () => {
     const app = buildApp({ checkDb: async () => true });
 
-    // Authorized origin
     const authorizedRes = await app.inject({
       method: "GET",
       url: "/api/health",
@@ -78,13 +81,19 @@ describe("Backend Health Endpoint Unit & Behavior Tests", () => {
     });
     assert.equal(authorizedRes.headers["access-control-allow-origin"], "http://localhost:3000");
 
-    // Unauthorized origin
+    await app.close();
+  });
+
+  // 5. unauthorized CORS
+  test("5. Unauthorized CORS origin does not receive Access-Control-Allow-Origin header", async () => {
+    const app = buildApp({ checkDb: async () => true });
+
     const unauthorizedRes = await app.inject({
       method: "GET",
       url: "/api/health",
       headers: { origin: "http://unauthorized-domain.com" }
     });
-    assert.notEqual(unauthorizedRes.headers["access-control-allow-origin"], "http://unauthorized-domain.com");
+    assert.equal(unauthorizedRes.headers["access-control-allow-origin"], undefined);
 
     await app.close();
   });
