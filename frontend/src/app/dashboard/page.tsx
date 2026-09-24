@@ -1,99 +1,96 @@
+"use client";
+
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
-import { Card, CardHeader, CardTitle, CardDescription, KPICard } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { SparkIcon, ArrowUpDownIcon, StoreIcon, PackageIcon } from "@/components/ui/icons";
-import { BannerImage } from "@/components/common/responsive-image";
+import { ErrorState } from "@/components/common/error-state";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DashboardKPIGrid } from "@/components/dashboard/dashboard-kpi-grid";
+import { SalesOverviewChart } from "@/components/dashboard/sales-overview-chart";
+import { StorePerformanceCard } from "@/components/dashboard/store-performance-card";
+import { InventorySummaryCard } from "@/components/dashboard/inventory-summary-card";
+import { RecentSalesTable } from "@/components/dashboard/recent-sales-table";
+import { useDashboardOverview } from "@/hooks/use-dashboard";
+import type { DashboardQueryParams } from "@/types/dashboard";
 
 export default function DashboardPage() {
+  const [selectedStoreId, setSelectedStoreId] = React.useState<string | undefined>(undefined);
+  const [selectedDateRange, setSelectedDateRange] = React.useState<string>("all");
+
+  const queryParams = React.useMemo<DashboardQueryParams>(() => {
+    const params: DashboardQueryParams = {};
+    if (selectedStoreId) {
+      params.storeId = selectedStoreId;
+    }
+    if (selectedDateRange === "30d") {
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      params.from = d.toISOString();
+    } else if (selectedDateRange === "90d") {
+      const d = new Date();
+      d.setDate(d.getDate() - 90);
+      params.from = d.toISOString();
+    }
+    return params;
+  }, [selectedStoreId, selectedDateRange]);
+
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useDashboardOverview(queryParams);
+
   return (
-    <PageContainer
-      title="Dashboard"
-      description="Executive retail operations summary and key performance indicators."
-      actions={
-        <div className="flex items-center gap-2">
-          <Badge variant="spark" className="hidden sm:inline-flex">
-            <SparkIcon className="w-3.5 h-3.5 mr-1" />
-            Phase 4.5 Foundation
-          </Badge>
-          <Button variant="outline" size="sm">
-            <ArrowUpDownIcon className="w-3.5 h-3.5 mr-1.5" />
-            Export Summary
-          </Button>
-        </div>
-      }
-    >
+    <PageContainer>
       <div className="space-y-6">
-        {/* Centralized Responsive Store Banner Component */}
-        <BannerImage
-          title="Walmart India Retail ERP"
-          subtitle="Centralized retail operations management covering inventory replenishment, POS sales, multi-store logistics, and financial ledger."
-          tag="Omnichannel Supercenter Network"
-          priority
+        {/* Dashboard Header with filter bar and responsive banner */}
+        <DashboardHeader
+          selectedStoreId={selectedStoreId}
+          onStoreChange={setSelectedStoreId}
+          selectedDateRange={selectedDateRange}
+          onDateRangeChange={setSelectedDateRange}
+          onRefresh={() => refetch()}
+          isFetching={isFetching}
         />
 
-        {/* Standardized Responsive KPI Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <KPICard
-            title="Today's Gross Sales"
-            value="₹4,82,500"
-            change="↑ +12.4%"
-            isPositive
-            trendLabel="vs yesterday"
-            icon={<span className="font-bold text-xs">₹</span>}
-            iconBg="bg-emerald-50 text-semantic-success"
+        {/* Global Error Banner with Retry */}
+        {isError && (
+          <ErrorState
+            title="Failed to load Dashboard data"
+            message={
+              error instanceof Error
+                ? error.message
+                : "An unexpected error occurred while fetching information from the server."
+            }
+            onRetry={() => refetch()}
           />
+        )}
 
-          <KPICard
-            title="Active Outlets"
-            value="8 / 8 Stores"
-            change="Operational"
-            isPositive
-            trendLabel="all regions"
-            icon={<StoreIcon className="w-4 h-4" />}
-            iconBg="bg-brand-sky text-brand-primary"
-          />
+        {/* Key Performance Indicators Grid */}
+        <DashboardKPIGrid summary={data?.summary} isLoading={isLoading} />
 
-          <KPICard
-            title="Tracked SKUs"
-            value="90 Products"
-            change="12 SKUs"
-            isPositive={false}
-            trendLabel="below reorder level"
-            icon={<PackageIcon className="w-4 h-4" />}
-            iconBg="bg-amber-50 text-semantic-warning"
-          />
+        {/* Analytics & Performance Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Column: Sales Trend & Recent Sales */}
+          <div className="lg:col-span-2 space-y-6">
+            <SalesOverviewChart
+              salesTrend={data?.salesTrend}
+              isLoading={isLoading}
+            />
+            <RecentSalesTable
+              sales={data?.recentSales}
+              isLoading={isLoading}
+            />
+          </div>
 
-          <KPICard
-            title="GST Compliance"
-            value="100% Balanced"
-            change="DR == CR"
-            isPositive
-            trendLabel="trial balance"
-            icon={<span className="font-bold text-[10px]">GST</span>}
-            iconBg="bg-sky-50 text-semantic-info"
-          />
+          {/* Secondary Column: Inventory Health & Store Breakdown */}
+          <div className="space-y-6">
+            <InventorySummaryCard
+              inventory={data?.inventorySummary}
+              isLoading={isLoading}
+            />
+            <StorePerformanceCard
+              stores={data?.storePerformance}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-
-        {/* Phase 5 Scope Notice */}
-        <Card className="border-dashed border-border bg-surface-subtle">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div>
-                <CardTitle className="text-sm font-semibold text-slate-900">
-                  Dashboard Implementation Scope
-                </CardTitle>
-                <CardDescription className="mt-1">
-                  Full analytics charts, store performance rankings, and real-time sales feeds will be connected in Phase 5.
-                </CardDescription>
-              </div>
-              <Badge variant="outline" className="self-start sm:self-auto">
-                Phase 4.5 Foundation Locked
-              </Badge>
-            </div>
-          </CardHeader>
-        </Card>
       </div>
     </PageContainer>
   );

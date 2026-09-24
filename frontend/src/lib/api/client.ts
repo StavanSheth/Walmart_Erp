@@ -1,5 +1,6 @@
 import { env } from "../config/env";
 import type { HealthResponse } from "@/types/api";
+import type { DashboardOverviewResponse, DashboardQueryParams } from "@/types/dashboard";
 
 export class ApiError extends Error {
   constructor(
@@ -75,6 +76,24 @@ export class ApiClient {
    */
   public async getHealth(): Promise<HealthResponse> {
     return this.request<HealthResponse>("/health");
+  }
+
+  /**
+   * Phase 5 Dashboard Overview data
+   */
+  public async getDashboardOverview(
+    params?: DashboardQueryParams
+  ): Promise<DashboardOverviewResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.storeId) searchParams.set("storeId", params.storeId);
+    if (params?.regionId) searchParams.set("regionId", params.regionId);
+    if (params?.from) searchParams.set("from", params.from);
+    if (params?.to) searchParams.set("to", params.to);
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `/dashboard/overview?${queryString}`
+      : "/dashboard/overview";
+    return this.request<DashboardOverviewResponse>(endpoint);
   }
 }
 

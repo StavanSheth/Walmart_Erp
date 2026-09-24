@@ -4,6 +4,7 @@ import { config } from "./common/config/env.js";
 import { checkDatabaseConnection } from "./common/database/prisma.js";
 import { AppError } from "./common/errors/app-error.js";
 import { getLoggerConfig } from "./common/logging/logger.js";
+import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
 
 export interface HealthResponse {
   success: boolean;
@@ -112,6 +113,9 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
       return reply.status(503).send(response);
     }
   });
+
+  // Phase 5 Dashboard Routes
+  app.register(dashboardRoutes, { prefix: "/api/dashboard" });
 
   return app;
 }
