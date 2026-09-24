@@ -30,10 +30,10 @@ export default function ReportsPage() {
             <Card key={idx}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <Badge variant="default">{rep.type}</Badge>
+                  <Badge variant="neutral">{rep.type}</Badge>
                   <span className="text-[11px] font-medium text-slate-400">{rep.freq}</span>
                 </div>
-                <CardTitle className="text-sm font-semibold mt-2">{rep.title}</CardTitle>
+                <CardTitle className="mt-2">{rep.title}</CardTitle>
                 <CardDescription>{rep.description}</CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
@@ -46,7 +46,7 @@ export default function ReportsPage() {
           ))}
         </div>
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               Reports Module Scope

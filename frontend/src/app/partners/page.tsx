@@ -4,7 +4,7 @@ import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge, Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@/components/ui/icons";
 
@@ -58,14 +58,14 @@ export default function PartnersPage() {
                 <Card key={p.code}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs text-slate-400">{p.code}</span>
-                      <Badge variant="success">Verified Vendor</Badge>
+                      <span className="font-mono text-xs text-slate-400 tabular-nums">{p.code}</span>
+                      <StatusBadge status={p.status} label="Verified Vendor" />
                     </div>
-                    <CardTitle className="text-sm font-semibold mt-1">{p.name}</CardTitle>
+                    <CardTitle className="mt-1">{p.name}</CardTitle>
                     <CardDescription>{p.city}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2 text-xs text-slate-600">
-                    <p className="font-mono text-[11px] text-slate-500">GSTIN: {p.gstin}</p>
+                  <CardContent className="space-y-2 type-body-secondary">
+                    <p className="font-mono tabular-nums text-slate-600">GSTIN: {p.gstin}</p>
                     <p className="text-slate-400">Category: {p.category}</p>
                   </CardContent>
                 </Card>
@@ -83,14 +83,14 @@ export default function PartnersPage() {
                 <Card key={i}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-semibold">{c.name}</CardTitle>
-                      <Badge variant="default">Retail</Badge>
+                      <CardTitle>{c.name}</CardTitle>
+                      <Badge variant="neutral">Retail</Badge>
                     </div>
                     <CardDescription>{c.city}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-1 text-xs text-slate-500">
-                    <p className="font-mono">{c.email}</p>
-                    <p>{c.phone}</p>
+                  <CardContent className="space-y-1 type-body-secondary">
+                    <p className="font-mono text-slate-600">{c.email}</p>
+                    <p className="font-mono tabular-nums text-slate-400">{c.phone}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -98,7 +98,7 @@ export default function PartnersPage() {
           </TabsContent>
         </Tabs>
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               Partners & Customers Module Scope

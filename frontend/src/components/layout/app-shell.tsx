@@ -10,7 +10,7 @@ import { GlobalSearchModal } from "./global-search";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ShellProvider>
-      <div className="min-h-screen bg-walmart-surface text-slate-900 flex antialiased">
+      <div className="min-h-screen bg-surface-page text-slate-900 flex antialiased">
         {/* Desktop / Tablet Sidebar (hidden on mobile) */}
         <Sidebar className="hidden md:flex shrink-0 sticky top-0" />
 

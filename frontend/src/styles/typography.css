@@ -1,0 +1,163 @@
+/**
+ * Walmart ERP — Typography System
+ * Standardized typography scale, hierarchy, and tabular numbers.
+ * Uses Everyday Sans with standard enterprise system fallback (Arial / Helvetica / sans-serif).
+ */
+
+body {
+  font-family: "Everyday Sans", Arial, Helvetica, sans-serif;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   Tabular Numbers (Financial, Ledger, Inventory & Metrics)
+   ========================================================================== */
+.tabular-nums,
+[data-tabular-nums="true"] {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   Standardized Typography Classes
+   ========================================================================== */
+
+/* Page Title (Desktop 28-30px, Mobile 24px, Weight 700, -0.02em) */
+.type-page-title {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .type-page-title {
+    font-size: 1.875rem; /* 30px */
+    line-height: 2.25rem;
+  }
+}
+
+/* Section Title (Desktop 20-21px, Mobile 18px, Weight 700, -0.015em) */
+.type-section-title {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .type-section-title {
+    font-size: 1.3125rem; /* 21px */
+    line-height: 1.75rem;
+  }
+}
+
+/* Card Title (Desktop 16px, Mobile 15px, Weight 600, -0.01em) */
+.type-card-title {
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .type-card-title {
+    font-size: 1rem; /* 16px */
+    line-height: 1.375rem;
+  }
+}
+
+/* Body (14px, Weight 400, Line Height 1.375rem) */
+.type-body {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.375rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* Body Small / Secondary (12-13px, Weight 400) */
+.type-body-small,
+.type-body-secondary {
+  font-size: 0.78125rem; /* 12.5px */
+  line-height: 1.125rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* Label (11-12px, Weight 600, Uppercase, Tracking 0.05em) */
+.type-label {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Caption (11px, Weight 400) */
+.type-caption {
+  font-size: 0.6875rem; /* 11px */
+  line-height: 0.875rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* Table Text */
+.type-table-text,
+.type-table-body {
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.type-table-header {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+/* KPI / Metric Value (Desktop 30px, Mobile 24px, Weight 700 + Tabular Nums) */
+.type-kpi {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+@media (min-width: 768px) {
+  .type-kpi {
+    font-size: 1.875rem; /* 30px */
+    line-height: 2.25rem;
+  }
+}
+
+/* Badge Text (11px, Weight 600) */
+.type-badge,
+.type-badge-text {
+  font-size: 0.6875rem; /* 11px */
+  line-height: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Navigation Text (13px, Weight 500) */
+.type-nav,
+.type-nav-text {
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.125rem;
+  font-weight: 500;
+}

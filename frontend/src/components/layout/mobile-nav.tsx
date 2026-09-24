@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useShell } from "@/context/shell-context";
 import { MOBILE_BOTTOM_NAV_ITEMS, MAIN_NAV_ITEMS } from "@/lib/config/navigation";
+import { ASSETS } from "@/lib/assets";
 import { NavIconByName, SparkIcon } from "../ui/icons";
-import { Sheet } from "../ui/sheet";
-import { cn } from "@/lib/utils";
+import { Sheet } from "@/components/ui/sheet";
+import { cn } from "@/lib/cn";
 import Image from "next/image";
 
 export function MobileBottomNav({ className }: { className?: string }) {
@@ -16,13 +17,14 @@ export function MobileBottomNav({ className }: { className?: string }) {
 
   return (
     <nav
-      aria-label="Mobile Navigation"
+      aria-label="Mobile Bottom Navigation"
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 md:hidden shadow-lg",
+        "fixed bottom-0 left-0 right-0 z-dropdown bg-surface/95 backdrop-blur-md border-t border-border px-3 py-1 md:hidden shadow-lg",
+        "h-16 pb-[env(safe-area-inset-bottom,0px)]",
         className
       )}
     >
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-around h-full">
         {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
           const isMore = item.name === "More";
           const isActive =
@@ -36,10 +38,10 @@ export function MobileBottomNav({ className }: { className?: string }) {
                 key={item.name}
                 type="button"
                 onClick={() => setMobileDrawerOpen(true)}
-                className="flex flex-col items-center justify-center p-1 rounded-lg text-slate-500 hover:text-walmart-blue transition-colors focus:outline-none"
+                className="flex flex-col items-center justify-center p-1 rounded-md text-slate-500 hover:text-brand-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
                 <NavIconByName name={item.iconName} className="w-5 h-5" />
-                <span className="text-[10px] font-medium mt-1">More</span>
+                <span className="text-[10px] font-medium mt-0.5">More</span>
               </button>
             );
           }
@@ -48,18 +50,19 @@ export function MobileBottomNav({ className }: { className?: string }) {
             <Link
               key={item.name}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center justify-center p-1 rounded-lg transition-colors focus:outline-none",
+                "flex flex-col items-center justify-center p-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
                 isActive
-                  ? "text-walmart-blue font-bold"
+                  ? "text-brand-primary font-bold"
                   : "text-slate-500 hover:text-slate-900"
               )}
             >
               <NavIconByName
                 name={item.iconName}
-                className={cn("w-5 h-5", isActive && "text-walmart-blue")}
+                className={cn("w-5 h-5", isActive && "text-brand-primary")}
               />
-              <span className="text-[10px] font-medium mt-1">{item.name}</span>
+              <span className="text-[10px] font-medium mt-0.5">{item.name}</span>
             </Link>
           );
         })}
@@ -80,17 +83,17 @@ export function MobileDrawer() {
       side="left"
     >
       <div className="space-y-6">
-        {/* Active Store Widget */}
-        <div className="relative rounded-xl overflow-hidden h-28 border border-slate-200 shadow-xs">
+        {/* Active Store Widget (Without gradients) */}
+        <div className="relative rounded-xl overflow-hidden h-28 border border-border shadow-xs">
           <Image
-            src="/images/stores/store-sidebar.webp"
+            src={ASSETS.stores.sidebar}
             alt={currentStore.name}
             fill
             className="object-cover"
             sizes="300px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-walmart-navy-dark/95 via-walmart-navy-dark/60 to-transparent flex flex-col justify-end p-3 text-white">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-walmart-yellow">
+          <div className="absolute inset-0 bg-brand-navy-dark/85 flex flex-col justify-end p-3 text-white">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-brand-yellow">
               Active Store
             </span>
             <p className="text-xs font-bold truncate">{currentStore.name}</p>
@@ -102,7 +105,7 @@ export function MobileDrawer() {
 
         {/* All Navigation Links */}
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 mb-2">
+          <p className="type-label px-2 mb-2 text-slate-400">
             Modules
           </p>
           {MAIN_NAV_ITEMS.map((item) => {
@@ -116,10 +119,10 @@ export function MobileDrawer() {
                 href={item.href}
                 onClick={() => setMobileDrawerOpen(false)}
                 className={cn(
-                  "flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors",
+                  "flex items-center justify-between px-3 py-2.5 rounded-md text-xs font-medium transition-colors",
                   isActive
-                    ? "bg-walmart-blue text-white shadow-xs font-semibold"
-                    : "text-slate-700 hover:bg-slate-100"
+                    ? "bg-brand-primary text-white shadow-xs font-semibold"
+                    : "text-slate-700 hover:bg-surface-muted"
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -132,10 +135,10 @@ export function MobileDrawer() {
                 {item.badge && (
                   <span
                     className={cn(
-                      "px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                      "px-1.5 py-0.5 rounded-pill text-[10px] font-bold",
                       isActive
-                        ? "bg-white text-walmart-blue"
-                        : "bg-walmart-yellow text-walmart-navy"
+                        ? "bg-white text-brand-primary"
+                        : "bg-brand-yellow text-brand-navy"
                     )}
                   >
                     {item.badge}
@@ -147,12 +150,12 @@ export function MobileDrawer() {
         </div>
 
         {/* Brand Footer */}
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 px-2">
-          <div className="flex items-center gap-1.5">
-            <SparkIcon className="w-4 h-4 text-walmart-yellow" />
-            <span className="font-semibold text-slate-600">Walmart ERP</span>
+        <div className="pt-4 border-t border-border-subtle flex items-center justify-between text-xs text-slate-400 px-2">
+          <div className="flex items-center gap-2">
+            <SparkIcon className="w-4 h-4" />
+            <span className="font-semibold text-slate-700">Walmart ERP</span>
           </div>
-          <span>v0.1.0</span>
+          <span className="tabular-nums">v0.1.0</span>
         </div>
       </div>
     </Sheet>

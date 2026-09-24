@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon, HomeIcon } from "../ui/icons";
+import { cn } from "@/lib/cn";
 
 interface RouteLabelMap {
   [segment: string]: string;
@@ -54,12 +55,12 @@ export function Breadcrumbs({ className }: { className?: string }) {
   }, [pathname]);
 
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label="Breadcrumbs" className={cn("truncate", className)}>
       <ol className="flex items-center gap-1.5 text-xs text-slate-500">
         <li>
           <Link
             href="/dashboard"
-            className="flex items-center gap-1 hover:text-walmart-blue transition-colors focus:outline-none"
+            className="flex items-center gap-1 hover:text-brand-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded p-0.5"
             aria-label="Home"
           >
             <HomeIcon className="w-3.5 h-3.5" />
@@ -75,7 +76,7 @@ export function Breadcrumbs({ className }: { className?: string }) {
             ) : (
               <Link
                 href={crumb.href}
-                className="hover:text-walmart-blue transition-colors font-medium focus:outline-none"
+                className="hover:text-brand-primary transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded p-0.5"
               >
                 {crumb.label}
               </Link>

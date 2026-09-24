@@ -1,0 +1,162 @@
+/**
+ * Walmart ERP — Animation & Transition System
+ * Centralized keyframes, short UI transitions, and prefers-reduced-motion accessibility.
+ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   Centralized Animation Classes
+   ========================================================================== */
+
+.anim-fade-in {
+  animation: fadeIn 150ms ease-out forwards;
+}
+
+.anim-fade-out {
+  animation: fadeOut 150ms ease-out forwards;
+}
+
+.anim-scale-in,
+.anim-modal {
+  animation: scaleIn 150ms ease-out forwards;
+}
+
+.anim-scale-out {
+  animation: scaleOut 150ms ease-out forwards;
+}
+
+.anim-slide-up {
+  animation: slideUp 150ms ease-out forwards;
+}
+
+.anim-slide-down {
+  animation: slideDown 150ms ease-out forwards;
+}
+
+.anim-drawer-left {
+  animation: slideInFromLeft 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-drawer-right {
+  animation: slideInFromRight 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-drawer-bottom {
+  animation: slideInFromBottom 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-pulse,
+.anim-skeleton {
+  animation: pulseSubtle 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ==========================================================================
+   Accessibility: Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

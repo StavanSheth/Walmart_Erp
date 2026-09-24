@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import { AlertCircleIcon, RefreshCwIcon } from "../ui/icons";
 import { Button } from "../ui/button";
 
@@ -19,15 +19,15 @@ export function ErrorState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-rose-200 bg-rose-50/50",
+        "flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-semantic-danger-border bg-semantic-danger-bg",
         className
       )}
     >
-      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-rose-600 mb-3">
+      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 text-semantic-danger mb-3">
         <AlertCircleIcon className="w-6 h-6" />
       </div>
-      <h3 className="text-sm font-semibold text-rose-900">{title}</h3>
-      <p className="mt-1 text-xs text-rose-700 max-w-sm">{message}</p>
+      <h3 className="type-card-title text-rose-900">{title}</h3>
+      <p className="type-body-secondary text-rose-700 mt-1 max-w-sm">{message}</p>
       {onRetry ? (
         <div className="mt-4">
           <Button

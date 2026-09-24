@@ -1,5 +1,9 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
+import { PageHeader } from "./page-header";
+
+export { PageHeader, PageTitle, PageDescription, PageActions } from "./page-header";
+export { Section, SectionHeader, type SectionProps, type SectionHeaderProps } from "./section";
 
 export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
@@ -19,29 +23,13 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6",
+        "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 space-y-6",
         className
       )}
       {...props}
     >
-      {(title || actions) && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/60">
-          <div>
-            {title ? (
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-                {title}
-              </h1>
-            ) : null}
-            {description ? (
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">{description}</p>
-            ) : null}
-          </div>
-          {actions ? (
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              {actions}
-            </div>
-          ) : null}
-        </div>
+      {(title || actions || description) && (
+        <PageHeader title={title} description={description} actions={actions} />
       )}
 
       <div>{children}</div>

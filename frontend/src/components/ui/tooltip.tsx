@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface TooltipProps {
   content: string;
@@ -40,7 +40,7 @@ export function Tooltip({
         <div
           role="tooltip"
           className={cn(
-            "absolute z-50 pointer-events-none whitespace-nowrap rounded-md bg-walmart-navy px-2.5 py-1 text-xs font-medium text-white shadow-md animate-in fade-in duration-100",
+            "absolute z-popover pointer-events-none whitespace-nowrap rounded-md bg-brand-navy px-2.5 py-1 text-xs font-medium text-white shadow-md anim-fade-in",
             positionStyles[side]
           )}
         >

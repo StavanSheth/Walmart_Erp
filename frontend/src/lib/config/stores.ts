@@ -1,4 +1,5 @@
 import type { StoreInfo } from "@/types/store";
+import { ASSETS } from "@/lib/assets";
 
 export const DEMO_STORES: StoreInfo[] = [
   {
@@ -10,7 +11,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "Andheri West, Mumbai, Maharashtra 400053",
     phone: "+91 22 26789012",
     pincode: "400053",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-del-001",
@@ -21,7 +22,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "Block A, Connaught Place, New Delhi 110001",
     phone: "+91 11 23456701",
     pincode: "110001",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-blr-001",
@@ -32,7 +33,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "100 Feet Rd, Indiranagar, Bengaluru 560038",
     phone: "+91 80 23456701",
     pincode: "560038",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-pun-001",
@@ -43,7 +44,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "North Main Road, Koregaon Park, Pune 411001",
     phone: "+91 20 23456701",
     pincode: "411001",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-chn-001",
@@ -54,7 +55,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "Usman Road, T Nagar, Chennai 600017",
     phone: "+91 44 23456701",
     pincode: "600017",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-kol-001",
@@ -65,7 +66,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "Park Street, Kolkata 700016",
     phone: "+91 33 23456701",
     pincode: "700016",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-jpr-001",
@@ -76,7 +77,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "MI Road, Near Panch Batti, Jaipur 302001",
     phone: "+91 141 2345672",
     pincode: "302001",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   },
   {
     id: "store-bhu-001",
@@ -87,7 +88,7 @@ export const DEMO_STORES: StoreInfo[] = [
     address: "Janpath, Ashok Nagar, Bhubaneswar 751001",
     phone: "+91 674 2345671",
     pincode: "751001",
-    imageUrl: "/images/stores/store-main.webp"
+    imageUrl: ASSETS.stores.main
   }
 ];
 

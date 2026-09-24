@@ -1,0 +1,143 @@
+/**
+ * Walmart ERP — Central Design Tokens
+ * Source of truth for Colors, Radii, Shadows, Spacing, Transitions, and Z-Index.
+ * Adheres strictly to Walmart Brand Center guidelines and ERP enterprise design specifications.
+ */
+
+:root {
+  /* ==========================================================================
+     1. Brand Colors (Walmart Brand Center)
+     ========================================================================== */
+  --color-brand-primary: #0071CE;          /* Walmart True Blue */
+  --color-brand-primary-hover: #004F9A;    /* Bentonville Blue / Dark Blue */
+  --color-brand-primary-active: #003B73;   /* Deep Blue */
+  --color-brand-secondary: #FFC220;        /* Walmart Spark Yellow */
+  --color-brand-yellow: #FFC220;           /* Semantic Alias */
+  --color-brand-yellow-hover: #E5A800;     /* Darker Yellow */
+  --color-brand-yellow-light: #FFF9E6;     /* Tint Yellow */
+  --color-brand-bentonville: #004F9A;      /* Supporting Blue: Bentonville */
+  --color-brand-everyday: #0071CE;         /* Everyday Blue */
+  --color-brand-sky: #EBF4FC;              /* Sky Blue Tint */
+  --color-brand-navy: #071B3A;             /* Walmart Enterprise Navy */
+  --color-brand-navy-dark: #041026;        /* Deep Navy */
+  --color-brand-white: #FFFFFF;
+
+  /* ==========================================================================
+     2. Neutral & Surface Colors
+     ========================================================================== */
+  --color-bg-page: #F4F8FC;                 /* Page background */
+  --color-bg-surface: #FFFFFF;              /* Default surface */
+  --color-bg-surface-hover: #F8FAFC;        /* Surface hover */
+  --color-bg-subtle: #F8FAFC;               /* Subtle surface */
+  --color-bg-muted: #F1F5F9;                /* Muted surface */
+  --color-bg-elevated: #FFFFFF;             /* Elevated surface */
+  --color-bg-overlay: rgba(15, 23, 42, 0.6);/* Overlay backdrop */
+
+  /* ==========================================================================
+     3. Text Colors (WCAG Compliant)
+     ========================================================================== */
+  --color-text-primary: #0F172A;            /* Primary text (Slate 900) */
+  --color-text-secondary: #475569;          /* Secondary text (Slate 600) */
+  --color-text-muted: #64748B;              /* Muted text (Slate 500) */
+  --color-text-disabled: #94A3B8;           /* Disabled text (Slate 400) */
+  --color-text-inverse: #FFFFFF;            /* Inverse text */
+  --color-text-brand: #0071CE;              /* Interactive brand text */
+
+  /* ==========================================================================
+     4. Border Colors
+     ========================================================================== */
+  --color-border: #E2E8F0;                  /* Border */
+  --color-border-subtle: #F1F5F9;           /* Subtle border */
+  --color-border-strong: #CBD5E1;           /* Strong border */
+  --color-border-focus: #0071CE;            /* Focus ring color */
+
+  /* ==========================================================================
+     5. Semantic Colors (Status & Alerts)
+     ========================================================================== */
+  --color-success: #10B981;
+  --color-success-hover: #059669;
+  --color-success-bg: #ECFDF5;
+  --color-success-border: #A7F3D0;
+  --color-success-text: #065F46;
+
+  --color-warning: #F59E0B;
+  --color-warning-hover: #D97706;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #FDE68A;
+  --color-warning-text: #92400E;
+
+  --color-danger: #EF4444;
+  --color-danger-hover: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-border: #FECACA;
+  --color-danger-text: #991B1B;
+
+  --color-info: #0284C7;
+  --color-info-hover: #0369A1;
+  --color-info-bg: #F0F9FF;
+  --color-info-border: #BAE6FD;
+  --color-info-text: #075985;
+
+  /* ==========================================================================
+     6. Border Radius Grid
+     ========================================================================== */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;     /* Buttons, inputs */
+  --radius-lg: 12px;    /* Cards, dropdowns */
+  --radius-xl: 16px;    /* Large cards, modals */
+  --radius-2xl: 20px;   /* Drawers, dialogs */
+  --radius-pill: 9999px;/* Badges, avatars */
+
+  /* ==========================================================================
+     7. Elevation & Box Shadows
+     ========================================================================== */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-overlay: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+
+  /* ==========================================================================
+     8. Centralized Z-Index Hierarchy
+     ========================================================================== */
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-header: 30;
+  --z-dropdown: 40;
+  --z-popover: 50;
+  --z-drawer: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+
+  /* ==========================================================================
+     9. 4px-Based Spacing Scale
+     ========================================================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Standard Component Heights */
+  --control-height-sm: 32px;
+  --control-height-md: 36px;  /* Standard Desktop Input/Button */
+  --control-height-lg: 40px;  /* Standard Mobile Input/Button */
+  --header-height: 64px;
+  --mobile-nav-height: 64px;
+
+  /* ==========================================================================
+     10. Transitions & Timing
+     ========================================================================== */
+  --transition-micro: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}

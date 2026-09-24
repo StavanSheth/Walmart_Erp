@@ -31,31 +31,31 @@ export default function StoresPage() {
             return (
               <Card
                 key={store.code}
-                className={isSelected ? "border-walmart-blue ring-1 ring-walmart-blue" : ""}
+                variant={isSelected ? "selected" : "default"}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface-muted text-slate-700 tabular-nums">
                       {store.code}
                     </span>
                     {isSelected ? (
                       <Badge variant="spark">Active Outlet</Badge>
                     ) : (
-                      <Badge variant="default">Supercenter</Badge>
+                      <Badge variant="neutral">Supercenter</Badge>
                     )}
                   </div>
-                  <CardTitle className="text-sm font-semibold text-slate-900 mt-2 truncate">
+                  <CardTitle className="mt-2 truncate">
                     {store.name}
                   </CardTitle>
-                  <CardDescription className="text-xs text-slate-500">
+                  <CardDescription>
                     {store.city}, {store.state}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-3 pt-2">
-                  <div className="text-xs text-slate-600 space-y-1">
+                  <div className="type-body-secondary space-y-1">
                     <p className="truncate text-slate-500">{store.address}</p>
-                    <p className="font-mono text-[11px] text-slate-400">{store.phone}</p>
+                    <p className="font-mono tabular-nums text-slate-400">{store.phone}</p>
                   </div>
 
                   <Button
@@ -66,7 +66,7 @@ export default function StoresPage() {
                   >
                     {isSelected ? (
                       <>
-                        <CheckIcon className="w-3.5 h-3.5 mr-1 text-walmart-blue" />
+                        <CheckIcon className="w-3.5 h-3.5 mr-1 text-brand-primary" />
                         Selected Store
                       </>
                     ) : (
@@ -82,7 +82,7 @@ export default function StoresPage() {
           })}
         </div>
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               Stores Module Scope

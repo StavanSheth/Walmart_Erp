@@ -31,7 +31,7 @@ export default function LedgerPage() {
     {
       key: "code",
       header: "Account Code",
-      render: (item) => <span className="font-mono text-xs font-semibold">{item.code}</span>
+      render: (item) => <span className="font-mono text-xs font-semibold tabular-nums">{item.code}</span>
     },
     {
       key: "name",
@@ -48,7 +48,7 @@ export default function LedgerPage() {
               ? "success"
               : item.type === "LIABILITY"
                 ? "warning"
-                : "default"
+                : "neutral"
           }
         >
           {item.type}
@@ -59,7 +59,8 @@ export default function LedgerPage() {
       key: "balance",
       header: "Current Balance",
       align: "right",
-      render: (item) => <span className="font-semibold text-slate-900 font-mono">{item.balance}</span>
+      isNumeric: true,
+      render: (item) => <span className="font-semibold text-slate-900 font-mono tabular-nums">{item.balance}</span>
     }
   ];
 
@@ -83,20 +84,20 @@ export default function LedgerPage() {
           renderMobileCard={(item) => (
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-slate-400">{item.code}</span>
-                <Badge variant={item.type === "ASSET" ? "success" : "default"}>
+                <span className="font-mono text-xs text-slate-400 tabular-nums">{item.code}</span>
+                <Badge variant={item.type === "ASSET" ? "success" : "neutral"}>
                   {item.type}
                 </Badge>
               </div>
               <p className="font-semibold text-sm text-slate-900">{item.name}</p>
-              <p className="text-sm font-mono font-bold text-slate-800 text-right pt-2 border-t border-slate-100">
+              <p className="text-sm font-mono font-bold text-slate-800 text-right pt-2 border-t border-border-subtle tabular-nums">
                 {item.balance}
               </p>
             </div>
           )}
         />
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               General Ledger Module Scope

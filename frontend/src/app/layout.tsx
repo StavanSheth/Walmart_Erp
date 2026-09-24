@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppShell } from "@/components/layout/app-shell";
+import { ASSETS } from "@/lib/assets";
 
 export const metadata: Metadata = {
   title: "Walmart ERP — Enterprise Retail Operations",
   description: "Walmart India ERP Application Shell and Operations Platform",
   icons: {
-    icon: "/brand/walmart-spark.svg"
+    icon: ASSETS.brand.spark
   }
 };
 
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-walmart-surface text-slate-900">
+      <body className="antialiased min-h-screen bg-surface-page text-slate-900">
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

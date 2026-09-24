@@ -25,7 +25,7 @@ export default function SettingsPage() {
           <TabsContent value="general" className="mt-4">
             <Card className="max-w-2xl">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold">Organization Profile</CardTitle>
+                <CardTitle>Organization Profile</CardTitle>
                 <CardDescription>
                   Central enterprise identity used on all invoices, POs, and tax filings.
                 </CardDescription>
@@ -33,16 +33,16 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input label="Company Name" defaultValue="Walmart India Retail Pvt Ltd" readOnly />
-                  <Input label="Tenant Code" defaultValue="WALMART-IN" readOnly />
+                  <Input label="Tenant Code" defaultValue="WALMART-IN" readOnly className="font-mono tabular-nums" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input label="Corporate PAN" defaultValue="AABCW1234D" readOnly />
+                  <Input label="Corporate PAN" defaultValue="AABCW1234D" readOnly className="font-mono tabular-nums" />
                   <Input label="Primary Currency" defaultValue="INR (₹)" readOnly />
                 </div>
                 <Input label="Default Timezone" defaultValue="Asia/Kolkata (IST)" readOnly />
               </CardContent>
               <CardFooter className="justify-between">
-                <span className="text-xs text-slate-400">Read-only demo configuration</span>
+                <span className="type-body-secondary text-slate-400">Read-only demo configuration</span>
                 <Button size="sm">Save Changes</Button>
               </CardFooter>
             </Card>
@@ -51,7 +51,7 @@ export default function SettingsPage() {
           <TabsContent value="tax" className="mt-4">
             <Card className="max-w-2xl">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold">Indian GST Tax Configuration</CardTitle>
+                <CardTitle>Indian GST Tax Configuration</CardTitle>
                 <CardDescription>Standardized goods and services tax rates applied across categories.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -81,13 +81,13 @@ export default function SettingsPage() {
           <TabsContent value="preferences" className="mt-4">
             <Card className="max-w-2xl">
               <CardHeader>
-                <CardTitle className="text-sm font-semibold">User Interface Preferences</CardTitle>
+                <CardTitle>User Interface Preferences</CardTitle>
                 <CardDescription>Customize navigation and display behavior.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-700">Dense Table Layout</label>
-                  <p className="text-xs text-slate-500">Show compact row padding on desktop screens.</p>
+                  <label className="text-xs font-semibold text-slate-700">Dense Table Layout</label>
+                  <p className="type-body-secondary text-slate-500">Show compact row padding on desktop screens.</p>
                 </div>
               </CardContent>
               <CardFooter className="justify-end">
@@ -97,7 +97,7 @@ export default function SettingsPage() {
           </TabsContent>
         </Tabs>
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               Settings Module Scope

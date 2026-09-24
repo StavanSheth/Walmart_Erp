@@ -1,6 +1,6 @@
 import * as React from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -29,7 +29,7 @@ export function Avatar({ name, src, size = "md", className, ...props }: AvatarPr
   return (
     <div
       className={cn(
-        "relative inline-flex items-center justify-center shrink-0 rounded-full font-semibold select-none overflow-hidden border border-slate-200 shadow-xs",
+        "relative inline-flex items-center justify-center shrink-0 rounded-pill font-semibold select-none overflow-hidden border border-border shadow-xs",
         sizeClasses[size],
         className
       )}
@@ -44,7 +44,7 @@ export function Avatar({ name, src, size = "md", className, ...props }: AvatarPr
           className="object-cover"
         />
       ) : (
-        <span className="w-full h-full flex items-center justify-center bg-walmart-blue text-white">
+        <span className="w-full h-full flex items-center justify-center bg-brand-primary text-white font-medium">
           {initials || "U"}
         </span>
       )}

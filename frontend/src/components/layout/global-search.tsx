@@ -4,8 +4,9 @@ import * as React from "react";
 import { useShell } from "@/context/shell-context";
 import { SearchIcon, XIcon } from "../ui/icons";
 import { DEMO_SEARCH_DATA } from "@/lib/config/demo-data";
-import { Badge } from "../ui/badge";
-import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/ui/badge";
+import { Modal } from "@/components/ui/modal";
+import { cn } from "@/lib/cn";
 import Link from "next/link";
 
 const CATEGORIES = ["All", "Products", "Stores", "Customers", "Partners", "Orders"] as const;
@@ -25,17 +26,6 @@ export function GlobalSearchModal() {
     }
   }, [searchOpen]);
 
-  // Escape key handler
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && searchOpen) {
-        setSearchOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [searchOpen, setSearchOpen]);
-
   const filteredResults = React.useMemo(() => {
     return DEMO_SEARCH_DATA.filter((item) => {
       const matchesCategory =
@@ -50,121 +40,112 @@ export function GlobalSearchModal() {
     });
   }, [query, selectedCategory]);
 
-  if (!searchOpen) return null;
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Global Search"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-4"
+    <Modal
+      isOpen={searchOpen}
+      onClose={() => setSearchOpen(false)}
+      size="xl"
+      hideHeader
+      className="p-0 overflow-hidden"
     >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
-        onClick={() => setSearchOpen(false)}
-        aria-hidden="true"
-      />
-
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-150">
-        {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-100 gap-3">
-          <SearchIcon className="w-5 h-5 text-slate-400 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products, stores, customers, orders, partners..."
-            className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
-          />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              aria-label="Clear search"
-              className="text-slate-400 hover:text-slate-600 p-1"
-            >
-              <XIcon className="w-4 h-4" />
-            </button>
-          ) : (
-            <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-slate-100 rounded border border-slate-200">
-              ESC
-            </span>
-          )}
-        </div>
-
-        {/* Categories Bar */}
-        <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-50/70 border-b border-slate-100 overflow-x-auto text-xs">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={cn(
-                "px-2.5 py-1 rounded-md font-medium whitespace-nowrap transition-colors",
-                selectedCategory === cat
-                  ? "bg-walmart-blue text-white shadow-xs"
-                  : "text-slate-600 hover:bg-slate-200/60"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Results List */}
-        <div className="max-h-80 overflow-y-auto p-2 space-y-1">
-          {filteredResults.length > 0 ? (
-            filteredResults.map((res) => (
-              <Link
-                key={res.id}
-                href={res.href}
-                onClick={() => setSearchOpen(false)}
-                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
-              >
-                <div className="min-w-0 pr-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-900 group-hover:text-walmart-blue transition-colors truncate">
-                      {res.title}
-                    </span>
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                      • {res.category}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 truncate mt-0.5">{res.subtitle}</p>
-                </div>
-                {res.badge ? (
-                  <Badge
-                    variant={
-                      res.badge === "In Stock" || res.badge === "Delivered"
-                        ? "success"
-                        : res.badge === "Low Stock"
-                          ? "warning"
-                          : "default"
-                    }
-                    className="shrink-0"
-                  >
-                    {res.badge}
-                  </Badge>
-                ) : null}
-              </Link>
-            ))
-          ) : (
-            <div className="py-10 text-center text-xs text-slate-400">
-              No results found for &ldquo;{query}&rdquo; in {selectedCategory}
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span>{filteredResults.length} demo results</span>
-          <span className="hidden sm:inline">Use ↑ ↓ to navigate, ESC to close</span>
-        </div>
+      {/* Search Input Bar */}
+      <div className="flex items-center px-4 py-3.5 border-b border-border gap-3">
+        <SearchIcon className="w-5 h-5 text-slate-400 shrink-0" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search products, stores, customers, orders, partners..."
+          className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+        />
+        {query ? (
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            aria-label="Clear search query"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+          >
+            <XIcon className="w-4 h-4" />
+          </button>
+        ) : (
+          <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-surface-muted rounded border border-border">
+            ESC
+          </span>
+        )}
       </div>
-    </div>
+
+      {/* Categories Bar */}
+      <div className="flex items-center gap-1.5 px-4 py-2 bg-surface-subtle border-b border-border overflow-x-auto text-xs">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCategory(cat)}
+            className={cn(
+              "px-2.5 py-1 rounded-pill font-medium transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+              selectedCategory === cat
+                ? "bg-brand-primary text-white shadow-xs"
+                : "text-slate-600 hover:bg-surface-muted hover:text-slate-900"
+            )}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Search Results Area */}
+      <div className="max-h-80 overflow-y-auto p-2 divide-y divide-border-subtle">
+        {filteredResults.length === 0 ? (
+          <div className="p-8 text-center text-slate-400">
+            <SearchIcon className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+            <p className="text-xs font-semibold text-slate-700">No matching results found</p>
+            <p className="text-[11px] mt-0.5">Try searching with a different SKU, name, or category</p>
+          </div>
+        ) : (
+          filteredResults.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+              onClick={() => setSearchOpen(false)}
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-subtle transition-colors group focus-visible:outline-none focus-visible:bg-surface-muted"
+            >
+              <div className="min-w-0 pr-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-900 group-hover:text-brand-primary transition-colors truncate">
+                    {item.title}
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded text-[10px] uppercase font-bold tracking-wider bg-surface-muted text-slate-500 shrink-0">
+                    {item.category}
+                  </span>
+                </div>
+                <p className="type-body-secondary mt-0.5 truncate">{item.subtitle}</p>
+              </div>
+
+              {item.badge ? (
+                <StatusBadge status={item.badge} className="shrink-0" />
+              ) : null}
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Footer / Shortcuts Help */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-surface-subtle border-t border-border text-[11px] text-slate-400">
+        <div className="flex items-center gap-3">
+          <span>
+            Navigate <kbd className="font-mono font-semibold text-slate-600">↑↓</kbd>
+          </span>
+          <span>
+            Select <kbd className="font-mono font-semibold text-slate-600">↵</kbd>
+          </span>
+          <span>
+            Close <kbd className="font-mono font-semibold text-slate-600">Esc</kbd>
+          </span>
+        </div>
+        <span className="tabular-nums font-mono">{filteredResults.length} results</span>
+      </div>
+    </Modal>
   );
 }
 
@@ -177,17 +158,17 @@ export function GlobalSearchTrigger({ className }: { className?: string }) {
       onClick={() => setSearchOpen(true)}
       aria-label="Open global search (Ctrl+K)"
       className={cn(
-        "flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-400 transition-colors shadow-xs text-xs focus:outline-none focus:ring-2 focus:ring-walmart-blue",
+        "flex items-center justify-between w-full h-9 px-3 rounded-md border border-border bg-surface text-xs text-slate-400 hover:border-border-strong hover:bg-surface-subtle transition-colors shadow-xs group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
         className
       )}
     >
-      <SearchIcon className="w-4 h-4 text-slate-400 shrink-0" />
-      <span className="hidden sm:inline truncate">Search ERP...</span>
-      <span className="hidden md:inline-flex ml-auto pl-2">
-        <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 rounded border border-slate-200">
-          ⌘K
-        </kbd>
-      </span>
+      <div className="flex items-center gap-2 truncate">
+        <SearchIcon className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+        <span className="truncate">Search ERP...</span>
+      </div>
+      <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-500 bg-surface-muted rounded border border-border">
+        ⌘K
+      </kbd>
     </button>
   );
 }

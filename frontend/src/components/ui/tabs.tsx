@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 interface TabsContextValue {
   value: string;
@@ -52,7 +52,7 @@ export function TabsList({
     <div
       role="tablist"
       className={cn(
-        "inline-flex items-center gap-1 p-1 bg-slate-100 rounded-lg text-slate-600 text-xs font-medium border border-slate-200/80",
+        "inline-flex items-center gap-1 p-1 bg-surface-muted rounded-md text-slate-600 text-xs font-medium border border-border",
         className
       )}
     >
@@ -82,9 +82,10 @@ export function TabsTrigger({
       aria-selected={isSelected}
       onClick={() => context.onChange(value)}
       className={cn(
-        "inline-flex items-center justify-center px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-walmart-blue",
+        "inline-flex items-center justify-center px-3 py-1.5 rounded-sm text-xs font-medium transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
         isSelected
-          ? "bg-white text-walmart-navy shadow-sm font-semibold"
+          ? "bg-surface text-brand-navy shadow-xs font-semibold"
           : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50",
         className
       )}

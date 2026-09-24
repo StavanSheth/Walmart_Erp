@@ -3,7 +3,7 @@
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
 import { ResponsiveTable, type Column } from "@/components/common/responsive-table";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PlusIcon, FilterIcon } from "@/components/ui/icons";
@@ -77,7 +77,7 @@ export default function InventoryPage() {
     {
       key: "sku",
       header: "SKU / Code",
-      render: (item) => <span className="font-mono text-xs font-semibold">{item.sku}</span>
+      render: (item) => <span className="font-mono text-xs font-semibold tabular-nums">{item.sku}</span>
     },
     {
       key: "name",
@@ -85,7 +85,7 @@ export default function InventoryPage() {
       render: (item) => (
         <div>
           <p className="font-medium text-slate-900 text-xs sm:text-sm">{item.name}</p>
-          <p className="text-[11px] text-slate-400">{item.category}</p>
+          <p className="type-body-secondary">{item.category}</p>
         </div>
       )
     },
@@ -93,16 +93,18 @@ export default function InventoryPage() {
       key: "unitPrice",
       header: "Unit Price",
       align: "right",
-      render: (item) => <span className="font-semibold text-slate-800">{item.unitPrice}</span>
+      isNumeric: true,
+      render: (item) => <span className="font-semibold text-slate-900 tabular-nums">{item.unitPrice}</span>
     },
     {
       key: "stock",
       header: "Available Stock",
       align: "right",
+      isNumeric: true,
       render: (item) => (
         <div>
-          <span className="font-semibold text-slate-900">{item.stock}</span>
-          <span className="text-[10px] text-slate-400 ml-1">/ min {item.reorderLevel}</span>
+          <span className="font-semibold text-slate-900 tabular-nums">{item.stock}</span>
+          <span className="text-[10px] text-slate-400 ml-1 tabular-nums">/ min {item.reorderLevel}</span>
         </div>
       )
     },
@@ -110,16 +112,7 @@ export default function InventoryPage() {
       key: "status",
       header: "Status",
       align: "center",
-      render: (item) => {
-        switch (item.status) {
-          case "IN_STOCK":
-            return <Badge variant="success">In Stock</Badge>;
-          case "LOW_STOCK":
-            return <Badge variant="warning">Low Stock</Badge>;
-          case "OUT_OF_STOCK":
-            return <Badge variant="danger">Out of Stock</Badge>;
-        }
-      }
+      render: (item) => <StatusBadge status={item.status} />
     }
   ];
 
@@ -141,7 +134,7 @@ export default function InventoryPage() {
       }
     >
       <div className="space-y-6">
-        {/* Responsive Table Shell with desktop table & mobile cards */}
+        {/* Standardized Responsive Table */}
         <ResponsiveTable
           data={DEMO_PRODUCTS}
           columns={columns}
@@ -150,21 +143,19 @@ export default function InventoryPage() {
           renderMobileCard={(item) => (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-slate-400">{item.sku}</span>
-                {item.status === "IN_STOCK" && <Badge variant="success">In Stock</Badge>}
-                {item.status === "LOW_STOCK" && <Badge variant="warning">Low Stock</Badge>}
-                {item.status === "OUT_OF_STOCK" && <Badge variant="danger">Out of Stock</Badge>}
+                <span className="font-mono text-xs text-slate-400 tabular-nums">{item.sku}</span>
+                <StatusBadge status={item.status} />
               </div>
               <p className="font-semibold text-sm text-slate-900">{item.name}</p>
-              <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+              <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-border-subtle">
                 <span>{item.category}</span>
-                <span className="font-bold text-slate-900">{item.unitPrice}</span>
+                <span className="font-bold text-slate-900 tabular-nums">{item.unitPrice}</span>
               </div>
             </div>
           )}
         />
 
-        <Card className="border-dashed border-slate-300 bg-slate-50/50">
+        <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
               Inventory Module Scope

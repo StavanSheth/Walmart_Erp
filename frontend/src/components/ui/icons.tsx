@@ -1,6 +1,8 @@
-import type { SVGProps } from "react";
+import * as React from "react";
+import Image from "next/image";
+import { ASSETS } from "@/lib/assets";
 
-export type IconProps = SVGProps<SVGSVGElement>;
+export type IconProps = React.SVGProps<SVGSVGElement>;
 
 export function DashboardIcon({ className = "w-5 h-5", ...props }: IconProps) {
   return (
@@ -272,26 +274,31 @@ export function RefreshCwIcon({ className = "w-4 h-4", ...props }: IconProps) {
   );
 }
 
-export function SparkIcon({ className = "w-5 h-5 text-walmart-yellow", ...props }: IconProps) {
+/**
+ * Official Walmart Spark Presentation Component
+ * Adheres strictly to Walmart Brand Center rules: consumes official vector asset directly.
+ */
+export function SparkIcon({
+  className = "w-5 h-5",
+  variant = "yellow",
+  alt = "Walmart Spark"
+}: {
+  className?: string;
+  variant?: "yellow" | "white";
+  alt?: string;
+}) {
+  const assetSrc = variant === "white" ? ASSETS.brand.sparkWhite : ASSETS.brand.spark;
+
   return (
-    <svg viewBox="0 0 100 100" fill="currentColor" className={className} {...props}>
-      <g>
-        <path d="M44 4 C44 1.8 46 0 48.5 0 L51.5 0 C54 0 56 1.8 56 4 L56 30 C56 32.2 54 34 51.5 34 L48.5 34 C46 34 44 32.2 44 30 Z" />
-        <path d="M44 70 C44 67.8 46 66 48.5 66 L51.5 66 C54 66 56 67.8 56 70 L56 96 C56 98.2 54 100 51.5 100 L48.5 100 C46 100 44 98.2 44 96 Z" />
-        <g transform="rotate(60 50 50)">
-          <path d="M44 4 C44 1.8 46 0 48.5 0 L51.5 0 C54 0 56 1.8 56 4 L56 30 C56 32.2 54 34 51.5 34 L48.5 34 C46 34 44 32.2 44 30 Z" />
-        </g>
-        <g transform="rotate(120 50 50)">
-          <path d="M44 4 C44 1.8 46 0 48.5 0 L51.5 0 C54 0 56 1.8 56 4 L56 30 C56 32.2 54 34 51.5 34 L48.5 34 C46 34 44 32.2 44 30 Z" />
-        </g>
-        <g transform="rotate(240 50 50)">
-          <path d="M44 4 C44 1.8 46 0 48.5 0 L51.5 0 C54 0 56 1.8 56 4 L56 30 C56 32.2 54 34 51.5 34 L48.5 34 C46 34 44 32.2 44 30 Z" />
-        </g>
-        <g transform="rotate(300 50 50)">
-          <path d="M44 4 C44 1.8 46 0 48.5 0 L51.5 0 C54 0 56 1.8 56 4 L56 30 C56 32.2 54 34 51.5 34 L48.5 34 C46 34 44 32.2 44 30 Z" />
-        </g>
-      </g>
-    </svg>
+    <span className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
+      <Image
+        src={assetSrc}
+        alt={alt}
+        fill
+        className="object-contain"
+        unoptimized
+      />
+    </span>
   );
 }
 
