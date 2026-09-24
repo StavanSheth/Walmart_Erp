@@ -31,7 +31,7 @@ export function InventoryDistributionCard({
   ];
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
+    <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
       <div className="flex items-center justify-between pb-1 min-w-0">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
           Inventory Distribution
@@ -39,20 +39,22 @@ export function InventoryDistributionCard({
         <span className="text-xs text-slate-400 font-medium shrink-0">Status</span>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 my-auto py-1 min-w-0">
-        {/* Donut Chart with Centered Total Units */}
-        <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 mx-auto">
+      <div className="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 my-auto py-1 min-w-0">
+        {/* Donut Chart with Centered Total Units - Green slice on right side */}
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={40}
-                outerRadius={54}
-                paddingAngle={4}
+                innerRadius={36}
+                outerRadius={50}
+                paddingAngle={3}
                 dataKey="value"
                 strokeWidth={0}
+                startAngle={90}
+                endAngle={-270}
               >
                 {chartData.map((entry) => (
                   <Cell key={entry.name} fill={entry.color} />
@@ -63,18 +65,18 @@ export function InventoryDistributionCard({
 
           {/* Donut Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-base sm:text-lg font-black text-slate-900 tabular-nums leading-tight">
+            <span className="text-sm sm:text-base font-black text-slate-900 tabular-nums leading-tight">
               {formatNumber(data.totalUnits)}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+            <span className="text-[8px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
               Total Units
             </span>
           </div>
         </div>
 
         {/* Legend & Breakdown */}
-        <div className="space-y-2 sm:space-y-2.5 w-full sm:w-auto text-xs font-semibold shrink-0">
-          <div className="flex items-center justify-between sm:justify-start gap-3">
+        <div className="space-y-1.5 sm:space-y-2 w-auto text-xs font-semibold shrink-0">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
               <span className="text-slate-700">In Stock</span>
@@ -84,7 +86,7 @@ export function InventoryDistributionCard({
             </span>
           </div>
 
-          <div className="flex items-center justify-between sm:justify-start gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
               <span className="text-slate-700">Low Stock</span>
@@ -94,7 +96,7 @@ export function InventoryDistributionCard({
             </span>
           </div>
 
-          <div className="flex items-center justify-between sm:justify-start gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
               <span className="text-slate-700">Out of Stock</span>

@@ -23,7 +23,7 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 space-y-6",
+        "w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-7 xl:px-8 py-3 sm:py-4 lg:py-5 space-y-4 sm:space-y-5",
         className
       )}
       {...props}

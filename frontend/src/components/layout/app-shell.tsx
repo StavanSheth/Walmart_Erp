@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col min-w-0 relative">
           {/* Top Banner Image (Visible till KPI cards end, behind header, greeting, and liquid glass KPI cards) */}
           {isDashboard && (
-            <div className="absolute top-0 left-0 right-0 h-[420px] sm:h-[440px] lg:h-[470px] xl:h-[480px] overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-0 left-0 right-0 h-[450px] sm:h-[480px] lg:h-[510px] xl:h-[520px] overflow-hidden pointer-events-none z-0">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"

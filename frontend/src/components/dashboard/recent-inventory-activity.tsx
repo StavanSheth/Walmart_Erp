@@ -207,8 +207,8 @@ export function RecentInventoryActivity({
   };
 
   return (
-    <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full overflow-hidden shadow-md">
-      <div className="flex items-center justify-between mb-3 min-w-0">
+    <div className="glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between h-full overflow-hidden shadow-md">
+      <div className="flex items-center justify-between mb-2 min-w-0">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
           Recent Inventory Activity
         </h3>
@@ -245,7 +245,7 @@ export function RecentInventoryActivity({
           {displayActivities.map((act) => (
             <div
               key={act.id}
-              className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-2 sm:gap-3 text-xs min-w-0"
+              className="py-2 first:pt-0 last:pb-0 flex items-center justify-between gap-2 sm:gap-3 text-xs min-w-0"
             >
               {/* Product info with product visual thumbnail / icon */}
               <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">

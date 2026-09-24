@@ -50,8 +50,8 @@ export function DashboardAlerts({ alerts = [], isLoading = false }: DashboardAle
   };
 
   return (
-    <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full overflow-hidden shadow-md">
-      <div className="flex items-center justify-between mb-3 min-w-0">
+    <div className="glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between h-full overflow-hidden shadow-md">
+      <div className="flex items-center justify-between mb-2 min-w-0">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
           Alerts & Notifications
         </h3>

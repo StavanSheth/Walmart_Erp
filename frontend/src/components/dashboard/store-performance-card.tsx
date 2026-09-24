@@ -12,8 +12,8 @@ export function StorePerformanceCard({ stores = [], isLoading = false }: StorePe
   const topStores = stores.slice(0, 5);
 
   return (
-    <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full overflow-hidden shadow-md">
-      <div className="flex items-center justify-between mb-3 min-w-0">
+    <div className="glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between h-full overflow-hidden shadow-md">
+      <div className="flex items-center justify-between mb-2 min-w-0">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
           Store Performance
         </h3>
@@ -31,7 +31,7 @@ export function StorePerformanceCard({ stores = [], isLoading = false }: StorePe
       </div>
 
       {isLoading ? (
-        <div className="space-y-3.5 py-2">
+        <div className="space-y-3 py-2">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="animate-pulse flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-slate-200/70 shrink-0" />
@@ -46,7 +46,7 @@ export function StorePerformanceCard({ stores = [], isLoading = false }: StorePe
           No store performance data available
         </div>
       ) : (
-        <div className="space-y-3 my-auto">
+        <div className="space-y-2 sm:space-y-2.5 my-auto">
           {topStores.map((store, index) => {
             const rank = store.rank || index + 1;
             const pct = Math.round(store.relativePercentage || 0);

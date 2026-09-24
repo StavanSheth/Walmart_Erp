@@ -94,9 +94,9 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
   const hasData = combinedPoints.length > 0;
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
+    <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
       {/* Header with Title & Selector */}
-      <div className="flex items-center justify-between pb-2 min-w-0">
+      <div className="flex items-center justify-between pb-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-brand-primary text-base shrink-0">📊</span>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
@@ -119,7 +119,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
       </div>
 
       {/* Main Headline Metric & Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-2 min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-1.5 min-w-0">
         <div className="flex items-baseline gap-2.5 min-w-0">
           <span className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight truncate">
             {formatCurrency(chartData.totalSales)}
@@ -137,7 +137,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
             <span className="text-slate-700">Sales</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00B5E2]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#00C4FF]" />
             <span className="text-slate-700">Purchases</span>
           </div>
         </div>
@@ -151,17 +151,17 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
           className="py-10"
         />
       ) : (
-        <div className="w-full min-w-0 h-[220px] sm:h-[240px] mt-2">
+        <div className="w-full min-w-0 h-[185px] sm:h-[195px] mt-1">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={combinedPoints} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0071DC" stopOpacity={0.35} />
+                  <stop offset="5%" stopColor="#0071DC" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#0071DC" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="purchasesGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00B5E2" stopOpacity={0.30} />
-                  <stop offset="95%" stopColor="#00B5E2" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="#00C4FF" stopOpacity={0.20} />
+                  <stop offset="95%" stopColor="#00C4FF" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
@@ -201,12 +201,12 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
                 type="monotone"
                 dataKey="purchases"
                 name="Purchases"
-                stroke="#00B5E2"
+                stroke="#00C4FF"
                 strokeWidth={2.5}
                 fillOpacity={1}
                 fill="url(#purchasesGrad)"
-                dot={{ r: 2.5, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 1.5 }}
-                activeDot={{ r: 5, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 2 }}
+                dot={{ r: 2.5, fill: "#00C4FF", stroke: "#FFF", strokeWidth: 1.5 }}
+                activeDot={{ r: 5, fill: "#00C4FF", stroke: "#FFF", strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>

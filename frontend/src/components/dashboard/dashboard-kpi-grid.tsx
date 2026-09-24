@@ -116,7 +116,7 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* 1. Total Products */}
-        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               📦
@@ -140,7 +140,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 2. In Stock (Units) */}
-        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🟢
@@ -164,7 +164,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 3. Low Stock Items */}
-        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/35 flex items-center justify-center text-amber-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               ⚠️
@@ -188,7 +188,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 4. Out of Stock */}
-        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🚫
@@ -212,7 +212,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 5. Total Store Locations */}
-        <div className="bg-[#082244]/60 hover:bg-[#082244]/70 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-lg shrink-0 backdrop-blur-md shadow-xs">
               🏪
@@ -241,7 +241,7 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="grid grid-cols-2 gap-3 md:hidden">
         {/* 1. Total Sales (Today) */}
-        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 text-sm mb-2 backdrop-blur-md">
             🛒
           </div>
@@ -260,7 +260,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 2. Total Orders */}
-        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
           <div className="w-8 h-8 rounded-lg bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 text-sm mb-2 backdrop-blur-md">
             📄
           </div>
@@ -279,7 +279,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 3. Active Stores */}
-        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
           <div className="w-8 h-8 rounded-lg bg-purple-500/25 border border-purple-400/35 flex items-center justify-center text-purple-200 text-sm mb-2 backdrop-blur-md">
             🏬
           </div>
@@ -298,7 +298,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 4. Total Inventory Value */}
-        <div className="bg-[#082244]/65 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white">
+        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
           <div className="w-8 h-8 rounded-lg bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 text-sm mb-2 backdrop-blur-md">
             📦
           </div>

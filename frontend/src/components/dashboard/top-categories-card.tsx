@@ -22,8 +22,8 @@ export function TopCategoriesCard({ categories = [], isLoading = false }: TopCat
   const topList = categories.slice(0, 5);
 
   return (
-    <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full overflow-hidden shadow-md">
-      <div className="flex items-center justify-between mb-3 min-w-0">
+    <div className="glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between h-full overflow-hidden shadow-md">
+      <div className="flex items-center justify-between mb-2 min-w-0">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight flex items-baseline gap-1 min-w-0 truncate">
           <span className="truncate">Top Categories</span>
           <span className="text-[11px] font-normal text-slate-500 hidden sm:inline shrink-0">(By Stock Value)</span>
