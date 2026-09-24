@@ -158,29 +158,29 @@ export function GlobalSearchTrigger({ className, isDashboard = false }: { classN
       onClick={() => setSearchOpen(true)}
       aria-label="Open global search (Ctrl+K)"
       className={cn(
-        "flex items-center justify-between w-full h-9 px-3 rounded-md transition-colors shadow-xs group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+        "flex items-center justify-between w-full h-10 px-4 rounded-2xl transition-all duration-200 shadow-xs group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary cursor-pointer",
         isDashboard
-          ? "border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md rounded-full text-xs"
-          : "border border-border bg-surface text-xs text-slate-400 hover:border-border-strong hover:bg-surface-subtle",
+          ? "border border-white/25 bg-white/20 hover:bg-white/25 text-white backdrop-blur-md"
+          : "border border-border bg-surface text-slate-400 hover:border-border-strong hover:bg-surface-subtle",
         className
       )}
     >
-      <div className="flex items-center gap-2 truncate">
+      <div className="flex items-center gap-2.5 truncate">
         <SearchIcon
           className={cn(
             "w-4 h-4 shrink-0 transition-colors",
             isDashboard ? "text-white/80" : "text-slate-400 group-hover:text-slate-600"
           )}
         />
-        <span className={cn("truncate text-xs", isDashboard ? "text-white/80" : "text-slate-400")}>
+        <span className={cn("truncate text-xs font-medium", isDashboard ? "text-white/90" : "text-slate-500")}>
           Search products, SKUs, stores, customers...
         </span>
       </div>
       <kbd
         className={cn(
-          "hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded",
+          "hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-semibold rounded-lg",
           isDashboard
-            ? "text-white/90 bg-white/20 border border-white/25"
+            ? "text-white/95 bg-white/20 border border-white/25"
             : "text-slate-500 bg-surface-muted border border-border"
         )}
       >
