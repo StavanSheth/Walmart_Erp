@@ -6,3 +6,593 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum RegionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum StoreStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+enum InventoryMovementType {
+  OPENING
+  PURCHASE
+  SALE
+  RETURN
+  ADJUSTMENT
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+enum PartnerType {
+  SUPPLIER
+  WHOLESALER
+  DISTRIBUTOR
+  VENDOR
+}
+
+enum PartnerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CustomerType {
+  RETAIL
+  BUSINESS
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  UPI
+  BANK_TRANSFER
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PurchaseStatus {
+  DRAFT
+  ORDERED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+// ============================================================================
+// 1. TENANCY & IDENTITY MODELS
+// ============================================================================
+
+model Organization {
+  id        String             @id @default(uuid())
+  name      String
+  code      String             @unique
+  currency  String             @default("INR")
+  timezone  String             @default("Asia/Kolkata")
+  status    OrganizationStatus @default(ACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  // Tenant-owned entity collections
+  users              User[]
+  regions            Region[]
+  stores             Store[]
+  categories         Category[]
+  products           Product[]
+  inventory          Inventory[]
+  inventoryMovements InventoryMovement[]
+  partners           Partner[]
+  customers          Customer[]
+  salesOrders        SalesOrder[]
+  payments           Payment[]
+  purchaseOrders     PurchaseOrder[]
+  accounts           Account[]
+  journalEntries     JournalEntry[]
+  auditLogs          AuditLog[]
+
+  @@index([name])
+  @@index([status])
+}
+
+model User {
+  id             String     @id @default(uuid())
+  organizationId String
+  roleId         String?
+  name           String
+  email          String
+  phone          String?
+  passwordHash   String
+  status         UserStatus @default(ACTIVE)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role          Role?        @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  managedStores Store[]      @relation("StoreManager")
+  auditLogs     AuditLog[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId, status])
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  code        String  @unique
+  name        String
+  description String?
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+// ============================================================================
+// 2. GEOGRAPHY & STORE MODELS
+// ============================================================================
+
+model Region {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  code           String
+  status         RegionStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  stores       Store[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status])
+}
+
+model Store {
+  id             String      @id @default(uuid())
+  organizationId String
+  regionId       String?
+  name           String
+  code           String
+  address        String?
+  city           String?
+  state          String?
+  country        String      @default("India")
+  pincode        String?
+  phone          String?
+  email          String?
+  managerId      String?
+  status         StoreStatus @default(ACTIVE)
+  image          String?
+  latitude       Decimal?    @db.Decimal(10, 7)
+  longitude      Decimal?    @db.Decimal(10, 7)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  region       Region?      @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  manager      User?        @relation("StoreManager", fields: [managerId], references: [id], onDelete: SetNull)
+
+  inventory          Inventory[]
+  inventoryMovements InventoryMovement[]
+  salesOrders        SalesOrder[]
+  purchaseOrders     PurchaseOrder[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, regionId])
+  @@index([organizationId, status])
+}
+
+// ============================================================================
+// 3. PRODUCT & INVENTORY MODELS
+// ============================================================================
+
+model Category {
+  id             String         @id @default(uuid())
+  organizationId String
+  parentId       String?
+  name           String
+  code           String
+  description    String?
+  status         CategoryStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent       Category?    @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Category[]   @relation("CategoryHierarchy")
+  products     Product[]
+
+  @@unique([organizationId, code])
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+}
+
+model Product {
+  id             String        @id @default(uuid())
+  organizationId String
+  categoryId     String?
+  sku            String
+  barcode        String?
+  name           String
+  description    String?
+  unit           String        @default("pcs")
+  costPrice      Decimal       @db.Decimal(12, 2)
+  sellingPrice   Decimal       @db.Decimal(12, 2)
+  taxRate        Decimal       @default(0) @db.Decimal(5, 2)
+  reorderLevel   Int           @default(0)
+  status         ProductStatus @default(ACTIVE)
+  image          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category     Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  inventory          Inventory[]
+  inventoryMovements InventoryMovement[]
+  salesOrderItems    SalesOrderItem[]
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@unique([organizationId, sku])
+  @@unique([organizationId, barcode])
+  @@index([organizationId, categoryId])
+  @@index([organizationId, status])
+  @@index([organizationId, name])
+}
+
+model Inventory {
+  id             String   @id @default(uuid())
+  organizationId String
+  storeId        String
+  productId      String
+  onHand         Int      @default(0)
+  reserved       Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product      Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Available stock is computed: onHand - reserved
+  @@unique([organizationId, storeId, productId])
+  @@index([storeId, productId])
+  @@index([productId])
+}
+
+model InventoryMovement {
+  id             String                @id @default(uuid())
+  organizationId String
+  storeId        String
+  productId      String
+  type           InventoryMovementType
+  quantity       Int
+  unitCost       Decimal?              @db.Decimal(12, 2)
+  referenceType  String?
+  referenceId    String?
+  notes          String?
+  createdAt      DateTime              @default(now())
+
+  // Historical audit log: Restrict deletion to preserve transaction history
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  product      Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, storeId, productId])
+  @@index([organizationId, type, createdAt])
+  @@index([referenceType, referenceId])
+}
+
+// ============================================================================
+// 4. PARTIES (PARTNERS & CUSTOMERS)
+// ============================================================================
+
+model Partner {
+  id             String        @id @default(uuid())
+  organizationId String
+  name           String
+  type           PartnerType
+  phone          String?
+  email          String?
+  address        String?
+  taxId          String?
+  creditLimit    Decimal       @default(0) @db.Decimal(12, 2)
+  status         PartnerStatus @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purchaseOrders PurchaseOrder[]
+
+  @@index([organizationId, type])
+  @@index([organizationId, status])
+}
+
+model Customer {
+  id             String         @id @default(uuid())
+  organizationId String
+  name           String
+  phone          String?
+  email          String?
+  address        String?
+  customerType   CustomerType   @default(RETAIL)
+  creditLimit    Decimal        @default(0) @db.Decimal(12, 2)
+  status         CustomerStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrders  SalesOrder[]
+
+  @@index([organizationId, phone])
+  @@index([organizationId, status])
+}
+
+// ============================================================================
+// 5. SALES & PAYMENT TRANSACTIONS
+// ============================================================================
+
+model SalesOrder {
+  id             String      @id @default(uuid())
+  organizationId String
+  storeId        String
+  customerId     String?
+  orderNumber    String
+  status         OrderStatus @default(DRAFT)
+  subtotal       Decimal     @default(0) @db.Decimal(12, 2)
+  discount       Decimal     @default(0) @db.Decimal(12, 2)
+  tax            Decimal     @default(0) @db.Decimal(12, 2)
+  total          Decimal     @default(0) @db.Decimal(12, 2)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Historical financial record: Restrict cascade on store and organization
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  store        Store            @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  customer     Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items        SalesOrderItem[]
+  payments     Payment[]
+
+  @@unique([organizationId, orderNumber])
+  @@index([organizationId, storeId, createdAt])
+  @@index([organizationId, customerId])
+  @@index([status])
+}
+
+model SalesOrderItem {
+  id           String  @id @default(uuid())
+  salesOrderId String
+  productId    String
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(12, 2)
+  discount     Decimal @default(0) @db.Decimal(12, 2)
+  tax          Decimal @default(0) @db.Decimal(12, 2)
+  total        Decimal @db.Decimal(12, 2)
+
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([salesOrderId])
+  @@index([productId])
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  organizationId String
+  salesOrderId   String?
+  amount         Decimal       @db.Decimal(12, 2)
+  method         PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  reference      String?
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  salesOrder   SalesOrder?  @relation(fields: [salesOrderId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([salesOrderId])
+  @@index([paidAt])
+}
+
+// ============================================================================
+// 6. PROCUREMENT (PURCHASE ORDERS)
+// ============================================================================
+
+model PurchaseOrder {
+  id             String         @id @default(uuid())
+  organizationId String
+  storeId        String
+  partnerId      String
+  orderNumber    String
+  status         PurchaseStatus @default(DRAFT)
+  subtotal       Decimal        @default(0) @db.Decimal(12, 2)
+  tax            Decimal        @default(0) @db.Decimal(12, 2)
+  total          Decimal        @default(0) @db.Decimal(12, 2)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Historical record: Restrict cascade deletion
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  store        Store               @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  partner      Partner             @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  items        PurchaseOrderItem[]
+
+  @@unique([organizationId, orderNumber])
+  @@index([organizationId, storeId, createdAt])
+  @@index([organizationId, partnerId])
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(uuid())
+  purchaseOrderId String
+  productId       String
+  quantity        Int
+  unitCost        Decimal @db.Decimal(12, 2)
+  tax             Decimal @default(0) @db.Decimal(12, 2)
+  total           Decimal @db.Decimal(12, 2)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([purchaseOrderId])
+  @@index([productId])
+}
+
+// ============================================================================
+// 7. GENERAL LEDGER & DOUBLE-ENTRY ACCOUNTING
+// ============================================================================
+
+model Account {
+  id             String      @id @default(uuid())
+  organizationId String
+  code           String
+  name           String
+  type           AccountType
+  parentId       String?
+  isActive       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent       Account?      @relation("AccountHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Account[]     @relation("AccountHierarchy")
+  journalLines JournalLine[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, type])
+}
+
+model JournalEntry {
+  id             String   @id @default(uuid())
+  organizationId String
+  entryNumber    String?
+  referenceType  String?
+  referenceId    String?
+  description    String
+  entryDate      DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  // Financial audit log: Restrict cascade deletion
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  lines        JournalLine[]
+
+  @@index([organizationId, entryDate])
+  @@index([referenceType, referenceId])
+}
+
+model JournalLine {
+  id             String  @id @default(uuid())
+  journalEntryId String
+  accountId      String
+  debit          Decimal @default(0) @db.Decimal(12, 2)
+  credit         Decimal @default(0) @db.Decimal(12, 2)
+
+  // Double-entry rule: SUM(debit) == SUM(credit) per JournalEntry enforced at service layer
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account      Account      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([journalEntryId])
+  @@index([accountId])
+}
+
+// ============================================================================
+// 8. AUDIT LOGGING
+// ============================================================================
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  action         String
+  entity         String
+  entityId       String?
+  oldValue       Json?
+  newValue       Json?
+  createdAt      DateTime @default(now())
+
+  // Immutable audit trail: Restrict cascade deletion
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([entity, entityId])
+  @@index([organizationId, userId])
+}
