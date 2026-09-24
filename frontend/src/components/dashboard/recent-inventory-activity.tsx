@@ -29,14 +29,14 @@ export function RecentInventoryActivity({
   };
 
   return (
-    <div className="glass-card rounded-2xl p-5 flex flex-col justify-between h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+    <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full overflow-hidden shadow-md">
+      <div className="flex items-center justify-between mb-3 min-w-0">
+        <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
           Recent Inventory Activity
         </h3>
         <Link
           href="/inventory"
-          className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition"
+          className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition shrink-0"
         >
           <span>View All</span>
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,13 +48,13 @@ export function RecentInventoryActivity({
       {isLoading ? (
         <div className="space-y-3 py-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="animate-pulse flex items-center gap-3">
-              <div className="w-7 h-7 rounded bg-slate-200/70" />
-              <div className="flex-1 space-y-1">
+            <div key={i} className="animate-pulse flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded bg-slate-200/70 shrink-0" />
+              <div className="flex-1 space-y-1 min-w-0">
                 <div className="h-3 bg-slate-200/70 rounded w-1/2" />
                 <div className="h-2.5 bg-slate-200/70 rounded w-1/4" />
               </div>
-              <div className="h-3 bg-slate-200/70 rounded w-20" />
+              <div className="h-3 bg-slate-200/70 rounded w-16 shrink-0" />
             </div>
           ))}
         </div>
@@ -63,18 +63,18 @@ export function RecentInventoryActivity({
           No recent inventory activity recorded
         </div>
       ) : (
-        <div className="divide-y divide-slate-100/70">
+        <div className="divide-y divide-slate-100/70 my-auto">
           {displayActivities.map((act) => (
             <div
               key={act.id}
-              className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs"
+              className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-2 sm:gap-3 text-xs min-w-0"
             >
               {/* Product info with subtle icon */}
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="w-7 h-7 rounded-lg bg-blue-50/80 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600 font-bold text-[10px]">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600 font-bold text-[10px]">
                   {act.productName.slice(0, 2).toUpperCase()}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="font-semibold text-slate-800 truncate" title={act.productName}>
                     {act.productName}
                   </p>
@@ -85,15 +85,15 @@ export function RecentInventoryActivity({
               </div>
 
               {/* Activity Label with dot indicator */}
-              <div className="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-white/60 border border-slate-100/80">
-                <span className={`w-2 h-2 rounded-full ${getDotColor(act.statusColor)}`} />
-                <span className="font-medium text-slate-700 text-[11px]">
+              <div className="flex items-center gap-1.5 shrink-0 px-2 py-0.5 rounded-full bg-white/70 border border-slate-100 text-[10px] sm:text-[11px] max-w-[130px] sm:max-w-[160px] truncate">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${getDotColor(act.statusColor)}`} />
+                <span className="font-medium text-slate-700 truncate">
                   {act.activityLabel}
                 </span>
               </div>
 
               {/* Time */}
-              <div className="text-right text-[11px] font-medium text-slate-400 tabular-nums shrink-0 w-16">
+              <div className="text-right text-[10px] sm:text-[11px] font-medium text-slate-400 tabular-nums shrink-0">
                 {act.time}
               </div>
             </div>

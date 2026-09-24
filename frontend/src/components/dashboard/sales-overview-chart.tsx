@@ -34,15 +34,17 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl border border-white/70 bg-white/95 p-3 shadow-lg text-xs space-y-1 z-50 backdrop-blur-md">
+      <div className="rounded-xl border border-white/80 bg-white/95 p-2.5 shadow-lg text-xs space-y-1 z-50 backdrop-blur-md">
         <p className="font-bold text-slate-800">{formatShortDate(label || "")}</p>
         {payload.map((entry) => (
-          <div key={entry.name} className="flex items-center gap-2">
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-slate-600 capitalize">{entry.name}:</span>
+          <div key={entry.name} className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-1.5 text-slate-600 capitalize">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              {entry.name}:
+            </span>
             <span className="font-bold text-slate-900 tabular-nums">
               {formatCurrency(entry.value)}
             </span>
@@ -60,7 +62,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
 
   if (isLoading || !chartData) {
     return (
-      <div className="p-5 rounded-2xl glass-card space-y-3">
+      <div className="p-4 sm:p-5 rounded-2xl glass-card space-y-3 h-full overflow-hidden">
         <div className="flex justify-between items-center">
           <Skeleton className="h-5 w-32 rounded" />
           <Skeleton className="h-7 w-24 rounded-full" />
@@ -72,7 +74,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
   }
 
   // Combine sales and purchases into one chart series
-  const combinedPoints = chartData.sales.map((sPoint) => {
+  const allPoints = chartData.sales.map((sPoint) => {
     const pPoint = chartData.purchases.find((p) => p.date === sPoint.date);
     return {
       date: sPoint.date,
@@ -81,20 +83,28 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
     };
   });
 
+  // Filter points based on selectedRange to prevent crowding
+  const combinedPoints =
+    selectedRange === "7d"
+      ? allPoints.slice(-7)
+      : selectedRange === "30d"
+        ? allPoints.slice(-30)
+        : allPoints;
+
   const hasData = combinedPoints.length > 0;
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl glass-card flex flex-col justify-between shadow-lg">
+    <div className="p-4 sm:p-5 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
       {/* Header with Title & Selector */}
-      <div className="flex items-center justify-between pb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-brand-primary text-base">📊</span>
-          <h3 className="text-sm sm:text-base font-bold text-slate-900">
+      <div className="flex items-center justify-between pb-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-brand-primary text-base shrink-0">📊</span>
+          <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
             Sales Overview
           </h3>
         </div>
 
-        <div className="relative inline-flex items-center">
+        <div className="relative inline-flex items-center shrink-0">
           <select
             value={selectedRange}
             onChange={(e) => setSelectedRange(e.target.value)}
@@ -109,24 +119,24 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
       </div>
 
       {/* Main Headline Metric & Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-2">
-        <div className="flex items-baseline gap-2.5">
-          <span className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-2 min-w-0">
+        <div className="flex items-baseline gap-2.5 min-w-0">
+          <span className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight truncate">
             {formatCurrency(chartData.totalSales)}
           </span>
-          <div className="inline-flex items-center gap-1 text-xs">
+          <div className="inline-flex items-center gap-1 text-xs shrink-0">
             <span className="font-bold text-emerald-600">↑ {chartData.changePercent}%</span>
             <span className="text-slate-500 font-medium hidden xs:inline">vs. previous period</span>
           </div>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 text-xs font-semibold">
+        <div className="flex items-center gap-4 text-xs font-semibold shrink-0">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#0071DC]" />
             <span className="text-slate-700">Sales</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00B5E2]" />
             <span className="text-slate-700">Purchases</span>
           </div>
@@ -141,7 +151,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
           className="py-10"
         />
       ) : (
-        <div className="w-full h-[220px] sm:h-[240px] mt-2">
+        <div className="w-full min-w-0 h-[220px] sm:h-[240px] mt-2">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={combinedPoints} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <defs>
@@ -150,7 +160,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
                   <stop offset="95%" stopColor="#0071DC" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="purchasesGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00B5E2" stopOpacity={0.25} />
+                  <stop offset="5%" stopColor="#00B5E2" stopOpacity={0.30} />
                   <stop offset="95%" stopColor="#00B5E2" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
@@ -162,6 +172,8 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
                 fontSize={10}
                 tickLine={false}
                 axisLine={{ stroke: "#E2E8F0" }}
+                interval="preserveStartEnd"
+                minTickGap={25}
               />
               <YAxis
                 tickFormatter={(val) => formatCurrency(val, true)}
@@ -172,6 +184,7 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
                 width={45}
               />
               <Tooltip content={<CustomTooltip />} />
+              {/* Sales Plot (Dark Blue) */}
               <Area
                 type="monotone"
                 dataKey="sales"
@@ -180,17 +193,20 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
                 strokeWidth={2.5}
                 fillOpacity={1}
                 fill="url(#salesGrad)"
+                dot={{ r: 2.5, fill: "#0071DC", stroke: "#FFF", strokeWidth: 1.5 }}
                 activeDot={{ r: 5, fill: "#0071DC", stroke: "#FFF", strokeWidth: 2 }}
               />
+              {/* Purchases Plot (Cyan / Turquoise) */}
               <Area
                 type="monotone"
                 dataKey="purchases"
                 name="Purchases"
                 stroke="#00B5E2"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 fillOpacity={1}
                 fill="url(#purchasesGrad)"
-                activeDot={{ r: 4, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 2 }}
+                dot={{ r: 2.5, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 1.5 }}
+                activeDot={{ r: 5, fill: "#00B5E2", stroke: "#FFF", strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
