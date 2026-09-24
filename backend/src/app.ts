@@ -13,17 +13,23 @@ export interface HealthResponse {
   timestamp: string;
 }
 
-export function buildApp(): FastifyInstance {
+export interface AppOptions {
+  checkDb?: () => Promise<boolean>;
+}
+
+export function buildApp(options: AppOptions = {}): FastifyInstance {
+  const checkDb = options.checkDb ?? checkDatabaseConnection;
+
   const app = fastify({
     logger: getLoggerConfig()
   });
 
-  // Configurable CORS with explicit allowed origins
-  const allowedOrigins = config.CORS_ORIGIN.split(",").map((o) => o.trim());
+  // Configurable CORS using once-normalized allowed origins
+  const allowedOrigins = config.corsOrigins;
 
   app.register(cors, {
     origin: (origin, callback) => {
-      // Allow requests with no origin (curl, server-to-server, native apps)
+      // Allow requests with no origin (curl, server-to-server, native tools)
       if (!origin) {
         callback(null, true);
         return;
@@ -31,7 +37,8 @@ export function buildApp(): FastifyInstance {
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`CORS origin not allowed: ${origin}`), false);
+        // Disallow CORS: do not reflect Access-Control-Allow-Origin
+        callback(null, false);
       }
     },
     credentials: true,
@@ -55,13 +62,15 @@ export function buildApp(): FastifyInstance {
     }
 
     const statusCode = (error as { statusCode?: number }).statusCode || 500;
+    const isProd = config.NODE_ENV === "production";
     reply.status(statusCode).send({
       success: false,
       error: {
-        message: statusCode === 500 && config.NODE_ENV === "production"
+        message: statusCode === 500 && isProd
           ? "Internal Server Error"
           : error.message || "An unexpected error occurred",
-        statusCode
+        statusCode,
+        code: statusCode === 500 ? "INTERNAL_SERVER_ERROR" : "ERROR"
       }
     });
   });
@@ -78,9 +87,9 @@ export function buildApp(): FastifyInstance {
     });
   });
 
-  // Phase 1 Health Endpoint with real PostgreSQL verification
+  // Phase 1 Health Endpoint with PostgreSQL verification
   app.get("/api/health", async (_request: FastifyRequest, reply: FastifyReply) => {
-    const isDbConnected = await checkDatabaseConnection();
+    const isDbConnected = await checkDb();
     const timestamp = new Date().toISOString();
 
     if (isDbConnected) {
@@ -100,7 +109,6 @@ export function buildApp(): FastifyInstance {
         database: "error",
         timestamp
       };
-      // HTTP 503 Service Unavailable when core dependency (database) is down
       return reply.status(503).send(response);
     }
   });

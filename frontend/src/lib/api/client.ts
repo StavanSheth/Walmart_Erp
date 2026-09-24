@@ -17,38 +17,25 @@ export class ApiClient {
   private readonly baseUrl: string;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || env.NEXT_PUBLIC_API_URL;
+    const rawUrl = baseUrl || env.NEXT_PUBLIC_API_URL;
+    this.baseUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
   }
 
   public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const url = `${this.baseUrl}${formattedEndpoint}`;
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       ...options.headers
     };
 
+    let response: Response;
     try {
-      const response = await fetch(url, {
+      response = await fetch(url, {
         ...options,
         headers
       });
-
-      if (!response.ok) {
-        let errorData: unknown;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = await response.text();
-        }
-        throw new ApiError(
-          `Request failed with status ${response.status}`,
-          response.status,
-          errorData
-        );
-      }
-
-      return (await response.json()) as T;
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
@@ -57,6 +44,26 @@ export class ApiClient {
         error instanceof Error ? error.message : "Network error occurred"
       );
     }
+
+    if (!response.ok) {
+      let errorData: unknown;
+      try {
+        errorData = await response.json();
+      } catch {
+        try {
+          errorData = await response.text();
+        } catch {
+          errorData = null;
+        }
+      }
+      throw new ApiError(
+        `Request failed with status ${response.status}`,
+        response.status,
+        errorData
+      );
+    }
+
+    return (await response.json()) as T;
   }
 
   /**

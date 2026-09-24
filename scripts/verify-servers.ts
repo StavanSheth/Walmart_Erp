@@ -30,16 +30,20 @@ async function runVerification() {
   const backendUrl = process.env.BACKEND_URL || "http://localhost:4000";
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
-  // 1. Backend reachability and health endpoint
+  let backendReachable = false;
+
+  // 1. Backend reachability and health endpoint with authorized origin
   try {
     const res = await fetch(`${backendUrl}/api/health`, {
       headers: { Origin: frontendUrl }
     });
 
-    const isHttpOk = res.status === 200 || res.status === 503;
+    const isHttpExpected = res.status === 200 || res.status === 503;
+    backendReachable = isHttpExpected;
+
     record(
       "Backend Reachability",
-      isHttpOk,
+      isHttpExpected,
       `HTTP status ${res.status} received from ${backendUrl}/api/health`
     );
 
@@ -47,54 +51,76 @@ async function runVerification() {
     const parseResult = HealthResponseSchema.safeParse(data);
 
     record(
-      "Health Response Shape",
+      "Health Response Schema",
       parseResult.success,
       parseResult.success
         ? `Response matches schema: ${JSON.stringify(data)}`
         : `Schema validation failed: ${JSON.stringify(parseResult.error?.format())}`
     );
 
-    // 2. Real database connectivity check
+    // 2. Real database connectivity verification
     if (parseResult.success) {
-      const isDbOk = data.database === "ok";
+      const isConsistent =
+        (res.status === 200 && data.status === "ok" && data.database === "ok") ||
+        (res.status === 503 && data.status === "degraded" && data.database === "error");
+
       record(
         "Database Status Verification",
-        true,
-        isDbOk
-          ? "PostgreSQL database connection is ACTIVE and verified (SELECT 1 succeeded)"
-          : "Fastify verified that PostgreSQL is currently unreachable (reported 'database: error')"
+        isConsistent,
+        data.database === "ok"
+          ? "PostgreSQL database connection is ACTIVE and verified (SELECT 1 succeeded, status 200)"
+          : "Backend correctly reported real database state as DISCONNECTED (status 503 degraded, no faked health)"
       );
+    } else {
+      record("Database Status Verification", false, "Could not verify database status due to invalid schema");
     }
 
-    // 3. CORS verification for allowed origin
+    // 3. CORS verification for authorized origin
     const corsHeader = res.headers.get("access-control-allow-origin");
     record(
-      "CORS Allowed Origin",
+      "CORS Authorized Origin",
       corsHeader === frontendUrl,
-      `Access-Control-Allow-Origin header is '${corsHeader}', expected '${frontendUrl}'`
+      `Access-Control-Allow-Origin is '${corsHeader}', expected '${frontendUrl}'`
     );
   } catch (err) {
-    record("Backend Reachability", false, `Failed to reach backend: ${(err as Error).message}`);
+    record("Backend Reachability", false, `Failed to reach backend at ${backendUrl}: ${(err as Error).message}`);
+    record("Health Response Schema", false, "Skipped: backend unreachable");
+    record("Database Status Verification", false, "Skipped: backend unreachable");
+    record("CORS Authorized Origin", false, "Skipped: backend unreachable");
   }
 
-  // 4. CORS rejection verification for unauthorized origin
-  try {
-    const unauthorizedOrigin = "http://unauthorized-domain.example.com";
-    const res = await fetch(`${backendUrl}/api/health`, {
-      headers: { Origin: unauthorizedOrigin }
-    });
-    const corsHeader = res.headers.get("access-control-allow-origin");
-    const isRejected = corsHeader !== unauthorizedOrigin;
+  // 4. CORS verification for unauthorized origin
+  if (!backendReachable) {
     record(
       "CORS Unauthorized Origin Rejection",
-      isRejected,
-      isRejected
-        ? "Unauthorized origin successfully denied access"
-        : `Unauthorized origin unexpectedly allowed: ${corsHeader}`
+      false,
+      "INFRASTRUCTURE FAILURE: Backend is not reachable, cannot verify CORS rejection"
     );
-  } catch {
-    // If the server aborted or closed connection for unauthorized origin, that's a pass
-    record("CORS Unauthorized Origin Rejection", true, "Connection closed or rejected for unauthorized origin");
+  } else {
+    try {
+      const unauthorizedOrigin = "http://unauthorized-domain.example.com";
+      const res = await fetch(`${backendUrl}/api/health`, {
+        headers: { Origin: unauthorizedOrigin }
+      });
+
+      const corsHeader = res.headers.get("access-control-allow-origin");
+      const isRejected = corsHeader !== unauthorizedOrigin;
+
+      record(
+        "CORS Unauthorized Origin Rejection",
+        isRejected,
+        isRejected
+          ? `Unauthorized origin successfully denied (allow-origin: ${corsHeader ?? "none"})`
+          : `Unauthorized origin unexpectedly allowed: ${corsHeader}`
+      );
+    } catch (err) {
+      // Do not convert network errors or crash into CORS success
+      record(
+        "CORS Unauthorized Origin Rejection",
+        false,
+        `INFRASTRUCTURE FAILURE: Backend failed during unauthorized CORS check: ${(err as Error).message}`
+      );
+    }
   }
 
   // 5. Frontend reachability
@@ -109,7 +135,7 @@ async function runVerification() {
       `HTTP status ${res.status}, valid HTML page rendered`
     );
   } catch (err) {
-    record("Frontend Reachability", false, `Failed to reach frontend: ${(err as Error).message}`);
+    record("Frontend Reachability", false, `Failed to reach frontend at ${frontendUrl}: ${(err as Error).message}`);
   }
 
   console.log("==================================================");
