@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/cn";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "elevated" | "outlined" | "interactive" | "selected";
+  variant?: "default" | "elevated" | "outlined" | "interactive" | "selected" | "glass";
 }
 
 export function Card({ className, variant = "default", ...props }: CardProps) {
@@ -13,7 +13,9 @@ export function Card({ className, variant = "default", ...props }: CardProps) {
     interactive:
       "bg-surface border-border shadow-xs hover:border-border-strong hover:shadow-sm cursor-pointer transition-all duration-150",
     selected:
-      "bg-surface border-brand-primary shadow-xs ring-1 ring-brand-primary"
+      "bg-surface border-brand-primary shadow-xs ring-1 ring-brand-primary",
+    glass:
+      "glass text-slate-900 shadow-glass border-border/80"
   };
 
   return (
