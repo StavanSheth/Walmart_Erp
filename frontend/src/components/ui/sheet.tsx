@@ -11,6 +11,7 @@ export interface SheetProps {
   side?: "left" | "right" | "bottom";
   children: React.ReactNode;
   className?: string;
+  variant?: "default" | "glass";
 }
 
 export function Sheet({
@@ -19,7 +20,8 @@ export function Sheet({
   title,
   side = "left",
   children,
-  className
+  className,
+  variant = "default"
 }: SheetProps) {
   // Escape key handler
   React.useEffect(() => {
@@ -47,17 +49,30 @@ export function Sheet({
 
   if (!isOpen) return null;
 
+  const isGlass = variant === "glass";
+
   const sideClasses = {
-    left: "inset-y-0 left-0 h-full w-72 sm:w-80 shadow-2xl border-r border-border anim-drawer-left",
-    right: "inset-y-0 right-0 h-full w-80 sm:w-96 shadow-2xl border-l border-border anim-drawer-right",
-    bottom: "inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl shadow-2xl border-t border-border anim-drawer-bottom"
+    left: isGlass
+      ? "inset-y-0 left-0 h-full w-72 sm:w-80 shadow-2xl border-r border-white/20 anim-drawer-left"
+      : "inset-y-0 left-0 h-full w-72 sm:w-80 shadow-2xl border-r border-border anim-drawer-left",
+    right: isGlass
+      ? "inset-y-0 right-0 h-full w-80 sm:w-96 shadow-2xl border-l border-white/20 anim-drawer-right"
+      : "inset-y-0 right-0 h-full w-80 sm:w-96 shadow-2xl border-l border-border anim-drawer-right",
+    bottom: isGlass
+      ? "inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl shadow-2xl border-t border-white/20 anim-drawer-bottom"
+      : "inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl shadow-2xl border-t border-border anim-drawer-bottom"
   };
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-drawer overflow-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity anim-fade-in"
+        className={cn(
+          "fixed inset-0 transition-opacity anim-fade-in",
+          isGlass
+            ? "bg-black/65 backdrop-blur-sm"
+            : "bg-slate-900/60 backdrop-blur-xs"
+        )}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -65,18 +80,41 @@ export function Sheet({
       {/* Sheet Panel */}
       <div
         className={cn(
-          "fixed bg-surface z-10 flex flex-col focus-visible:outline-none",
+          "fixed z-10 flex flex-col focus-visible:outline-none",
+          isGlass
+            ? "bg-[#06182c]/85 backdrop-blur-2xl text-white shadow-2xl"
+            : "bg-surface text-slate-900",
           sideClasses[side],
           className
         )}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border-subtle shrink-0">
-          <h2 className="type-card-title text-slate-900">{title}</h2>
+        <div
+          className={cn(
+            "flex items-center justify-between px-5 py-4 shrink-0",
+            isGlass
+              ? "border-b border-white/15 text-white"
+              : "border-b border-border-subtle"
+          )}
+        >
+          <h2
+            className={cn(
+              isGlass
+                ? "text-base font-extrabold tracking-tight text-white"
+                : "type-card-title text-slate-900"
+            )}
+          >
+            {title}
+          </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close sheet"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-surface-muted hover:text-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className={cn(
+              "p-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95",
+              isGlass
+                ? "rounded-full text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20"
+                : "rounded-lg text-slate-400 hover:bg-surface-muted hover:text-slate-700"
+            )}
           >
             <XIcon className="w-4 h-4" />
           </button>
