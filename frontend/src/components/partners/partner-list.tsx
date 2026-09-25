@@ -110,12 +110,12 @@ export function PartnerList({
         />
       ) : (
         <>
-          {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
+          {/* Desktop Table with vertical and horizontal scroll bar */}
+          <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[480px] erp-scrollbar">
             <table className="w-full text-left text-xs text-slate-600 border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/75 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-                  <th className="py-3 px-4 w-10">
+              <thead className="sticky top-0 z-10 shadow-2xs">
+                <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                  <th className="py-3 px-4 w-10 bg-slate-50">
                     <input
                       type="checkbox"
                       aria-label="Select all partners"
@@ -124,15 +124,15 @@ export function PartnerList({
                       className="rounded border-slate-300 text-[#0071DC] focus:ring-[#0071DC] cursor-pointer"
                     />
                   </th>
-                  <th className="py-3 px-3">Name</th>
-                  <th className="py-3 px-3">Type</th>
-                  <th className="py-3 px-3">Region</th>
-                  <th className="py-3 px-3">Contact Person</th>
-                  <th className="py-3 px-3">Email</th>
-                  <th className="py-3 px-3">Status</th>
-                  <th className="py-3 px-3">Last Order</th>
-                  <th className="py-3 px-3 text-right">Total Value</th>
-                  <th className="py-3 px-4 text-center w-12">Actions</th>
+                  <th className="py-3 px-3 bg-slate-50">Name</th>
+                  <th className="py-3 px-3 bg-slate-50">Type</th>
+                  <th className="py-3 px-3 bg-slate-50">Region</th>
+                  <th className="py-3 px-3 bg-slate-50">Contact Person</th>
+                  <th className="py-3 px-3 bg-slate-50">Email</th>
+                  <th className="py-3 px-3 bg-slate-50">Status</th>
+                  <th className="py-3 px-3 bg-slate-50">Last Order</th>
+                  <th className="py-3 px-3 text-right bg-slate-50">Total Value</th>
+                  <th className="py-3 px-4 text-center w-12 bg-slate-50">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-normal">
@@ -261,8 +261,8 @@ export function PartnerList({
             </table>
           </div>
 
-          {/* Mobile View: Cards */}
-          <div className="block md:hidden divide-y divide-slate-100">
+          {/* Mobile View: Cards with scroll bar */}
+          <div className="block md:hidden divide-y divide-slate-100 overflow-y-auto max-h-[480px] erp-scrollbar">
             {items.map((item) => (
               <div
                 key={item.id}
