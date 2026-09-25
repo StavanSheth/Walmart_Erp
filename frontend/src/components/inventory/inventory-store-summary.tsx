@@ -45,16 +45,9 @@ export function InventoryStoreSummary({
           </h3>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => onRegionChange && onRegionChange("ALL")}
-            className="text-xs font-bold text-brand-primary hover:text-blue-700 transition inline-flex items-center gap-0.5 whitespace-nowrap"
-          >
-            View All →
-          </button>
-
+        <div className="flex items-center gap-2">
           {regions.length > 0 && (
+
             <select
               value={selectedRegionId}
               onChange={(e) => onRegionChange && onRegionChange(e.target.value)}
@@ -91,7 +84,7 @@ export function InventoryStoreSummary({
             className="py-10"
           />
         ) : (
-          <div className="overflow-x-auto overflow-y-auto max-h-[310px] -mx-4 sm:-mx-5 px-4 sm:px-5">
+          <div className="overflow-x-auto overflow-y-auto max-h-[355px] -mx-4 sm:-mx-5 px-4 sm:px-5">
             <table className="w-full text-left border-collapse text-xs">
               <thead className="sticky top-0 bg-white z-10 shadow-2xs">
                 <tr className="border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-white">

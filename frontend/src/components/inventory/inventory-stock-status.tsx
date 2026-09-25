@@ -89,14 +89,9 @@ export function InventoryStockStatus({
             Stock Status
           </h3>
         </div>
-        <button
-          type="button"
-          onClick={() => onStatusClick && onStatusClick("ALL")}
-          className="text-xs font-bold text-brand-primary hover:text-blue-700 transition"
-        >
-          View All →
-        </button>
+        <span className="text-[11px] text-slate-400 font-medium">Distribution</span>
       </div>
+
 
       {/* 4 Status Rows */}
       <div className="space-y-1.5 pt-2 flex-1">

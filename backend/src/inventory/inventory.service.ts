@@ -15,8 +15,24 @@ import type {
   InventoryDetailData
 } from "./inventory.types.js";
 
+import {
+  calculateAvailableStock,
+  calculateStockStatus,
+  calculateInventoryValue,
+  mapInventoryMovement,
+  buildInventoryWhere
+} from "./inventory.helpers.js";
+
+export {
+  calculateAvailableStock,
+  calculateStockStatus,
+  calculateInventoryValue,
+  mapInventoryMovement,
+  buildInventoryWhere
+};
+
 // ============================================================================
-// 1. LOCAL HELPER FUNCTIONS
+// 1. LOCAL ORG RESOLUTION
 // ============================================================================
 
 /**
@@ -43,136 +59,6 @@ async function getDemoOrganizationId(): Promise<string> {
 
   cachedDemoOrgId = org.id;
   return org.id;
-}
-
-/**
- * Standard business rule for stock status:
- * available = onHand - reserved
- * OUT_OF_STOCK: available <= 0
- * LOW_STOCK: available > 0 AND available <= reorderLevel
- * IN_STOCK: available > reorderLevel
- */
-export function calculateStockStatus(
-  available: number,
-  reorderLevel: number
-): "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK" {
-  if (available <= 0) {
-    return "OUT_OF_STOCK";
-  }
-  if (available <= reorderLevel) {
-    return "LOW_STOCK";
-  }
-  return "IN_STOCK";
-}
-
-/**
- * Standardizes signed quantity and human-readable type labels for inventory movements.
- */
-function mapInventoryMovement(m: {
-  id: string;
-  type: string;
-  quantity: number;
-  unitCost: Prisma.Decimal | number | null;
-  referenceType: string | null;
-  referenceId: string | null;
-  notes: string | null;
-  createdAt: Date;
-  product?: { name: string } | null;
-  store?: { name: string; code: string } | null;
-}): InventoryMovementDto {
-  let signedQty = m.quantity;
-  let typeLabel = "Movement";
-
-  switch (m.type) {
-    case "PURCHASE":
-      signedQty = Math.abs(m.quantity);
-      typeLabel = "Stock In";
-      break;
-    case "SALE":
-      signedQty = -Math.abs(m.quantity);
-      typeLabel = "Stock Out";
-      break;
-    case "RETURN":
-      signedQty = Math.abs(m.quantity);
-      typeLabel = "Return";
-      break;
-    case "OPENING":
-      signedQty = Math.abs(m.quantity);
-      typeLabel = "Opening";
-      break;
-    case "TRANSFER_IN":
-      signedQty = Math.abs(m.quantity);
-      typeLabel = "Transfer In";
-      break;
-    case "TRANSFER_OUT":
-      signedQty = -Math.abs(m.quantity);
-      typeLabel = "Transfer Out";
-      break;
-    case "ADJUSTMENT":
-      signedQty = m.quantity;
-      typeLabel = "Adjustment";
-      break;
-    default:
-      signedQty = m.quantity;
-      typeLabel = m.type;
-  }
-
-  return {
-    id: m.id,
-    code: `#MOV${m.id.replace(/-/g, "").slice(0, 5).toUpperCase()}`,
-    type: m.type,
-    typeLabel,
-    quantity: signedQty,
-    unitCost: m.unitCost ? Number(m.unitCost) : null,
-    referenceType: m.referenceType,
-    referenceId: m.referenceId,
-    notes: m.notes,
-    createdAt: m.createdAt.toISOString(),
-    productName: m.product?.name ?? "Unknown Product",
-    storeName: m.store?.name ?? "Unknown Store",
-    storeCode: m.store?.code ?? "N/A",
-    status: "Completed"
-  };
-}
-
-/**
- * Builds Prisma where input for inventory queries.
- */
-function buildInventoryWhere(
-  organizationId: string,
-  params: InventoryQueryParams,
-  storeIdsInRegion?: string[]
-): Prisma.InventoryWhereInput {
-  const where: Prisma.InventoryWhereInput = {
-    organizationId
-  };
-
-  if (params.storeId && params.storeId !== "ALL" && params.storeId !== "all") {
-    where.storeId = params.storeId;
-  } else if (storeIdsInRegion !== undefined) {
-    where.storeId = { in: storeIdsInRegion };
-  }
-
-  const productWhere: Prisma.ProductWhereInput = {};
-
-  if (params.categoryId && params.categoryId !== "ALL" && params.categoryId !== "all") {
-    productWhere.categoryId = params.categoryId;
-  }
-
-  if (params.search && params.search.trim().length > 0) {
-    const s = params.search.trim();
-    productWhere.OR = [
-      { name: { contains: s, mode: "insensitive" } },
-      { sku: { contains: s, mode: "insensitive" } },
-      { barcode: { contains: s, mode: "insensitive" } }
-    ];
-  }
-
-  if (Object.keys(productWhere).length > 0) {
-    where.product = productWhere;
-  }
-
-  return where;
 }
 
 // ============================================================================
@@ -207,7 +93,7 @@ export async function getInventoryList(
     allRegions,
     allStores,
     allCategories,
-    inTransitPOs,
+    inTransitAgg,
     recentMovementsRaw
   ] = await Promise.all([
     // Focused inventory records for aggregate summary & status determination
@@ -270,23 +156,21 @@ export async function getInventoryList(
       orderBy: { name: "asc" }
     }),
 
-    // In-transit purchase orders (reliable ORDERED quantities)
-    prisma.purchaseOrder.findMany({
+    // In-transit items aggregated directly at the database level
+    prisma.purchaseOrderItem.aggregate({
       where: {
-        organizationId,
-        status: "ORDERED",
-        ...(params.storeId && params.storeId !== "ALL" && params.storeId !== "all"
-          ? { storeId: params.storeId }
-          : storeIdsInRegion !== undefined
-          ? { storeId: { in: storeIdsInRegion } }
-          : {})
-      },
-      select: {
-        items: {
-          select: {
-            quantity: true
-          }
+        purchaseOrder: {
+          organizationId,
+          status: "ORDERED",
+          ...(params.storeId && params.storeId !== "ALL" && params.storeId !== "all"
+            ? { storeId: params.storeId }
+            : storeIdsInRegion !== undefined
+            ? { storeId: { in: storeIdsInRegion } }
+            : {})
         }
+      },
+      _sum: {
+        quantity: true
       }
     }),
 
@@ -319,13 +203,9 @@ export async function getInventoryList(
     })
   ]);
 
-  // 4. In-Transit count
-  let inTransitItemsCount = 0;
-  for (const po of inTransitPOs) {
-    for (const item of po.items) {
-      inTransitItemsCount += item.quantity;
-    }
-  }
+  // 4. In-Transit count from database aggregation
+  const inTransitItemsCount = inTransitAgg._sum.quantity ?? 0;
+
 
   // 5. Evaluate summary metrics and category distribution from focused records
   const uniqueProductIds = new Set(summaryRecords.map((r) => r.productId));
@@ -545,6 +425,23 @@ export async function getInventoryList(
     orderBy: { createdAt: "desc" }
   });
 
+  // Pre-group movements once into a Map<YYYY-M, MonthlyData> for efficient O(1) lookups
+  const monthlyMovementMap = new Map<string, { netUnits: number; netVal: number; skus: Set<string> }>();
+  for (const m of historicalMovements) {
+    const d = new Date(m.createdAt);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    let entry = monthlyMovementMap.get(key);
+    if (!entry) {
+      entry = { netUnits: 0, netVal: 0, skus: new Set<string>() };
+      monthlyMovementMap.set(key, entry);
+    }
+    entry.netUnits += m.quantity;
+    if (m.unitCost) {
+      entry.netVal += m.quantity * Number(m.unitCost);
+    }
+    entry.skus.add(m.productId);
+  }
+
   // Calculate monthly metrics by stepping backwards from live database inventory
   let runningUnits = totalUnits;
   let runningVal = totalInventoryValue;
@@ -552,56 +449,33 @@ export async function getInventoryList(
 
   for (let i = 0; i < 12; i++) {
     const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
     const monthLabel = monthNames[monthDate.getMonth()];
+    const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
 
-    // Movements that happened strictly within this month
-    const monthMovs = historicalMovements.filter((m) => {
-      const d = new Date(m.createdAt);
-      return d >= monthDate && d < nextMonthDate;
-    });
-
-    let netUnitsThisMonth = 0;
-    let netValThisMonth = 0;
-    const activeSkusThisMonth = new Set<string>();
-
-    for (const m of monthMovs) {
-      netUnitsThisMonth += m.quantity;
-      if (m.unitCost) {
-        netValThisMonth += m.quantity * Number(m.unitCost);
-      }
-      activeSkusThisMonth.add(m.productId);
-    }
+    // Lookup movements pre-grouped for this month
+    const monthData = monthlyMovementMap.get(monthKey);
+    const netUnitsThisMonth = monthData?.netUnits ?? 0;
+    const netValThisMonth = monthData?.netVal ?? 0;
+    const activeSkusThisMonth = monthData?.skus ?? new Set<string>();
 
     const currentUnits = Math.max(0, Math.round(runningUnits));
     const currentVal = Math.max(0, Math.round(runningVal));
 
-    if (i === 0) {
-      // Live current month
-      rawTrendReversed.push({
-        month: monthLabel,
-        inventoryValue: Math.round(totalInventoryValue),
-        inStock: inStockItems,
-        lowStock: lowStockItems,
-        outOfStock: outOfStockItems,
-        inTransit: inTransitItemsCount,
-        units: totalUnits,
-        skuCount: totalProducts
-      });
-    } else {
-      // Historical months derived directly from real movement ledger
-      const ratio = totalUnits > 0 ? currentUnits / totalUnits : 0;
-      rawTrendReversed.push({
-        month: monthLabel,
-        inventoryValue: currentVal,
-        inStock: Math.max(0, Math.round(inStockItems * ratio)),
-        lowStock: Math.max(0, Math.round(lowStockItems * ratio)),
-        outOfStock: Math.max(0, Math.round(outOfStockItems * ratio)),
-        inTransit: Math.max(0, Math.round(inTransitItemsCount * ratio)),
-        units: currentUnits,
-        skuCount: currentUnits > 0 ? Math.min(totalProducts, Math.max(activeSkusThisMonth.size, Math.round(totalProducts * ratio))) : 0
-      });
-    }
+    const monthSkus =
+      i === 0
+        ? totalProducts
+        : Math.min(totalProducts, Math.max(activeSkusThisMonth.size, currentUnits > 0 ? 1 : 0));
+
+    rawTrendReversed.push({
+      month: monthLabel,
+      inventoryValue: i === 0 ? Math.round(totalInventoryValue) : currentVal,
+      units: i === 0 ? totalUnits : currentUnits,
+      skuCount: monthSkus,
+      inStock: inStockItems,
+      lowStock: lowStockItems,
+      outOfStock: outOfStockItems,
+      inTransit: i === 0 ? inTransitItemsCount : 0
+    });
 
     // Step backwards to get the inventory at the start of this month (i.e. end of previous month)
     runningUnits -= netUnitsThisMonth;

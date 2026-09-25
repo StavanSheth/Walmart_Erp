@@ -52,18 +52,35 @@ export function InventoryDetailModal({
       ) : item ? (
         <div className="space-y-5">
           {/* Status and Top summary */}
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg bg-surface-subtle border border-border-subtle">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500">Status:</span>
-              <StatusBadge status={item.status} />
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-surface-subtle border border-border-subtle">
+            <div className="flex items-center gap-3 min-w-0">
+              {item.image ? (
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white border border-border shrink-0 shadow-2xs">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.image} alt={item.productName} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/80 text-brand-primary flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs select-none">
+                  {item.productName.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-slate-900 block leading-tight truncate">
+                  {item.productName}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  SKU: {item.sku}
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500">Unit:</span>
-              <span className="text-xs font-medium text-slate-800 uppercase px-2 py-0.5 rounded bg-surface border border-border">
+              <StatusBadge status={item.status} />
+              <span className="text-xs font-semibold text-slate-700 uppercase px-2 py-0.5 rounded bg-surface border border-border">
                 {item.unit}
               </span>
             </div>
           </div>
+
 
           {/* Product & Store Identifiers */}
           <div>

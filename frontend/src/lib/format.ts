@@ -35,11 +35,28 @@ export function formatDate(dateString: string): string {
   }).format(d);
 }
 
+export function formatPercentage(value: number, decimals = 1): string {
+  if (isNaN(value)) return "0%";
+  return `${value.toFixed(decimals)}%`;
+}
+
 export function formatShortDate(dateString: string): string {
   const d = new Date(dateString);
   if (isNaN(d.getTime())) return dateString;
   return new Intl.DateTimeFormat("en-IN", {
     day: "numeric",
     month: "short"
+  }).format(d);
+}
+
+export function formatDateTime(dateString: string): string {
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   }).format(d);
 }

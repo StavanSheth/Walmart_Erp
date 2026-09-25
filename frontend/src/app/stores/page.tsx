@@ -77,11 +77,13 @@ export default function StoresPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {stores.map((store) => {
-              const isSelected = store.code === currentStore.code;
+              const isSelected = store.code === currentStore?.code;
               return (
+
                 <Card
                   key={store.code}
                   variant={isSelected ? "selected" : "default"}
+                  className="flex flex-col justify-between h-full"
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">

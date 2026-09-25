@@ -91,13 +91,9 @@ export function InventoryCategoryChart({
             Inventory by Category
           </h3>
         </div>
-        <button
-          type="button"
-          onClick={() => onCategorySelect && onCategorySelect("ALL")}
-          className="text-xs font-bold text-brand-primary hover:text-blue-700 transition"
-        >
-          View All →
-        </button>
+        <span className="text-[11px] text-slate-400 font-medium">
+          {categories.length > 0 ? `${categories.length} Categories` : "Distribution"}
+        </span>
       </div>
 
       {/* Donut Chart & Legend Container */}

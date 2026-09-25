@@ -1,17 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon, PlusIcon, PackageIcon } from "@/components/ui/icons";
+import { CalendarIcon, PackageIcon, RefreshCwIcon } from "@/components/ui/icons";
+import { cn } from "@/lib/cn";
 
 export interface InventoryPageHeaderProps {
   onRefresh?: () => void;
   isFetching?: boolean;
-  onAddProduct?: () => void;
 }
 
 export function InventoryPageHeader({
-  onAddProduct
+  onRefresh,
+  isFetching = false
 }: InventoryPageHeaderProps) {
   const [currentDateString, setCurrentDateString] = React.useState("Mon, 22 Sep 2026");
   const [currentTimeString, setCurrentTimeString] = React.useState("10:24 AM");
@@ -59,7 +59,7 @@ export function InventoryPageHeader({
         </div>
       </div>
 
-      {/* 2. Right: Date & Time Card + Add Product Button */}
+      {/* 2. Right: Date & Time Card + Refresh */}
       <div className="flex items-center gap-2.5 sm:gap-3 self-end sm:self-auto shrink-0">
         {/* Date / Time Card */}
         <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/25 backdrop-blur-md border border-white/25 text-white shadow-xs h-9">
@@ -73,15 +73,19 @@ export function InventoryPageHeader({
           </div>
         </div>
 
-        {/* Add Product Button */}
-        <Button
-          type="button"
-          onClick={onAddProduct}
-          className="h-9 px-4 rounded-full bg-brand-primary hover:bg-blue-600 text-white font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 shrink-0"
-        >
-          <PlusIcon className="w-4 h-4" />
-          <span>Add Product</span>
-        </Button>
+        {/* Sync Refresh Button */}
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={isFetching}
+            className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 text-white border border-white/25 flex items-center justify-center shadow-xs transition backdrop-blur-md disabled:opacity-50"
+            title="Refresh Inventory Data"
+            aria-label="Refresh Inventory Data"
+          >
+            <RefreshCwIcon className={cn("w-4 h-4", isFetching && "animate-spin")} />
+          </button>
+        )}
       </div>
     </div>
   );

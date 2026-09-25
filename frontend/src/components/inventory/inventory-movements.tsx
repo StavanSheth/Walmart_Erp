@@ -8,13 +8,11 @@ import type { InventoryMovement } from "@/types/inventory";
 export interface InventoryMovementsProps {
   movements?: InventoryMovement[];
   isLoading?: boolean;
-  onViewAll?: () => void;
 }
 
 export function InventoryMovements({
   movements = [],
-  isLoading = false,
-  onViewAll
+  isLoading = false
 }: InventoryMovementsProps) {
   return (
     <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
@@ -24,18 +22,19 @@ export function InventoryMovements({
           <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
             <RefreshCwIcon className="w-4 h-4" />
           </div>
-          <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
-            Recent Inventory Movements
-          </h3>
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
+              Recent Inventory Movements
+            </h3>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+              Live audit ledger of stock receipts, transfers, and sales
+            </p>
+          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onViewAll}
-          className="text-xs font-bold text-brand-primary hover:text-blue-700 transition inline-flex items-center gap-0.5 whitespace-nowrap"
-        >
-          View All →
-        </button>
+        <span className="text-xs font-semibold text-slate-500 tabular-nums">
+          {movements.length} logged
+        </span>
       </div>
 
       {/* Movements Table using unified reusable component */}

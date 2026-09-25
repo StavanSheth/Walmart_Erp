@@ -23,8 +23,19 @@ export class ApiClient {
   private readonly baseUrl: string;
 
   constructor(baseUrl?: string) {
-    const rawUrl = baseUrl || env.NEXT_PUBLIC_API_URL;
-    this.baseUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+    if (baseUrl) {
+      this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+    } else if (typeof window !== "undefined") {
+      // In the browser, always use same-origin relative /api
+      // This routes through Next.js rewrite proxy, completely avoiding CORS,
+      // port blocking, and IPv4 vs IPv6 [::1] connection issues.
+      const rawUrl = env.NEXT_PUBLIC_API_URL || "/api";
+      this.baseUrl = rawUrl.startsWith("http") ? rawUrl.replace(/\/$/, "") : "/api";
+    } else {
+      // On the server (SSR): connect directly to the Fastify backend on IPv4 loopback
+      const rawUrl = process.env.INTERNAL_API_URL || "http://127.0.0.1:4000/api";
+      this.baseUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+    }
   }
 
   public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
