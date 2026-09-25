@@ -20,7 +20,8 @@ export const inventoryQuerySchema = z.object({
 export type InventoryQueryParams = z.infer<typeof inventoryQuerySchema>;
 
 export const inventoryIdParamSchema = z.object({
-  inventoryId: z.string().min(1, "Inventory ID is required")
+  id: z.string().min(1, "Inventory ID is required").optional(),
+  inventoryId: z.string().min(1, "Inventory ID is required").optional()
 });
 
 export type InventoryIdParam = z.infer<typeof inventoryIdParamSchema>;

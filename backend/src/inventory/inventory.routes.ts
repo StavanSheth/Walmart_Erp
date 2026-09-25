@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from "fastify";
 import { getInventoryList, getInventoryById } from "./inventory.service.js";
-import { inventoryQuerySchema, inventoryIdParamSchema } from "./inventory.schemas.js";
+import { inventoryQuerySchema } from "./inventory.schemas.js";
 
 export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPluginOptions) {
   // Primary endpoint: GET /api/inventory
@@ -25,22 +25,22 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
     });
   });
 
-  // Inventory Detail endpoint: GET /api/inventory/:inventoryId
-  app.get("/:inventoryId", async (request: FastifyRequest, reply: FastifyReply) => {
-    const parseResult = inventoryIdParamSchema.safeParse(request.params);
-    if (!parseResult.success) {
+  // Inventory Detail endpoint: GET /api/inventory/:id
+  app.get("/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = request.params as Record<string, string | undefined>;
+    const inventoryId = params.id || params.inventoryId;
+    if (!inventoryId || inventoryId.trim().length === 0) {
       return reply.status(400).send({
         success: false,
         error: {
           message: "Invalid inventory ID parameter",
           statusCode: 400,
-          code: "VALIDATION_ERROR",
-          details: parseResult.error.format()
+          code: "VALIDATION_ERROR"
         }
       });
     }
 
-    const data = await getInventoryById(parseResult.data.inventoryId);
+    const data = await getInventoryById(inventoryId);
     return reply.status(200).send({
       success: true,
       data

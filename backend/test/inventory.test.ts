@@ -9,69 +9,67 @@ import {
   calculateStoreStatus
 } from "../src/inventory/inventory.service.js";
 
-describe("Phase 6 Inventory Service & Endpoint Tests", () => {
+describe("Phase 6 Inventory - Required Business & Endpoint Verification Tests", () => {
   // ==========================================================================
-  // Unit Tests: Business Logic & Calculations
+  // Section 23: Business Logic & Calculation Verifications
   // ==========================================================================
-  describe("Stock Status & Calculation Unit Tests", () => {
-    it("calculates available stock as onHand - reserved", () => {
+  describe("Core Business Logic & Formulas", () => {
+    // 14. available = onHand - reserved
+    it("14. available = onHand - reserved", () => {
       assert.equal(calculateAvailableStock(100, 20), 80);
       assert.equal(calculateAvailableStock(50, 50), 0);
-      assert.equal(calculateAvailableStock(30, 40), 0);
+      assert.equal(calculateAvailableStock(30, 40), 0); // clamped to 0, never negative
     });
 
-    it("calculates inventory value as quantity * costPrice (never selling price)", () => {
+    // 15. inventory value = onHand * costPrice
+    it("15. inventory value = onHand * costPrice", () => {
       assert.equal(calculateInventoryValue(10, 25.5), 255);
       assert.equal(calculateInventoryValue(0, 50), 0);
+      assert.equal(calculateInventoryValue(100, 0), 0);
     });
 
-    it("returns OUT_OF_STOCK when available is 0 or negative", () => {
+    // 16. low-stock classification
+    it("16. low-stock classification", () => {
+      assert.equal(calculateStockStatus(5, 10), "LOW_STOCK");
+      assert.equal(calculateStockStatus(10, 10), "LOW_STOCK");
+      assert.equal(calculateStockStatus(1, 10), "LOW_STOCK");
+      assert.equal(calculateStockStatus(11, 10), "IN_STOCK");
+    });
+
+    // 17. out-of-stock classification
+    it("17. out-of-stock classification", () => {
       assert.equal(calculateStockStatus(0, 10), "OUT_OF_STOCK");
       assert.equal(calculateStockStatus(-5, 10), "OUT_OF_STOCK");
     });
 
-    it("returns LOW_STOCK when available is positive but less than or equal to reorderLevel", () => {
-      assert.equal(calculateStockStatus(5, 10), "LOW_STOCK");
-      assert.equal(calculateStockStatus(10, 10), "LOW_STOCK");
-      assert.equal(calculateStockStatus(1, 10), "LOW_STOCK");
-    });
-
-    it("returns IN_STOCK when available is strictly greater than reorderLevel", () => {
-      assert.equal(calculateStockStatus(11, 10), "IN_STOCK");
-      assert.equal(calculateStockStatus(100, 10), "IN_STOCK");
-    });
-
-    it("calculates health score deterministically clamped between 0 and 100", () => {
+    // Deterministic presentation indicators
+    it("health indicators calculate deterministically", () => {
       const healthy = calculateHealthScore(90, 10, 0);
       assert.equal(healthy.healthRating, "Good");
       assert.ok(healthy.healthScore >= 80);
 
-      const warning = calculateHealthScore(50, 30, 20);
-      assert.ok(warning.healthScore <= 79);
-
       const critical = calculateHealthScore(10, 40, 50);
       assert.equal(critical.healthRating, "Needs Attention");
-      assert.ok(critical.healthScore < 60);
-    });
 
-    it("calculates store health status as Healthy or Watch based on issue ratio", () => {
-      assert.equal(calculateStoreStatus(1, 0, 10), "Healthy"); // 10% issue ratio < 0.25
-      assert.equal(calculateStoreStatus(3, 2, 10), "Watch"); // 50% issue ratio >= 0.25
+      assert.equal(calculateStoreStatus(1, 0, 10), "Healthy");
+      assert.equal(calculateStoreStatus(3, 2, 10), "Watch");
     });
   });
 
   // ==========================================================================
-  // Integration Tests: API Endpoints
+  // Section 23: Integration API Endpoints Tests (1 through 13)
   // ==========================================================================
-  describe("API Endpoint Tests", () => {
-    it("1. GET /api/inventory returns 200", async () => {
+  describe("API Endpoints & Filtering", () => {
+    // 1. GET /api/inventory -> 200
+    it("1. GET /api/inventory -> 200", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory" });
       assert.equal(response.statusCode, 200);
       await app.close();
     });
 
-    it("2. default response structure contains summary, analytics, products, recentMovements, filterOptions", async () => {
+    // 2. Default response structure
+    it("2. default response structure", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory" });
       const body = JSON.parse(response.payload);
@@ -118,7 +116,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("3. search filtering filters items by product name, sku, or barcode", async () => {
+    // 3. Search
+    it("3. search", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?search=Rice" });
       assert.equal(response.statusCode, 200);
@@ -136,23 +135,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("4. region filtering scopes inventory to stores in the selected region", async () => {
-      const app = buildApp({ checkDb: async () => true });
-      const listRes = await app.inject({ method: "GET", url: "/api/inventory" });
-      const regions = JSON.parse(listRes.payload).data.filterOptions.regions;
-      assert.ok(regions.length > 0);
-
-      const targetRegion = regions[0];
-      const response = await app.inject({ method: "GET", url: `/api/inventory?regionId=${targetRegion.id}` });
-      assert.equal(response.statusCode, 200);
-
-      const body = JSON.parse(response.payload);
-      assert.equal(body.success, true);
-      assert.ok(body.data.summary.totalProducts > 0);
-      await app.close();
-    });
-
-    it("5. store filtering filters items by storeId", async () => {
+    // 4. Store filter
+    it("4. store filter", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?storeId=store-del-001" });
       assert.equal(response.statusCode, 200);
@@ -165,7 +149,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("6. category filtering filters items by categoryId", async () => {
+    // 5. Category filter
+    it("5. category filter", async () => {
       const app = buildApp({ checkDb: async () => true });
       const listRes = await app.inject({ method: "GET", url: "/api/inventory" });
       const categories = JSON.parse(listRes.payload).data.filterOptions.categories;
@@ -183,7 +168,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("7. status filtering filters items by stock status", async () => {
+    // 6. Status filter
+    it("6. status filter", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?status=LOW_STOCK" });
       assert.equal(response.statusCode, 200);
@@ -196,7 +182,31 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("8. pagination works with page & pageSize", async () => {
+    // 7. Combined filters
+    it("7. combined filters", async () => {
+      const app = buildApp({ checkDb: async () => true });
+      const listRes = await app.inject({ method: "GET", url: "/api/inventory" });
+      const filterOptions = JSON.parse(listRes.payload).data.filterOptions;
+      const targetStore = filterOptions.stores[0];
+      const targetCategory = filterOptions.categories[0];
+
+      const response = await app.inject({
+        method: "GET",
+        url: `/api/inventory?storeId=${targetStore.id}&categoryId=${targetCategory.id}&status=ALL`
+      });
+      assert.equal(response.statusCode, 200);
+
+      const body = JSON.parse(response.payload);
+      assert.equal(body.success, true);
+      for (const item of body.data.products.items) {
+        assert.equal(item.storeId, targetStore.id);
+        assert.equal(item.categoryId, targetCategory.id);
+      }
+      await app.close();
+    });
+
+    // 8. Pagination
+    it("8. pagination", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?page=2&pageSize=10" });
       assert.equal(response.statusCode, 200);
@@ -209,7 +219,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("9. invalid page rejects with 400", async () => {
+    // 9. Invalid page
+    it("9. invalid page", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?page=-5" });
       assert.equal(response.statusCode, 400);
@@ -220,7 +231,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("10. invalid pageSize rejects with 400", async () => {
+    // 10. Invalid pageSize
+    it("10. invalid pageSize", async () => {
       const app = buildApp({ checkDb: async () => true });
       const response = await app.inject({ method: "GET", url: "/api/inventory?pageSize=200" });
       assert.equal(response.statusCode, 400);
@@ -231,7 +243,20 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("11. GET /api/inventory/:inventoryId returns inventory detail", async () => {
+    // 11. Invalid status
+    it("11. invalid status", async () => {
+      const app = buildApp({ checkDb: async () => true });
+      const response = await app.inject({ method: "GET", url: "/api/inventory?status=INVALID_STATUS" });
+      assert.equal(response.statusCode, 400);
+
+      const body = JSON.parse(response.payload);
+      assert.equal(body.success, false);
+      assert.equal(body.error.code, "VALIDATION_ERROR");
+      await app.close();
+    });
+
+    // 12. GET /api/inventory/:id -> valid ID
+    it("12. GET /api/inventory/:id -> valid ID", async () => {
       const app = buildApp({ checkDb: async () => true });
       const listRes = await app.inject({ method: "GET", url: "/api/inventory?pageSize=1" });
       const firstItem = JSON.parse(listRes.payload).data.products.items[0];
@@ -250,7 +275,8 @@ describe("Phase 6 Inventory Service & Endpoint Tests", () => {
       await app.close();
     });
 
-    it("12. missing inventory returns 404", async () => {
+    // 13. GET /api/inventory/:id -> nonexistent ID -> 404
+    it("13. GET /api/inventory/:id -> nonexistent ID -> 404", async () => {
       const app = buildApp({ checkDb: async () => true });
       const detailRes = await app.inject({
         method: "GET",

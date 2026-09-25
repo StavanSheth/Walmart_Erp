@@ -16,14 +16,14 @@ export interface InventoryCategoryChartProps {
 }
 
 const CATEGORY_COLORS = [
-  "#3B82F6", // Blue
-  "#10B981", // Emerald
-  "#6366F1", // Indigo
-  "#F59E0B", // Amber
-  "#EC4899", // Pink
-  "#06B6D4", // Cyan
-  "#8B5CF6", // Purple
-  "#64748B"  // Slate
+  "#0071CE", // Brand Primary (Walmart Blue)
+  "#10B981", // Success / Emerald
+  "#0284C7", // Info / Sky
+  "#F59E0B", // Warning / Amber
+  "#004F9A", // Brand Bentonville Blue
+  "#EF4444", // Danger / Rose
+  "#071B3A", // Brand Navy
+  "#64748B"  // Slate Muted
 ];
 
 export function InventoryCategoryChart({

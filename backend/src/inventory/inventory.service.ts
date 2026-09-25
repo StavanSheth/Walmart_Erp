@@ -16,12 +16,12 @@ import type {
 } from "./inventory.types.js";
 
 // ============================================================================
-// DOMAIN HELPER FUNCTIONS (Preserved locally per architecture guideline)
+// 1. BUSINESS FORMULAS & PURE LOCAL CALCULATION HELPERS
 // ============================================================================
 
 /**
  * Calculates physical stock available for sale or transfer.
- * available = onHand - reserved
+ * available = Math.max(0, onHand - reserved)
  */
 export function calculateAvailableStock(onHand: number, reserved: number): number {
   return Math.max(0, onHand - reserved);
@@ -55,8 +55,27 @@ export function calculateInventoryValue(quantity: number, costPrice: number): nu
 }
 
 /**
+ * Unified status and tab resolver.
+ * Maps status query params and tab selections to single internal target status.
+ * Tabs: all -> ALL, low-stock -> LOW_STOCK, out-of-stock -> OUT_OF_STOCK, most-stocked -> ALL (sort only)
+ */
+export function resolveTargetStatus(
+  status?: string,
+  tab?: string
+): "ALL" | "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK" {
+  if (status && status !== "ALL") {
+    if (status === "IN_STOCK" || status === "LOW_STOCK" || status === "OUT_OF_STOCK") {
+      return status;
+    }
+  }
+  if (tab === "low-stock") return "LOW_STOCK";
+  if (tab === "out-of-stock") return "OUT_OF_STOCK";
+  return "ALL";
+}
+
+/**
  * Deterministic Inventory Health Score calculation based on stock ratios.
- * 80-100: Good, 60-79: Average, <60: Needs Attention
+ * Isolated health indicator for presentation only; never alters financial or inventory truths.
  */
 export function calculateHealthScore(
   inStock: number,
@@ -84,7 +103,7 @@ export function calculateHealthScore(
 }
 
 /**
- * Deterministic Store Health Status based on issue ratio.
+ * Deterministic Store Health Status presentation indicator based on issue ratio.
  */
 export function calculateStoreStatus(
   lowStock: number,
@@ -166,6 +185,288 @@ export function mapInventoryMovement(m: {
   };
 }
 
+// ============================================================================
+// 2. MODULAR BUILDER HELPERS
+// ============================================================================
+
+export function buildInventorySummary(input: {
+  totalProducts: number;
+  totalUnits: number;
+  totalInventoryValue: number;
+  inTransitItems: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+}): InventorySummaryDto {
+  return {
+    totalProducts: input.totalProducts,
+    lowStockItems: input.lowStockItems,
+    outOfStockItems: input.outOfStockItems,
+    inTransitItems: input.inTransitItems,
+    inventoryValue: Math.round(input.totalInventoryValue),
+    totalUnits: input.totalUnits
+  };
+}
+
+export function buildCategoryDistribution(
+  categoryMap: Map<string, { categoryId: string; categoryName: string; value: number; productIds: Set<string> }>,
+  totalInventoryValue: number
+): CategoryDistributionDto[] {
+  return Array.from(categoryMap.values())
+    .map((c) => ({
+      categoryId: c.categoryId,
+      categoryName: c.categoryName,
+      value: Math.round(c.value),
+      itemCount: c.productIds.size,
+      percentage: totalInventoryValue > 0 ? Math.round((c.value / totalInventoryValue) * 100) : 0
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+}
+
+export function buildStoreSummary(
+  allStores: Array<{ id: string; name: string; code: string; regionId: string | null; region?: { name: string } | null }>,
+  storeStockMap: Map<string, { totalStock: number; lowStock: number; outOfStock: number; totalItems: number }>
+): StoreInventorySummaryDto[] {
+  return allStores
+    .map((s) => {
+      const stats = storeStockMap.get(s.id) || {
+        totalStock: 0,
+        lowStock: 0,
+        outOfStock: 0,
+        totalItems: 0
+      };
+      const status = calculateStoreStatus(stats.lowStock, stats.outOfStock, stats.totalItems);
+      return {
+        storeId: s.id,
+        storeName: s.name,
+        storeCode: s.code,
+        storeImage: null,
+        regionId: s.regionId,
+        regionName: s.region?.name || null,
+        totalStock: stats.totalStock,
+        lowStock: stats.lowStock,
+        outOfStock: stats.outOfStock,
+        status
+      };
+    })
+    .sort((a, b) => b.totalStock - a.totalStock);
+}
+
+export function buildInventoryTrend(
+  historicalMovements: Array<{ quantity: number; unitCost: Prisma.Decimal | number | null; productId: string; createdAt: Date }>,
+  currentSnapshot: {
+    totalUnits: number;
+    totalInventoryValue: number;
+    totalProducts: number;
+    inStockItems: number;
+    lowStockItems: number;
+    outOfStockItems: number;
+    inTransitItems: number;
+  },
+  now: Date = new Date()
+): InventoryTrendPointDto[] {
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const monthlyMovementMap = new Map<string, { netUnits: number; netVal: number; skus: Set<string> }>();
+  for (const m of historicalMovements) {
+    const d = new Date(m.createdAt);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    let entry = monthlyMovementMap.get(key);
+    if (!entry) {
+      entry = { netUnits: 0, netVal: 0, skus: new Set<string>() };
+      monthlyMovementMap.set(key, entry);
+    }
+    entry.netUnits += m.quantity;
+    if (m.unitCost) {
+      entry.netVal += m.quantity * Number(m.unitCost);
+    }
+    entry.skus.add(m.productId);
+  }
+
+  let runningUnits = currentSnapshot.totalUnits;
+  let runningVal = currentSnapshot.totalInventoryValue;
+  const rawTrendReversed: InventoryTrendPointDto[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthLabel = monthNames[monthDate.getMonth()];
+    const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
+
+    const monthData = monthlyMovementMap.get(monthKey);
+    const netUnitsThisMonth = monthData?.netUnits ?? 0;
+    const netValThisMonth = monthData?.netVal ?? 0;
+    const activeSkusThisMonth = monthData?.skus ?? new Set<string>();
+
+    const currentUnits = Math.max(0, Math.round(runningUnits));
+    const currentVal = Math.max(0, Math.round(runningVal));
+
+    const monthSkus =
+      i === 0
+        ? currentSnapshot.totalProducts
+        : Math.min(currentSnapshot.totalProducts, Math.max(activeSkusThisMonth.size, currentUnits > 0 ? 1 : 0));
+
+    rawTrendReversed.push({
+      month: monthLabel,
+      inventoryValue: i === 0 ? Math.round(currentSnapshot.totalInventoryValue) : currentVal,
+      units: i === 0 ? currentSnapshot.totalUnits : currentUnits,
+      skuCount: monthSkus,
+      inStock: currentSnapshot.inStockItems,
+      lowStock: currentSnapshot.lowStockItems,
+      outOfStock: currentSnapshot.outOfStockItems,
+      inTransit: i === 0 ? currentSnapshot.inTransitItems : 0
+    });
+
+    runningUnits -= netUnitsThisMonth;
+    runningVal -= netValThisMonth;
+  }
+
+  return rawTrendReversed.reverse();
+}
+
+export interface ProductAggregationRecord {
+  firstInvId: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  barcode: string;
+  categoryName: string;
+  categoryId: string;
+  onHand: number;
+  reserved: number;
+  reorderLevel: number;
+  costPrice: number;
+  sellingPrice: number;
+  storesCount: number;
+  unit: string;
+  image: string | null;
+}
+
+export function buildProductItems(input: {
+  isMultiStore: boolean;
+  productAggMap: Map<string, ProductAggregationRecord>;
+  paginatedStoreRecords?: Array<{
+    id: string;
+    productId: string;
+    storeId: string;
+    onHand: number;
+    reserved: number;
+    product: {
+      name: string;
+      sku: string;
+      barcode: string | null;
+      unit: string;
+      costPrice: Prisma.Decimal | number;
+      sellingPrice: Prisma.Decimal | number;
+      reorderLevel: number;
+      image: string | null;
+      categoryId: string | null;
+      category?: { name: string } | null;
+    };
+    store: {
+      name: string;
+      code: string;
+    };
+  }>;
+  totalStoreCount: number;
+  storeCoverageMap?: Map<string, number>;
+  targetStatus: "ALL" | "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
+  tab?: string;
+  page: number;
+  pageSize: number;
+}): { items: InventoryProductItemDto[]; total: number; totalPages: number } {
+  const { isMultiStore, totalStoreCount, targetStatus, tab, page, pageSize } = input;
+
+  if (!isMultiStore && input.paginatedStoreRecords) {
+    const items = input.paginatedStoreRecords.map((inv) => {
+      const onHand = inv.onHand;
+      const reserved = inv.reserved;
+      const available = calculateAvailableStock(onHand, reserved);
+      const costPrice = Number(inv.product.costPrice);
+      const sellingPrice = Number(inv.product.sellingPrice);
+      const inventoryValue = calculateInventoryValue(onHand, costPrice);
+      const reorderLevel = inv.product.reorderLevel;
+      const status = calculateStockStatus(available, reorderLevel);
+      const storeCoverage = input.storeCoverageMap?.get(inv.productId) ?? 0;
+
+      return {
+        id: inv.id,
+        productId: inv.productId,
+        storeId: inv.storeId,
+        productName: inv.product.name,
+        sku: inv.product.sku,
+        barcode: inv.product.barcode,
+        categoryName: inv.product.category?.name ?? "Uncategorized",
+        categoryId: inv.product.categoryId,
+        storeName: inv.store.name,
+        storeCode: inv.store.code,
+        onHand,
+        reserved,
+        available,
+        reorderLevel,
+        costPrice,
+        sellingPrice,
+        inventoryValue,
+        status,
+        storeCoverage,
+        unit: inv.product.unit,
+        image: inv.product.image
+      };
+    });
+
+    return { items, total: 0, totalPages: 1 };
+  }
+
+  // All Stores / Multi-Store View: aggregate catalog products
+  const aggregatedList: InventoryProductItemDto[] = [];
+  for (const p of input.productAggMap.values()) {
+    const available = calculateAvailableStock(p.onHand, p.reserved);
+    const inventoryValue = calculateInventoryValue(p.onHand, p.costPrice);
+    const storeCoverage = Math.min(100, Math.round((p.storesCount / totalStoreCount) * 100));
+    const status = calculateStockStatus(available, p.reorderLevel);
+
+    aggregatedList.push({
+      id: p.firstInvId,
+      productId: p.productId,
+      storeId: "ALL",
+      productName: p.productName,
+      sku: p.sku,
+      barcode: p.barcode,
+      categoryName: p.categoryName,
+      categoryId: p.categoryId,
+      storeName: `All Outlets (${p.storesCount}/${totalStoreCount} Stores)`,
+      storeCode: "ALL",
+      onHand: p.onHand,
+      reserved: p.reserved,
+      available,
+      reorderLevel: p.reorderLevel,
+      costPrice: p.costPrice,
+      sellingPrice: p.sellingPrice,
+      inventoryValue,
+      status,
+      storeCoverage,
+      unit: p.unit,
+      image: p.image
+    });
+  }
+
+  let filtered = aggregatedList;
+  if (targetStatus !== "ALL") {
+    filtered = filtered.filter((item) => item.status === targetStatus);
+  }
+
+  if (tab === "low-stock" || tab === "out-of-stock") {
+    filtered.sort((a, b) => a.onHand - b.onHand || a.productName.localeCompare(b.productName));
+  } else {
+    filtered.sort((a, b) => b.onHand - a.onHand || a.productName.localeCompare(b.productName));
+  }
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const items = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  return { items, total, totalPages };
+}
+
 /**
  * Builds Prisma where input for inventory queries.
  */
@@ -207,7 +508,7 @@ export function buildInventoryWhere(
 }
 
 // ============================================================================
-// LOCAL ORG RESOLUTION
+// 3. ORG RESOLUTION
 // ============================================================================
 
 let cachedDemoOrgId: string | null = null;
@@ -234,13 +535,14 @@ async function getDemoOrganizationId(): Promise<string> {
 }
 
 // ============================================================================
-// PRIMARY INVENTORY LIST SERVICE (Single unified entrypoint)
+// 4. PRIMARY INVENTORY LIST SERVICE (Single unified entrypoint)
 // ============================================================================
 
 export async function getInventoryList(
   params: InventoryQueryParams
 ): Promise<InventoryResponseData> {
   const organizationId = await getDemoOrganizationId();
+  const targetStatus = resolveTargetStatus(params.status, params.tab);
 
   // 1. Resolve Stores in Region if regionId provided
   let storeIdsInRegion: string[] | undefined = undefined;
@@ -255,11 +557,7 @@ export async function getInventoryList(
   // 2. Base database filter
   const baseWhere = buildInventoryWhere(organizationId, params, storeIdsInRegion);
 
-  // 3. Concurrently execute:
-  // - Focused inventory records
-  // - Dropdown filter options (regions, stores, categories)
-  // - In-transit purchase orders (ORDERED status)
-  // - Recent movements (latest 10)
+  // 3. Concurrently execute queries using Prisma selects
   const [
     summaryRecords,
     allRegions,
@@ -308,7 +606,7 @@ export async function getInventoryList(
       orderBy: { name: "asc" }
     }),
 
-    // Active stores with minimal fields (used for dropdown & store summary)
+    // Active stores with minimal fields
     prisma.store.findMany({
       where: { organizationId, status: "ACTIVE" },
       select: {
@@ -379,7 +677,7 @@ export async function getInventoryList(
   const isMultiStore = !params.storeId || params.storeId === "ALL" || params.storeId === "all";
   const totalStoreCount = Math.max(1, allStores.length);
 
-  // 4. Evaluate summary metrics and category distribution from full filtered records
+  // 4. Evaluate summary metrics and category distribution from filtered records
   let totalUnits = 0;
   let totalInventoryValue = 0;
   let lowStockItems = 0;
@@ -394,28 +692,7 @@ export async function getInventoryList(
     string,
     { totalStock: number; lowStock: number; outOfStock: number; totalItems: number }
   >();
-
-  // Map to hold aggregated per-product totals for All Stores mode
-  interface ProductAgg {
-    firstInvId: string;
-    productId: string;
-    productName: string;
-    sku: string;
-    barcode: string;
-    categoryName: string;
-    categoryId: string;
-    onHand: number;
-    reserved: number;
-    reorderLevel: number;
-    costPrice: number;
-    sellingPrice: number;
-    storesCount: number;
-    unit: string;
-    image: string | null;
-  }
-  const productAggMap = new Map<string, ProductAgg>();
-
-  // For single-store view status tracking
+  const productAggMap = new Map<string, ProductAggregationRecord>();
   const matchingStatusIds: string[] = [];
 
   for (const record of summaryRecords) {
@@ -483,20 +760,9 @@ export async function getInventoryList(
     catEntry.productIds.add(record.productId);
     categoryMap.set(catId, catEntry);
 
-    // Filter matching IDs if status or tab filter active for single-store view
-    if (!isMultiStore) {
-      const targetStatus =
-        params.status && params.status !== "ALL"
-          ? params.status
-          : params.tab === "low-stock"
-          ? "LOW_STOCK"
-          : params.tab === "out-of-stock"
-          ? "OUT_OF_STOCK"
-          : null;
-
-      if (targetStatus && status === targetStatus) {
-        matchingStatusIds.push(record.id);
-      }
+    // Track matching IDs for single-store view status filtering
+    if (!isMultiStore && targetStatus !== "ALL" && status === targetStatus) {
+      matchingStatusIds.push(record.id);
     }
   }
 
@@ -506,7 +772,6 @@ export async function getInventoryList(
   const totalProducts = isMultiStore ? productAggMap.size : summaryRecords.length;
 
   if (isMultiStore) {
-    // Multi-store / All Stores: Count status per distinct catalog product using standard helper
     for (const p of productAggMap.values()) {
       const available = calculateAvailableStock(p.onHand, p.reserved);
       const status = calculateStockStatus(available, p.reorderLevel);
@@ -519,7 +784,6 @@ export async function getInventoryList(
       }
     }
   } else {
-    // Single Store View: Count status per store inventory record using standard helper
     for (const record of summaryRecords) {
       const available = calculateAvailableStock(record.onHand, record.reserved);
       const status = calculateStockStatus(available, record.product.reorderLevel);
@@ -529,28 +793,20 @@ export async function getInventoryList(
     }
   }
 
-  const summary: InventorySummaryDto = {
+  // 5. Build Summary
+  const summary = buildInventorySummary({
     totalProducts,
-    lowStockItems,
-    outOfStockItems,
+    totalUnits,
+    totalInventoryValue,
     inTransitItems: inTransitItemsCount,
-    inventoryValue: Math.round(totalInventoryValue),
-    totalUnits
-  };
+    lowStockItems,
+    outOfStockItems
+  });
 
-  // 5. Category Distribution (Top 8 categories)
-  const categoryDistribution: CategoryDistributionDto[] = Array.from(categoryMap.values())
-    .map((c) => ({
-      categoryId: c.categoryId,
-      categoryName: c.categoryName,
-      value: Math.round(c.value),
-      itemCount: c.productIds.size,
-      percentage: totalInventoryValue > 0 ? Math.round((c.value / totalInventoryValue) * 100) : 0
-    }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 8);
+  // 6. Build Category Distribution
+  const categoryDistribution = buildCategoryDistribution(categoryMap, totalInventoryValue);
 
-  // 6. Stock Status & Transparent Health Indicator (deterministic formula)
+  // 7. Stock Status & Transparent Health Indicator
   const totalEvaluated = Math.max(1, inStockItems + lowStockItems + outOfStockItems);
   const inStockPct = Math.round((inStockItems / totalEvaluated) * 100);
   const lowStockPct = Math.round((lowStockItems / totalEvaluated) * 100);
@@ -577,34 +833,11 @@ export async function getInventoryList(
     healthRating
   };
 
-  // 7. Store Summary (using minimal fields)
-  const storeSummary: StoreInventorySummaryDto[] = allStores
-    .map((s) => {
-      const stats = storeStockMap.get(s.id) || {
-        totalStock: 0,
-        lowStock: 0,
-        outOfStock: 0,
-        totalItems: 0
-      };
-      const status = calculateStoreStatus(stats.lowStock, stats.outOfStock, stats.totalItems);
-      return {
-        storeId: s.id,
-        storeName: s.name,
-        storeCode: s.code,
-        storeImage: null,
-        regionId: s.regionId,
-        regionName: s.region?.name || null,
-        totalStock: stats.totalStock,
-        lowStock: stats.lowStock,
-        outOfStock: stats.outOfStock,
-        status
-      };
-    })
-    .sort((a, b) => b.totalStock - a.totalStock);
+  // 8. Build Store Summary
+  const storeSummary = buildStoreSummary(allStores, storeStockMap);
 
-  // 8. Real Historical Inventory Movements from Database
+  // 9. Historical Inventory Movements & Trend
   const now = new Date();
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
   const historicalMovements = await prisma.inventoryMovement.findMany({
@@ -626,60 +859,19 @@ export async function getInventoryList(
     orderBy: { createdAt: "desc" }
   });
 
-  const monthlyMovementMap = new Map<string, { netUnits: number; netVal: number; skus: Set<string> }>();
-  for (const m of historicalMovements) {
-    const d = new Date(m.createdAt);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    let entry = monthlyMovementMap.get(key);
-    if (!entry) {
-      entry = { netUnits: 0, netVal: 0, skus: new Set<string>() };
-      monthlyMovementMap.set(key, entry);
-    }
-    entry.netUnits += m.quantity;
-    if (m.unitCost) {
-      entry.netVal += m.quantity * Number(m.unitCost);
-    }
-    entry.skus.add(m.productId);
-  }
-
-  let runningUnits = totalUnits;
-  let runningVal = totalInventoryValue;
-  const rawTrendReversed: InventoryTrendPointDto[] = [];
-
-  for (let i = 0; i < 12; i++) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthLabel = monthNames[monthDate.getMonth()];
-    const monthKey = `${monthDate.getFullYear()}-${monthDate.getMonth()}`;
-
-    const monthData = monthlyMovementMap.get(monthKey);
-    const netUnitsThisMonth = monthData?.netUnits ?? 0;
-    const netValThisMonth = monthData?.netVal ?? 0;
-    const activeSkusThisMonth = monthData?.skus ?? new Set<string>();
-
-    const currentUnits = Math.max(0, Math.round(runningUnits));
-    const currentVal = Math.max(0, Math.round(runningVal));
-
-    const monthSkus =
-      i === 0
-        ? totalProducts
-        : Math.min(totalProducts, Math.max(activeSkusThisMonth.size, currentUnits > 0 ? 1 : 0));
-
-    rawTrendReversed.push({
-      month: monthLabel,
-      inventoryValue: i === 0 ? Math.round(totalInventoryValue) : currentVal,
-      units: i === 0 ? totalUnits : currentUnits,
-      skuCount: monthSkus,
-      inStock: inStockItems,
-      lowStock: lowStockItems,
-      outOfStock: outOfStockItems,
-      inTransit: i === 0 ? inTransitItemsCount : 0
-    });
-
-    runningUnits -= netUnitsThisMonth;
-    runningVal -= netValThisMonth;
-  }
-
-  const inventoryTrend: InventoryTrendPointDto[] = rawTrendReversed.reverse();
+  const inventoryTrend = buildInventoryTrend(
+    historicalMovements,
+    {
+      totalUnits,
+      totalInventoryValue,
+      totalProducts,
+      inStockItems,
+      lowStockItems,
+      outOfStockItems,
+      inTransitItems: inTransitItemsCount
+    },
+    now
+  );
 
   const analytics: InventoryAnalyticsDto = {
     inventoryTrend,
@@ -688,7 +880,7 @@ export async function getInventoryList(
     storeSummary
   };
 
-  // 9. Products Table: Pagination and Filtering
+  // 10. Products Table: Pagination and Filtering
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.max(1, Math.min(100, params.pageSize ?? 25));
 
@@ -696,15 +888,9 @@ export async function getInventoryList(
   let total = 0;
   let totalPages = 1;
 
-  if (params.storeId && params.storeId !== "ALL" && params.storeId !== "all") {
-    // Specific Store View: Query per-store records directly
+  if (!isMultiStore) {
     const tableWhere: Prisma.InventoryWhereInput = { ...baseWhere };
-    const isStatusFiltering =
-      (params.status && params.status !== "ALL") ||
-      params.tab === "low-stock" ||
-      params.tab === "out-of-stock";
-
-    if (isStatusFiltering) {
+    if (targetStatus !== "ALL") {
       tableWhere.id = { in: matchingStatusIds };
     }
 
@@ -771,98 +957,34 @@ export async function getInventoryList(
       }
     }
 
-    items = paginatedRecords.map((inv) => {
-      const onHand = inv.onHand;
-      const reserved = inv.reserved;
-      const available = calculateAvailableStock(onHand, reserved);
-      const costPrice = Number(inv.product.costPrice);
-      const sellingPrice = Number(inv.product.sellingPrice);
-      const inventoryValue = calculateInventoryValue(onHand, costPrice);
-      const reorderLevel = inv.product.reorderLevel;
-      const status = calculateStockStatus(available, reorderLevel);
-      const storeCoverage = coverageMap.get(inv.productId) ?? 0;
-
-      return {
-        id: inv.id,
-        productId: inv.productId,
-        storeId: inv.storeId,
-        productName: inv.product.name,
-        sku: inv.product.sku,
-        barcode: inv.product.barcode,
-        categoryName: inv.product.category?.name ?? "Uncategorized",
-        categoryId: inv.product.categoryId,
-        storeName: inv.store.name,
-        storeCode: inv.store.code,
-        onHand,
-        reserved,
-        available,
-        reorderLevel,
-        costPrice,
-        sellingPrice,
-        inventoryValue,
-        status,
-        storeCoverage,
-        unit: inv.product.unit,
-        image: inv.product.image
-      };
+    const built = buildProductItems({
+      isMultiStore: false,
+      productAggMap,
+      paginatedStoreRecords: paginatedRecords,
+      totalStoreCount,
+      storeCoverageMap: coverageMap,
+      targetStatus,
+      tab: params.tab,
+      page,
+      pageSize
     });
+    items = built.items;
   } else {
-    // All Stores (or Region multi-store view): Aggregate by unique Product
-    const aggregatedList: InventoryProductItemDto[] = [];
-    for (const p of productAggMap.values()) {
-      const available = calculateAvailableStock(p.onHand, p.reserved);
-      const inventoryValue = calculateInventoryValue(p.onHand, p.costPrice);
-      const storeCoverage = Math.min(100, Math.round((p.storesCount / totalStoreCount) * 100));
-      const status = calculateStockStatus(available, p.reorderLevel);
-
-      aggregatedList.push({
-        id: p.firstInvId,
-        productId: p.productId,
-        storeId: "ALL",
-        productName: p.productName,
-        sku: p.sku,
-        barcode: p.barcode,
-        categoryName: p.categoryName,
-        categoryId: p.categoryId,
-        storeName: `All Outlets (${p.storesCount}/${totalStoreCount} Stores)`,
-        storeCode: "ALL",
-        onHand: p.onHand,
-        reserved: p.reserved,
-        available,
-        reorderLevel: p.reorderLevel,
-        costPrice: p.costPrice,
-        sellingPrice: p.sellingPrice,
-        inventoryValue,
-        status,
-        storeCoverage,
-        unit: p.unit,
-        image: p.image
-      });
-    }
-
-    // Filter by tab or status
-    let filtered = aggregatedList;
-    if (params.status && params.status !== "ALL") {
-      filtered = filtered.filter((item) => item.status === params.status);
-    } else if (params.tab === "low-stock") {
-      filtered = filtered.filter((item) => item.status === "LOW_STOCK");
-    } else if (params.tab === "out-of-stock") {
-      filtered = filtered.filter((item) => item.status === "OUT_OF_STOCK");
-    }
-
-    // Sort
-    if (params.tab === "low-stock" || params.tab === "out-of-stock") {
-      filtered.sort((a, b) => a.onHand - b.onHand || a.productName.localeCompare(b.productName));
-    } else {
-      filtered.sort((a, b) => b.onHand - a.onHand || a.productName.localeCompare(b.productName));
-    }
-
-    total = filtered.length;
-    totalPages = Math.max(1, Math.ceil(total / pageSize));
-    items = filtered.slice((page - 1) * pageSize, page * pageSize);
+    const built = buildProductItems({
+      isMultiStore: true,
+      productAggMap,
+      totalStoreCount,
+      targetStatus,
+      tab: params.tab,
+      page,
+      pageSize
+    });
+    items = built.items;
+    total = built.total;
+    totalPages = built.totalPages;
   }
 
-  // 10. Map Recent Movements
+  // 11. Map Recent Movements
   const recentMovements: InventoryMovementDto[] = recentMovementsRaw.map(mapInventoryMovement);
 
   return {
@@ -892,7 +1014,7 @@ export async function getInventoryList(
 }
 
 // ============================================================================
-// INVENTORY DETAIL SERVICE (Strict ID semantics — Inventory Record ID only)
+// 5. INVENTORY DETAIL SERVICE (Strict ID semantics — Inventory Record ID only)
 // ============================================================================
 
 export async function getInventoryById(inventoryId: string): Promise<InventoryDetailData> {

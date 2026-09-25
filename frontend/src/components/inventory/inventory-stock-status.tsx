@@ -7,7 +7,8 @@ import {
   CheckIcon,
   AlertTriangleIcon,
   AlertCircleIcon,
-  TruckIcon
+  TruckIcon,
+  ReportsIcon
 } from "@/components/ui/icons";
 import type { StockStatusSummary, StockStatus } from "@/types/inventory";
 
@@ -77,10 +78,7 @@ export function InventoryStockStatus({
       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-            </svg>
+            <ReportsIcon className="w-4 h-4" />
           </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
             Stock Status
