@@ -251,85 +251,85 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="grid grid-cols-2 gap-3 md:hidden">
         {/* 1. Total Sales (Today) */}
-        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 shrink-0 mb-2 backdrop-blur-md">
+        <div className="bg-[#06182c]/85 backdrop-blur-xl border border-white/30 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white transition-all">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0 mb-2 backdrop-blur-md shadow-xs">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
+            <p className="text-xs font-bold text-blue-100 uppercase tracking-wide drop-shadow-xs">
               Total Sales (Today)
             </p>
-            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
+            <h3 className="text-xl font-black text-white tabular-nums mt-1 drop-shadow-md tracking-tight">
               {formatCurrency(mobileSummary.totalSalesToday)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
-            <span className="font-bold text-emerald-400">↑ 12%</span>
+          <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/20 text-xs font-bold">
+            <span className="text-emerald-400 drop-shadow-xs">↑ 12%</span>
             <StockSparkline trend="surge" color="#34D399" id="m-sales" className="w-14 h-5" />
           </div>
         </div>
 
         {/* 2. Total Orders */}
-        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 mb-2 backdrop-blur-md">
+        <div className="bg-[#06182c]/85 backdrop-blur-xl border border-white/30 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white transition-all">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/30 border border-blue-400/40 flex items-center justify-center text-blue-300 shrink-0 mb-2 backdrop-blur-md shadow-xs">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
+            <p className="text-xs font-bold text-blue-100 uppercase tracking-wide drop-shadow-xs">
               Total Orders
             </p>
-            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
+            <h3 className="text-xl font-black text-white tabular-nums mt-1 drop-shadow-md tracking-tight">
               {formatNumber(mobileSummary.totalOrders)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
-            <span className="font-bold text-blue-400">↑ 8%</span>
+          <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/20 text-xs font-bold">
+            <span className="text-blue-300 drop-shadow-xs">↑ 8%</span>
             <StockSparkline trend="up" color="#38BDF8" id="m-orders" className="w-14 h-5" />
           </div>
         </div>
 
         {/* 3. Active Stores */}
-        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-purple-500/25 border border-purple-400/35 flex items-center justify-center text-purple-200 shrink-0 mb-2 backdrop-blur-md">
+        <div className="bg-[#06182c]/85 backdrop-blur-xl border border-white/30 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white transition-all">
+          <div className="w-8 h-8 rounded-lg bg-purple-500/30 border border-purple-400/40 flex items-center justify-center text-purple-300 shrink-0 mb-2 backdrop-blur-md shadow-xs">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
+            <p className="text-xs font-bold text-blue-100 uppercase tracking-wide drop-shadow-xs">
               Active Stores
             </p>
-            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
+            <h3 className="text-xl font-black text-white tabular-nums mt-1 drop-shadow-md tracking-tight">
               {formatNumber(mobileSummary.activeStores)}
             </h3>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-white/15 text-[10px] text-emerald-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-white/20 text-xs font-bold text-emerald-400 drop-shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-xs" />
             <span>100% operational</span>
           </div>
         </div>
 
         {/* 4. Total Inventory Value */}
-        <div className="bg-[#051A33]/30 backdrop-blur-md border border-white/25 rounded-2xl p-3.5 flex flex-col justify-between shadow-md text-white">
-          <div className="w-8 h-8 rounded-lg bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 shrink-0 mb-2 backdrop-blur-md">
+        <div className="bg-[#06182c]/85 backdrop-blur-xl border border-white/30 rounded-2xl p-3.5 flex flex-col justify-between shadow-lg text-white transition-all">
+          <div className="w-8 h-8 rounded-lg bg-rose-500/30 border border-rose-400/40 flex items-center justify-center text-rose-300 shrink-0 mb-2 backdrop-blur-md shadow-xs">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-blue-100 uppercase tracking-wider">
+            <p className="text-xs font-bold text-blue-100 uppercase tracking-wide drop-shadow-xs">
               Inventory Value
             </p>
-            <h3 className="text-lg font-black text-white tabular-nums mt-0.5 drop-shadow-sm">
+            <h3 className="text-xl font-black text-white tabular-nums mt-1 drop-shadow-md tracking-tight">
               {formatCurrency(mobileSummary.inventoryValue, true)}
             </h3>
           </div>
-          <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/15 text-[10px]">
-            <span className="font-bold text-rose-400">↓ 3%</span>
+          <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/20 text-xs font-bold">
+            <span className="text-rose-400 drop-shadow-xs">↓ 3%</span>
             <StockSparkline trend="down" color="#FB7185" id="m-val" className="w-14 h-5" />
           </div>
         </div>

@@ -43,9 +43,9 @@ export function InventoryDistributionCard({
         <span className="text-xs text-slate-400 font-medium shrink-0">Status</span>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 lg:gap-6 my-auto py-1 min-w-0 w-full">
+      <div className="flex items-center justify-between sm:justify-around gap-2.5 sm:gap-4 lg:gap-6 my-auto py-1 min-w-0 w-full">
         {/* Left Side: Donut Chart with Centered Total Units */}
-        <div className="relative w-[135px] h-[135px] sm:w-[165px] sm:h-[165px] lg:w-[170px] lg:h-[170px] xl:w-[185px] xl:h-[185px] shrink-0">
+        <div className="relative w-[140px] h-[140px] sm:w-[165px] sm:h-[165px] lg:w-[170px] lg:h-[170px] xl:w-[185px] xl:h-[185px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -67,45 +67,45 @@ export function InventoryDistributionCard({
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Donut Center Text */}
+          {/* Donut Center Text - Larger & clear on mobile */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
+            <span className="text-xl sm:text-xl lg:text-2xl xl:text-3xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
               {formatNumber(data.totalUnits)}
             </span>
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+            <span className="text-[10px] sm:text-[10px] lg:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
               Total Units
             </span>
           </div>
         </div>
 
-        {/* Right Side: Content / Legend Breakdown with guaranteed tabular alignment */}
-        <div className="space-y-1.5 sm:space-y-2.5 w-auto min-w-[115px] sm:min-w-[135px] text-[11px] sm:text-xs lg:text-sm font-semibold shrink-0">
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-2xs" />
-              <span className="text-slate-700 whitespace-nowrap">In Stock</span>
+        {/* Right Side: Content / Legend Breakdown - Larger text, tabular right-aligned */}
+        <div className="space-y-2 sm:space-y-2.5 w-auto min-w-[125px] sm:min-w-[135px] text-xs sm:text-xs lg:text-sm font-semibold shrink-0">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-2xs" />
+              <span className="text-slate-800 font-bold whitespace-nowrap">In Stock</span>
             </div>
-            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-black shrink-0">
               {data.inStockPercentage}%
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500 shrink-0 shadow-2xs" />
-              <span className="text-slate-700 whitespace-nowrap">Low Stock</span>
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-2xs" />
+              <span className="text-slate-800 font-bold whitespace-nowrap">Low Stock</span>
             </div>
-            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-black shrink-0">
               {data.lowStockPercentage}%
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 shrink-0 shadow-2xs" />
-              <span className="text-slate-700 whitespace-nowrap">Out of Stock</span>
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-2xs" />
+              <span className="text-slate-800 font-bold whitespace-nowrap">Out of Stock</span>
             </div>
-            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-black shrink-0">
               {data.outOfStockPercentage}%
             </span>
           </div>
