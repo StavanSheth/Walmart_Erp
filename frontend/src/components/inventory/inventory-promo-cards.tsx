@@ -7,7 +7,7 @@ export function InventoryPromoCards() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5 sm:gap-4 h-full">
       {/* Promo Card 1: Dark Glass Warehouse Banner */}
-      <div className="relative overflow-hidden rounded-2xl p-4 sm:p-5 text-white h-full min-h-[160px] flex flex-col justify-between shadow-xs border border-slate-800 bg-slate-900 group">
+      <div className="relative overflow-hidden rounded-2xl p-4 sm:p-5 text-white h-full min-h-[175px] flex flex-col justify-between shadow-xs border border-slate-800 bg-slate-900 group">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -47,7 +47,7 @@ export function InventoryPromoCards() {
       </div>
 
       {/* Promo Card 2: Sustainability Green Box */}
-      <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-emerald-50/95 to-teal-50/80 border border-emerald-200/70 h-full min-h-[200px] flex flex-col justify-between shadow-2xs">
+      <div className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-emerald-50/95 to-teal-50/80 border border-emerald-200/70 h-full min-h-[175px] flex flex-col justify-between shadow-2xs">
         <div className="space-y-2.5">
           <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

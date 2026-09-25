@@ -353,8 +353,8 @@ export function InventoryOverviewChart({
       {/* Main Content: Chart on left + Vertical Legend on right */}
       <div className="pt-2 flex-1 flex flex-col sm:flex-row items-center justify-between gap-3 relative">
         {/* Chart Canvas */}
-        <div className="h-[210px] w-full flex-1">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[210px] w-full flex-1 min-w-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={210}>
             <BarChart
               data={chartData}
               margin={{ top: 15, right: 10, left: -15, bottom: 0 }}

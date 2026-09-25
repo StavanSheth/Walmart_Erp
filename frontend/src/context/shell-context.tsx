@@ -27,10 +27,11 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch real stores live from PostgreSQL database
   React.useEffect(() => {
+    let active = true;
     async function loadStores() {
       try {
         const res = await apiClient.get<StoreInfo[]>("/api/stores");
-        if (res.data && res.data.length > 0) {
+        if (active && res.data && res.data.length > 0) {
           setStores(res.data);
           setCurrentStore((prev) => {
             const exists = res.data?.find((s: StoreInfo) => s.id === prev.id || s.code === prev.code);
@@ -38,10 +39,15 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
           });
         }
       } catch (err) {
-        console.error("Failed to load stores from API", err);
+        if (active) {
+          console.error("Failed to load stores from API:", err instanceof Error ? err.message : err);
+        }
       }
     }
-    loadStores();
+    void loadStores();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const toggleSidebar = React.useCallback(() => {

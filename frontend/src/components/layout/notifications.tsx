@@ -20,17 +20,23 @@ export function NotificationMenu({
 
   // Fetch live notifications directly from PostgreSQL database
   React.useEffect(() => {
+    let active = true;
     async function loadNotifications() {
       try {
         const res = await apiClient.get<NotificationItem[]>("/api/notifications");
-        if (res.data) {
+        if (active && res.data) {
           setNotifications(res.data);
         }
       } catch (err) {
-        console.error("Failed to load notifications from API", err);
+        if (active) {
+          console.error("Failed to load notifications from API:", err instanceof Error ? err.message : err);
+        }
       }
     }
-    loadNotifications();
+    void loadNotifications();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

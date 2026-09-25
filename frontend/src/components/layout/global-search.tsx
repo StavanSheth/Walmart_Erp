@@ -30,23 +30,34 @@ export function GlobalSearchModal() {
 
     setTimeout(() => inputRef.current?.focus(), 50);
 
-    const timer = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const res = await apiClient.get<SearchResultItem[]>("/api/search", {
-          params: query ? { q: query } : undefined
-        });
-        if (res.data) {
-          setSearchResults(res.data);
+    let active = true;
+    const timer = setTimeout(() => {
+      const runSearch = async () => {
+        setIsSearching(true);
+        try {
+          const res = await apiClient.get<SearchResultItem[]>("/api/search", {
+            params: query ? { q: query } : undefined
+          });
+          if (active && res.data) {
+            setSearchResults(res.data);
+          }
+        } catch (err) {
+          if (active) {
+            console.error("Failed to query live search API:", err instanceof Error ? err.message : err);
+          }
+        } finally {
+          if (active) {
+            setIsSearching(false);
+          }
         }
-      } catch (err) {
-        console.error("Failed to query live search API", err);
-      } finally {
-        setIsSearching(false);
-      }
+      };
+      void runSearch();
     }, 150);
 
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [searchOpen, query]);
 
   const filteredResults = React.useMemo(() => {
