@@ -6,9 +6,17 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   src?: string;
   size?: "sm" | "md" | "lg";
+  bordered?: boolean;
 }
 
-export function Avatar({ name, src, size = "md", className, ...props }: AvatarProps) {
+export function Avatar({
+  name,
+  src,
+  size = "md",
+  bordered = true,
+  className,
+  ...props
+}: AvatarProps) {
   const [imageError, setImageError] = React.useState(false);
 
   // Extract initials
@@ -29,7 +37,8 @@ export function Avatar({ name, src, size = "md", className, ...props }: AvatarPr
   return (
     <div
       className={cn(
-        "relative inline-flex items-center justify-center shrink-0 rounded-pill font-semibold select-none overflow-hidden border border-border shadow-xs",
+        "relative inline-flex items-center justify-center shrink-0 rounded-pill font-semibold select-none overflow-hidden",
+        bordered ? "border border-border shadow-xs" : "border-0 shadow-none",
         sizeClasses[size],
         className
       )}

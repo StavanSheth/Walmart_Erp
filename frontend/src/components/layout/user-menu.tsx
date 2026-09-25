@@ -29,7 +29,7 @@ export function UserMenu({
               isDashboard ? "hover:bg-white/10" : "hover:bg-surface-muted rounded-md"
             )}
           >
-            <Avatar name="Stavan Sheth" size="sm" />
+            <Avatar name="Stavan Sheth" size="sm" bordered={false} className="border-0 shadow-none ring-0" />
             <div className="hidden xl:flex flex-col text-left">
               <span
                 className={cn(
