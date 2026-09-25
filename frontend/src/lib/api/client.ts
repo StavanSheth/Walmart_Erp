@@ -28,7 +28,10 @@ export class ApiClient {
   }
 
   public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    let formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    if (this.baseUrl.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
+      formattedEndpoint = formattedEndpoint.slice(4);
+    }
     const url = `${this.baseUrl}${formattedEndpoint}`;
 
     const headers: HeadersInit = {

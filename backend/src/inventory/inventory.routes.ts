@@ -27,8 +27,7 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
 
   // Inventory Summary endpoint: GET /api/inventory/summary
   app.get("/summary", async (request: FastifyRequest, reply: FastifyReply) => {
-    const parseResult = inventoryQuerySchema.safeParse(request.query);
-    const params = parseResult.success ? parseResult.data : {};
+    const params = inventoryQuerySchema.parse(request.query || {});
     const data = await getInventoryList(params);
     return reply.status(200).send({
       success: true,
@@ -38,8 +37,7 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
 
   // Inventory Analytics endpoint: GET /api/inventory/analytics
   app.get("/analytics", async (request: FastifyRequest, reply: FastifyReply) => {
-    const parseResult = inventoryQuerySchema.safeParse(request.query);
-    const params = parseResult.success ? parseResult.data : {};
+    const params = inventoryQuerySchema.parse(request.query || {});
     const data = await getInventoryList(params);
     return reply.status(200).send({
       success: true,
