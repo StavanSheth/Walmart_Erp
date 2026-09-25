@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, PlusIcon } from "@/components/ui/icons";
+import { CalendarIcon, PlusIcon, PackageIcon } from "@/components/ui/icons";
 
 export interface InventoryPageHeaderProps {
   onRefresh?: () => void;
@@ -44,14 +44,7 @@ export function InventoryPageHeader({
       {/* 1. Left: Inventory Title & Taglines */}
       <div className="flex items-center gap-3.5">
         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-brand-primary flex items-center justify-center text-white shadow-md shadow-blue-500/25 shrink-0">
-          <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
+          <PackageIcon className="w-6 h-6 sm:w-7 sm:h-7" />
         </div>
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none drop-shadow-md">

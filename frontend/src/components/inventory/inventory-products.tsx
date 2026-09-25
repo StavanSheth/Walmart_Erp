@@ -4,6 +4,7 @@ import * as React from "react";
 import { Skeleton } from "@/components/common/loading-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { StatusBadge } from "@/components/ui/badge";
+import { PackageIcon } from "@/components/ui/icons";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import type { InventoryItem, InventoryTab, PaginationInfo } from "@/types/inventory";
@@ -32,8 +33,7 @@ export function InventoryProducts({
   const tabs: { id: InventoryTab; label: string }[] = [
     { id: "most-stocked", label: "Most Stocked" },
     { id: "low-stock", label: "Low Stock" },
-    { id: "out-of-stock", label: "Out of Stock" },
-    { id: "fast-moving", label: "Fast Moving" }
+    { id: "out-of-stock", label: "Out of Stock" }
   ];
 
   const getProductThumbnail = (name: string, category?: string) => {
@@ -96,9 +96,7 @@ export function InventoryProducts({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
+            <PackageIcon className="w-4 h-4" />
           </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
             Top Products

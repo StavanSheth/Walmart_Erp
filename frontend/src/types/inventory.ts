@@ -1,6 +1,6 @@
 export type StockStatus = "ALL" | "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 
-export type InventoryTab = "all" | "most-stocked" | "low-stock" | "out-of-stock" | "fast-moving";
+export type InventoryTab = "all" | "most-stocked" | "low-stock" | "out-of-stock";
 
 export interface InventoryItem {
   id: string;

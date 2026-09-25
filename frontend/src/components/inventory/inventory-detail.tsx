@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { Modal } from "@/components/ui/modal";
-import { StatusBadge, Badge } from "@/components/ui/badge";
-import { formatCurrency, formatNumber, formatDate } from "@/lib/format";
+import { StatusBadge } from "@/components/ui/badge";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import { useInventoryDetail } from "@/hooks/use-inventory";
 import { Skeleton } from "@/components/common/loading-state";
+import { InventoryMovementTable } from "./inventory-movement-table";
 
 export interface InventoryDetailModalProps {
   inventoryId: string | null;
@@ -158,64 +159,12 @@ export function InventoryDetailModal({
               <span className="text-[10px] text-slate-400">Latest activity records</span>
             </div>
 
-            {recentMovements.length === 0 ? (
-              <p className="text-xs text-slate-400 italic py-3 text-center border rounded-lg border-border-subtle">
-                No recent movements recorded for this inventory item.
-              </p>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-surface-subtle border-b border-border text-slate-500 font-semibold text-[11px]">
-                    <tr>
-                      <th className="px-3 py-2">Date</th>
-                      <th className="px-3 py-2">Type</th>
-                      <th className="px-3 py-2 text-right">Qty</th>
-                      <th className="px-3 py-2">Store</th>
-                      <th className="px-3 py-2">Reference</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border-subtle">
-                    {recentMovements.map((m) => {
-                      const isPositive = m.quantity > 0;
-                      return (
-                        <tr key={m.id} className="hover:bg-surface-subtle">
-                          <td className="px-3 py-2 font-mono text-[11px] text-slate-600 whitespace-nowrap">
-                            {formatDate(m.createdAt)}
-                          </td>
-                          <td className="px-3 py-2">
-                            <Badge
-                              variant={
-                                m.type === "SALE"
-                                  ? "neutral"
-                                  : m.type === "PURCHASE" || m.type === "OPENING"
-                                    ? "success"
-                                    : m.type === "RETURN"
-                                      ? "warning"
-                                      : "primary"
-                              }
-                              size="sm"
-                            >
-                              {m.type}
-                            </Badge>
-                          </td>
-                          <td className="px-3 py-2 text-right font-mono font-bold tabular-nums">
-                            <span className={isPositive ? "text-emerald-600" : "text-rose-600"}>
-                              {isPositive ? `+${m.quantity}` : m.quantity}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-slate-600 truncate max-w-[120px]" title={m.storeName}>
-                            {m.storeCode}
-                          </td>
-                          <td className="px-3 py-2 text-slate-500 truncate max-w-[130px]" title={m.notes || m.referenceType || ""}>
-                            {m.notes || m.referenceType || "-"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <InventoryMovementTable
+              movements={recentMovements}
+              mode="detail"
+              emptyTitle="No recent movements"
+              emptyDescription="No recent movements recorded for this inventory item."
+            />
           </div>
         </div>
       ) : null}

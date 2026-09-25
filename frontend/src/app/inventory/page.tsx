@@ -15,6 +15,7 @@ import { InventoryStoreSummary } from "@/components/inventory/inventory-store-su
 import { InventoryMovements } from "@/components/inventory/inventory-movements";
 import { InventoryPromoCards } from "@/components/inventory/inventory-promo-cards";
 import { InventoryDetailModal } from "@/components/inventory/inventory-detail";
+import { InventoryMovementTable } from "@/components/inventory/inventory-movement-table";
 
 import { useInventory } from "@/hooks/use-inventory";
 import type {
@@ -132,14 +133,12 @@ function InventoryPageContent() {
         )}
 
         {/* 2. KPI Summary (5 Cards: Total Products, Low Stock, Out of Stock, In Transit, Value) */}
-        <div className="pt-36 sm:pt-48 lg:pt-60 xl:pt-72">
-          <InventoryKPIGrid
-            summary={data?.summary}
-            isLoading={isLoading}
-            selectedStatus={statusParam}
-            onStatusClick={handleStatusChange}
-          />
-        </div>
+        <InventoryKPIGrid
+          summary={data?.summary}
+          isLoading={isLoading}
+          selectedStatus={statusParam}
+          onStatusClick={handleStatusChange}
+        />
 
         {/* 3. Inventory Analytics Section (Overview Chart, Donut Category Chart, Stock Status) */}
         <InventoryAnalyticsSection
@@ -213,72 +212,10 @@ function InventoryPageContent() {
           size="lg"
         >
           <div className="space-y-4 py-2">
-            <div className="overflow-x-auto overflow-y-auto max-h-[420px] rounded-xl border border-slate-200">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead className="sticky top-0 bg-slate-50 z-10">
-                  <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50">
-                    <th className="py-2.5 px-3">ID</th>
-                    <th className="py-2.5 px-3">Date & Time</th>
-                    <th className="py-2.5 px-3">Product</th>
-                    <th className="py-2.5 px-3 text-center">Type</th>
-                    <th className="py-2.5 px-3 text-right">Quantity</th>
-                    <th className="py-2.5 px-3">Store Location</th>
-                    <th className="py-2.5 px-3 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                  {(data?.recentMovements || []).map((mov) => {
-                    const isPositive = mov.quantity > 0;
-                    const isNegative = mov.quantity < 0;
-                    return (
-                      <tr key={mov.id} className="hover:bg-slate-50/80 transition">
-                        <td className="py-2.5 px-3 font-mono text-[11px] font-semibold text-slate-500">
-                          {mov.code}
-                        </td>
-                        <td className="py-2.5 px-3 text-slate-500 text-[11px] whitespace-nowrap">
-                          {new Intl.DateTimeFormat("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: true
-                          }).format(new Date(mov.createdAt))}
-                        </td>
-                        <td className="py-2.5 px-3 font-bold text-slate-900">
-                          {mov.productName}
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                            {mov.typeLabel}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-right tabular-nums font-bold">
-                          <span
-                            className={
-                              isPositive
-                                ? "text-emerald-600"
-                                : isNegative
-                                ? "text-rose-600"
-                                : "text-slate-700"
-                            }
-                          >
-                            {isPositive ? `+${mov.quantity}` : mov.quantity}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-slate-600">
-                          {mov.storeName}
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                            {mov.status}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <InventoryMovementTable
+              movements={data?.recentMovements || []}
+              maxHeight="max-h-[420px]"
+            />
             <div className="flex justify-end pt-2 border-t border-slate-100">
               <Button
                 variant="outline"
@@ -291,67 +228,27 @@ function InventoryPageContent() {
           </div>
         </Modal>
 
-        {/* 7. Add Product Placeholder Modal (Phase 6 requirement: no full CRUD workflow, clean placeholder) */}
+        {/* 7. Add Product Coming Soon Notice Modal */}
         <Modal
           isOpen={addProductModalOpen}
           onClose={() => setAddProductModalOpen(false)}
-          title="Add New Product"
-          description="Create a new catalog item and provision initial warehouse stock."
+          title="Add Product — Coming Soon"
+          description="Catalog item creation and warehouse initial stock allocation."
           size="md"
         >
           <div className="space-y-4 py-2">
-            <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-900 leading-relaxed">
-              <span className="font-bold block mb-1">ℹ️ Catalog & Product Ingestion</span>
+            <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-900 leading-relaxed">
+              <span className="font-bold block mb-1 text-sm">ℹ️ Catalog & Product Ingestion</span>
               Full product creation, barcode generation, and supplier provisioning will be wired in the upcoming Procurement & Catalog phase.
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-semibold text-slate-700 block mb-1">Product Title</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Great Value Organic Honey"
-                  disabled
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">SKU</label>
-                  <input
-                    type="text"
-                    placeholder="Auto-generated"
-                    disabled
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 block mb-1">Initial Stock</label>
-                  <input
-                    type="number"
-                    placeholder="100"
-                    disabled
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+            <div className="pt-2 border-t border-slate-100 flex justify-end">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setAddProductModalOpen(false)}
               >
                 Close
-              </Button>
-              <Button
-                size="sm"
-                disabled
-                className="bg-brand-primary text-white opacity-60 cursor-not-allowed"
-              >
-                Submit (Upcoming)
               </Button>
             </div>
           </div>

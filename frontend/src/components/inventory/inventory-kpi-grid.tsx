@@ -4,6 +4,13 @@ import * as React from "react";
 import { formatNumber } from "@/lib/format";
 import { Skeleton } from "@/components/common/loading-state";
 import { cn } from "@/lib/cn";
+import {
+  PackageIcon,
+  AlertTriangleIcon,
+  AlertCircleIcon,
+  TruckIcon,
+  LedgerIcon
+} from "@/components/ui/icons";
 import type { InventorySummary, StockStatus } from "@/types/inventory";
 
 export interface InventoryKPIGridProps {
@@ -21,8 +28,7 @@ interface StockSparklineProps {
 }
 
 /**
- * Stock-style ticker sparkline with gradient area fill underneath and live price point
- * Reused exactly from Dashboard KPI cards for 100% design fidelity.
+ * Stock-style ticker sparkline with gradient area fill underneath and live price point.
  */
 function StockSparkline({
   trend = "up",
@@ -135,14 +141,8 @@ export function InventoryKPIGrid({
       status: "ALL" as StockStatus,
       iconContainer: "bg-blue-500/25 border-blue-400/35 text-blue-200",
       mobileIconContainer: "bg-blue-500/30 border-blue-400/40 text-blue-300",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
-      trendText: "↑ 6.8%",
-      trendSub: "vs. last month",
-      trendColor: "text-emerald-400",
+      icon: <PackageIcon className="w-5 h-5" />,
+      subLabel: "Active catalog items",
       sparkColor: "#38BDF8",
       sparkTrend: "up" as const
     },
@@ -153,14 +153,8 @@ export function InventoryKPIGrid({
       status: "LOW_STOCK" as StockStatus,
       iconContainer: "bg-amber-500/25 border-amber-400/35 text-amber-200",
       mobileIconContainer: "bg-amber-500/30 border-amber-400/40 text-amber-300",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-      ),
-      trendText: "↑ 12%",
-      trendSub: "vs. last month",
-      trendColor: "text-amber-400",
+      icon: <AlertTriangleIcon className="w-5 h-5" />,
+      subLabel: "Requires reorder",
       sparkColor: "#FBBF24",
       sparkTrend: "steady" as const
     },
@@ -171,14 +165,8 @@ export function InventoryKPIGrid({
       status: "OUT_OF_STOCK" as StockStatus,
       iconContainer: "bg-rose-500/25 border-rose-400/35 text-rose-200",
       mobileIconContainer: "bg-rose-500/30 border-rose-400/40 text-rose-300",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-        </svg>
-      ),
-      trendText: "↓ 18%",
-      trendSub: "vs. last month",
-      trendColor: "text-rose-400",
+      icon: <AlertCircleIcon className="w-5 h-5" />,
+      subLabel: "Immediate attention",
       sparkColor: "#FB7185",
       sparkTrend: "down" as const
     },
@@ -189,18 +177,8 @@ export function InventoryKPIGrid({
       status: "ALL" as StockStatus,
       iconContainer: "bg-purple-500/25 border-purple-400/35 text-purple-200",
       mobileIconContainer: "bg-purple-500/30 border-purple-400/40 text-purple-300",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 18H9" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14v10Z" />
-          <circle cx="17" cy="18" r="2" strokeWidth={1.8} />
-          <circle cx="7" cy="18" r="2" strokeWidth={1.8} />
-        </svg>
-      ),
-      trendText: "↑ 9%",
-      trendSub: "vs. last month",
-      trendColor: "text-purple-300",
+      icon: <TruckIcon className="w-5 h-5" />,
+      subLabel: "Pending purchase orders",
       sparkColor: "#C084FC",
       sparkTrend: "up" as const
     },
@@ -211,14 +189,8 @@ export function InventoryKPIGrid({
       status: "ALL" as StockStatus,
       iconContainer: "bg-emerald-500/25 border-emerald-400/35 text-emerald-200",
       mobileIconContainer: "bg-emerald-500/30 border-emerald-400/40 text-emerald-300",
-      icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      trendText: "↑ 4.6%",
-      trendSub: "vs. last month",
-      trendColor: "text-emerald-400",
+      icon: <LedgerIcon className="w-5 h-5" />,
+      subLabel: "Total valuation",
       sparkColor: "#34D399",
       sparkTrend: "surge" as const
     }
@@ -271,10 +243,7 @@ export function InventoryKPIGrid({
                 </div>
               </div>
               <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/15">
-                <div className="text-[11px]">
-                  <span className={cn("font-bold", card.trendColor)}>{card.trendText}</span>
-                  <span className="text-blue-100/80 ml-1">{card.trendSub}</span>
-                </div>
+                <span className="text-[11px] text-blue-100/90 font-medium">{card.subLabel}</span>
                 <StockSparkline trend={card.sparkTrend} color={card.sparkColor} id={card.id} />
               </div>
             </div>
@@ -325,8 +294,8 @@ export function InventoryKPIGrid({
                   {card.value}
                 </h3>
               </div>
-              <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/20 text-xs font-bold">
-                <span className={cn("drop-shadow-xs", card.trendColor)}>{card.trendText}</span>
+              <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/20 text-xs">
+                <span className="text-[11px] text-blue-100/90 font-medium truncate">{card.subLabel}</span>
                 <StockSparkline
                   trend={card.sparkTrend}
                   color={card.sparkColor}

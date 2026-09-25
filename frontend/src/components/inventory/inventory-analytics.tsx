@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { InventoryOverviewChart } from "./inventory-overview-chart";
 import { InventoryCategoryChart } from "./inventory-category-chart";

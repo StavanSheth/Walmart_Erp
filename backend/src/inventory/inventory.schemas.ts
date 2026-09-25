@@ -3,7 +3,7 @@ import { z } from "zod";
 export const stockStatusSchema = z.enum(["ALL", "IN_STOCK", "LOW_STOCK", "OUT_OF_STOCK"]);
 export type StockStatus = z.infer<typeof stockStatusSchema>;
 
-export const inventoryTabSchema = z.enum(["all", "most-stocked", "low-stock", "out-of-stock", "fast-moving"]).default("all");
+export const inventoryTabSchema = z.enum(["all", "most-stocked", "low-stock", "out-of-stock"]).default("all");
 export type InventoryTab = z.infer<typeof inventoryTabSchema>;
 
 export const inventoryQuerySchema = z.object({
