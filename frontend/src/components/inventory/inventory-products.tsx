@@ -179,9 +179,16 @@ export function InventoryProducts({
                     <td className="py-2.5 px-2.5">
                       <div className="flex items-center gap-2.5 min-w-0">
                         {getProductThumbnail(item.productName, item.categoryName)}
-                        <span className="font-bold text-slate-900 truncate group-hover:text-brand-primary transition">
-                          {item.productName}
-                        </span>
+                        <div className="min-w-0 flex flex-col">
+                          <span className="font-bold text-slate-900 truncate group-hover:text-brand-primary transition">
+                            {item.productName}
+                          </span>
+                          {item.storeName && (
+                            <span className="text-[10px] text-slate-400 font-medium truncate">
+                              {item.storeName}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="py-2.5 px-2.5 text-slate-500 font-mono text-[11px]">{item.sku}</td>

@@ -133,12 +133,14 @@ function InventoryPageContent() {
         )}
 
         {/* 2. KPI Summary (5 Cards: Total Products, Low Stock, Out of Stock, In Transit, Value) */}
-        <InventoryKPIGrid
-          summary={data?.summary}
-          isLoading={isLoading}
-          selectedStatus={statusParam}
-          onStatusClick={handleStatusChange}
-        />
+        <div className="pt-52 sm:pt-64 lg:pt-[360px] xl:pt-[420px]">
+          <InventoryKPIGrid
+            summary={data?.summary}
+            isLoading={isLoading}
+            selectedStatus={statusParam}
+            onStatusClick={handleStatusChange}
+          />
+        </div>
 
         {/* 3. Inventory Analytics Section (Overview Chart, Donut Category Chart, Stock Status) */}
         <InventoryAnalyticsSection
