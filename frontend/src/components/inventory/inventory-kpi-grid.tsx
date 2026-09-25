@@ -219,7 +219,7 @@ export function InventoryKPIGrid({
                 }
               }}
               className={cn(
-                "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white select-none",
+                "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white select-none min-h-[136px]",
                 isFilterable && "cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
                 isSelected && "ring-2 ring-white/80 bg-[#051A33]/45 shadow-xl border-white/40"
               )}

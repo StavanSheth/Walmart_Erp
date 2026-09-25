@@ -116,7 +116,7 @@ export function DashboardKPIGrid({
           ========================================================================= */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* 1. Total Products */}
-        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white min-h-[136px]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 backdrop-blur-md shadow-xs">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +142,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 2. In Stock (Units) */}
-        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white min-h-[136px]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/25 border border-emerald-400/35 flex items-center justify-center text-emerald-200 shrink-0 backdrop-blur-md shadow-xs">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,7 +168,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 3. Low Stock Items */}
-        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white min-h-[136px]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/25 border border-amber-400/35 flex items-center justify-center text-amber-200 shrink-0 backdrop-blur-md shadow-xs">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,7 +194,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 4. Out of Stock */}
-        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white min-h-[136px]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-500/25 border border-rose-400/35 flex items-center justify-center text-rose-200 shrink-0 backdrop-blur-md shadow-xs">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -220,7 +220,7 @@ export function DashboardKPIGrid({
         </div>
 
         {/* 5. Total Store Locations */}
-        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white">
+        <div className="bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white min-h-[136px]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600/25 border border-blue-400/35 flex items-center justify-center text-blue-200 shrink-0 backdrop-blur-md shadow-xs">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
