@@ -106,7 +106,7 @@ export function InventoryKPIGrid({
         {/* Desktop Skeleton */}
         <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="p-4 rounded-2xl glass-card space-y-3 bg-[#06182c]/85 backdrop-blur-xl border border-white/25">
+            <div key={i} className="p-4 rounded-2xl glass-card space-y-3 bg-[#051A33]/25 backdrop-blur-md border border-white/20">
               <Skeleton className="w-10 h-10 rounded-xl bg-white/20" />
               <Skeleton className="w-24 h-3.5 rounded bg-white/20" />
               <Skeleton className="w-32 h-7 rounded bg-white/20" />
@@ -219,9 +219,9 @@ export function InventoryKPIGrid({
                 }
               }}
               className={cn(
-                "bg-[#06182c]/85 hover:bg-[#06182c]/95 backdrop-blur-xl border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-xl transition-all duration-200 text-white select-none",
+                "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 rounded-2xl p-4 flex flex-col justify-between shadow-lg transition-all duration-200 text-white select-none",
                 isFilterable && "cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
-                isSelected && "ring-2 ring-white/80 bg-[#06182c]/95 shadow-2xl border-white/40"
+                isSelected && "ring-2 ring-white/80 bg-[#051A33]/45 shadow-xl border-white/40"
               )}
             >
               <div className="flex items-center gap-3">
