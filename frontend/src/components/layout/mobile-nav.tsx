@@ -100,7 +100,7 @@ export function MobileDrawer() {
             className="object-cover"
             sizes="320px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#06182c]/95 via-[#06182c]/70 to-[#06182c]/30 backdrop-blur-[1px] flex flex-col justify-end p-3.5 text-white">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#06182c]/85 via-[#06182c]/50 to-[#06182c]/20 backdrop-blur-[1px] flex flex-col justify-end p-3.5 text-white">
             <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#FFC220] flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#FFC220] animate-pulse shadow-xs" />
               Active Store Outlet
@@ -174,7 +174,7 @@ export function MobileDrawer() {
               sizes="280px"
               className="object-cover object-center scale-110"
             />
-            <div className="absolute inset-0 bg-[#06182c]/80 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-[#06182c]/60 backdrop-blur-[1px]" />
           </div>
           <div className="relative z-10 flex items-center gap-2 min-w-0">
             <SparkIcon className="w-4 h-4 text-emerald-400 shrink-0" />

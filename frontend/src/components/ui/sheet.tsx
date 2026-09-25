@@ -70,7 +70,7 @@ export function Sheet({
         className={cn(
           "fixed inset-0 transition-opacity anim-fade-in",
           isGlass
-            ? "bg-black/65 backdrop-blur-sm"
+            ? "bg-black/40 backdrop-blur-xs"
             : "bg-slate-900/60 backdrop-blur-xs"
         )}
         onClick={onClose}
@@ -82,7 +82,7 @@ export function Sheet({
         className={cn(
           "fixed z-10 flex flex-col focus-visible:outline-none",
           isGlass
-            ? "bg-[#06182c]/85 backdrop-blur-2xl text-white shadow-2xl"
+            ? "bg-[#06182c]/60 backdrop-blur-xl text-white shadow-2xl"
             : "bg-surface text-slate-900",
           sideClasses[side],
           className
