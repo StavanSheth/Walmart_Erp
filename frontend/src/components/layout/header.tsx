@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { useShell } from "@/context/shell-context";
 import { Breadcrumbs } from "./breadcrumb";
 import { StoreSelector } from "./store-selector";
@@ -16,6 +17,7 @@ export interface HeaderProps {
 }
 
 export function Header({ className, isDashboard = true }: HeaderProps) {
+  const pathname = usePathname();
   const { setMobileDrawerOpen, setSearchOpen } = useShell();
   const [isScrolled, setIsScrolled] = React.useState(false);
 
@@ -77,8 +79,8 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           />
         </div>
 
-        {/* Desktop Breadcrumbs (fallback if not dashboard) */}
-        {!isDashboard && (
+        {/* Desktop Breadcrumbs (fallback if not dashboard or inventory) */}
+        {!isDashboard && pathname !== "/inventory" && (
           <div className="hidden lg:block truncate ml-4">
             <Breadcrumbs />
           </div>

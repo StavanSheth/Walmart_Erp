@@ -12,7 +12,7 @@ import { ASSETS } from "@/lib/assets";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isDashboard = pathname === "/dashboard" || pathname === "/";
+  const isDashboard = pathname === "/dashboard" || pathname === "/" || pathname === "/inventory";
 
   return (
     <ShellProvider>
@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">
-          {/* Top Banner Image (Visible till KPI cards end, behind header, greeting, and liquid glass KPI cards) */}
+          {/* Top Banner Image (Visible behind header and page hero section) */}
           {isDashboard && (
             <div className="absolute top-0 left-0 right-0 h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px] overflow-hidden pointer-events-none z-0">
               <Image

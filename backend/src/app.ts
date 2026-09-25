@@ -5,6 +5,7 @@ import { checkDatabaseConnection } from "./common/database/prisma.js";
 import { AppError } from "./common/errors/app-error.js";
 import { getLoggerConfig } from "./common/logging/logger.js";
 import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
+import { inventoryRoutes } from "./inventory/inventory.routes.js";
 
 export interface HealthResponse {
   success: boolean;
@@ -25,8 +26,9 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
     logger: getLoggerConfig()
   });
 
-  // Configurable CORS using once-normalized allowed origins
-  const allowedOrigins = config.corsOrigins;
+  // Configurable CORS supporting production origins and local development loopbacks
+  const allowedOrigins = config.corsOrigins.map((origin) => origin.replace(/\/$/, ""));
+  const isDev = config.NODE_ENV !== "production";
 
   app.register(cors, {
     origin: (origin, callback) => {
@@ -35,7 +37,11 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
         callback(null, true);
         return;
       }
-      if (allowedOrigins.includes(origin)) {
+      const normalized = origin.replace(/\/$/, "");
+      if (
+        allowedOrigins.includes(normalized) ||
+        (isDev && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(normalized))
+      ) {
         callback(null, true);
       } else {
         // Disallow CORS: do not reflect Access-Control-Allow-Origin
@@ -43,7 +49,8 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"]
   });
 
   // Centralized Error Handling
@@ -116,6 +123,9 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
 
   // Phase 5 Dashboard Routes
   app.register(dashboardRoutes, { prefix: "/api/dashboard" });
+
+  // Phase 6 Inventory Routes
+  app.register(inventoryRoutes, { prefix: "/api/inventory" });
 
   return app;
 }
