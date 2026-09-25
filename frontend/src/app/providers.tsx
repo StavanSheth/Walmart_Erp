@@ -23,10 +23,11 @@ export function Providers({ children }: { children: ReactNode }) {
       if (
         message.includes("ChunkLoadError") ||
         message.includes("Loading chunk") ||
-        message.includes("Failed to fetch dynamically imported module")
+        message.includes("Failed to fetch dynamically imported module") ||
+        message.includes("__webpack_modules__")
       ) {
         event.preventDefault();
-        console.warn("ChunkLoadError detected, refreshing page for updated assets...");
+        console.warn("Webpack module cache mismatch detected, refreshing page for updated assets...");
         window.location.reload();
       }
     };
