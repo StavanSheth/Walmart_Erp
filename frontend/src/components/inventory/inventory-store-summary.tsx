@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/common/loading-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { StoreIcon } from "@/components/ui/icons";
 import type { StoreInventorySummary, FilterOption } from "@/types/inventory";
 
 export interface InventoryStoreSummaryProps {
@@ -35,10 +36,7 @@ export function InventoryStoreSummary({
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 gap-2">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <StoreIcon className="w-4 h-4" />
           </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
             Store-wise Inventory
@@ -47,11 +45,11 @@ export function InventoryStoreSummary({
 
         <div className="flex items-center gap-2">
           {regions.length > 0 && (
-
             <select
               value={selectedRegionId}
               onChange={(e) => onRegionChange && onRegionChange(e.target.value)}
               className="h-7 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
+              aria-label="Filter stores by region"
             >
               <option value="ALL">All Regions</option>
               {regions.map((r) => (
@@ -88,11 +86,11 @@ export function InventoryStoreSummary({
             <table className="w-full text-left border-collapse text-xs">
               <thead className="sticky top-0 bg-white z-10 shadow-2xs">
                 <tr className="border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-white">
-                  <th className="py-2 pr-2 min-w-[120px] bg-white">Store</th>
-                  <th className="py-2 px-2 text-right bg-white">Stock</th>
-                  <th className="py-2 px-2 text-right bg-white">Low</th>
-                  <th className="py-2 px-2 text-right bg-white">OOS</th>
-                  <th className="py-2 pl-2 text-center bg-white">Status</th>
+                  <th scope="col" className="py-2 pr-2 min-w-[120px] bg-white">Store</th>
+                  <th scope="col" className="py-2 px-2 text-right bg-white">Stock</th>
+                  <th scope="col" className="py-2 px-2 text-right bg-white">Low</th>
+                  <th scope="col" className="py-2 px-2 text-right bg-white">OOS</th>
+                  <th scope="col" className="py-2 pl-2 text-center bg-white">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-700">

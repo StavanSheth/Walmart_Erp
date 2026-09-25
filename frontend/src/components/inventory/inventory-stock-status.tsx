@@ -3,7 +3,12 @@
 import * as React from "react";
 import { Skeleton } from "@/components/common/loading-state";
 import { formatNumber } from "@/lib/format";
-import { cn } from "@/lib/cn";
+import {
+  CheckIcon,
+  AlertTriangleIcon,
+  AlertCircleIcon,
+  TruckIcon
+} from "@/components/ui/icons";
 import type { StockStatusSummary, StockStatus } from "@/types/inventory";
 
 export interface InventoryStockStatusProps {
@@ -41,34 +46,26 @@ export function InventoryStockStatus({
       case "IN_STOCK":
         return (
           <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
+            <CheckIcon className="w-3.5 h-3.5" />
           </div>
         );
       case "LOW_STOCK":
         return (
           <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01" />
-            </svg>
+            <AlertTriangleIcon className="w-3.5 h-3.5" />
           </div>
         );
       case "OUT_OF_STOCK":
         return (
           <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <AlertCircleIcon className="w-3.5 h-3.5" />
           </div>
         );
       case "IN_TRANSIT":
       default:
         return (
           <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h8m0 0l3 3v6a1 1 0 01-1 1h-1m-10 0H6a1 1 0 01-1-1V7a1 1 0 011-1h8m-9 13a2 2 0 104 0m8 0a2 2 0 104 0" />
-            </svg>
+            <TruckIcon className="w-3.5 h-3.5" />
           </div>
         );
     }
@@ -92,23 +89,37 @@ export function InventoryStockStatus({
         <span className="text-[11px] text-slate-400 font-medium">Distribution</span>
       </div>
 
-
-      {/* 4 Status Rows */}
+      {/* 4 Status Rows - Accessible interactive buttons */}
       <div className="space-y-1.5 pt-2 flex-1">
         {statuses.map((item) => {
           const isFilterable = item.status !== "IN_TRANSIT";
+          if (isFilterable && onStatusClick) {
+            return (
+              <button
+                key={item.status}
+                type="button"
+                onClick={() => onStatusClick(item.status as StockStatus)}
+                aria-label={`Filter by ${item.label}: ${formatNumber(item.count)} items (${item.percentage}%)`}
+                className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition cursor-pointer hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                <div className="flex items-center gap-2.5">
+                  {getStatusIcon(item.status)}
+                  <span className="text-xs font-bold text-slate-800">{item.label}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <span className="font-extrabold text-slate-900 tabular-nums">
+                    {formatNumber(item.count)}
+                  </span>
+                  <span className="text-slate-400 font-semibold">({item.percentage}%)</span>
+                </div>
+              </button>
+            );
+          }
+
           return (
             <div
               key={item.status}
-              onClick={() => {
-                if (isFilterable && onStatusClick) {
-                  onStatusClick(item.status as StockStatus);
-                }
-              }}
-              className={cn(
-                "flex items-center justify-between py-1.5 px-2 rounded-xl transition",
-                isFilterable ? "cursor-pointer hover:bg-slate-50" : ""
-              )}
+              className="flex items-center justify-between py-1.5 px-2 rounded-xl"
             >
               <div className="flex items-center gap-2.5">
                 {getStatusIcon(item.status)}
@@ -130,9 +141,7 @@ export function InventoryStockStatus({
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-1.5">
             <span className="text-emerald-700">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-1.428-1.127-2.31a10.96 10.96 0 01-.428-1.187z" clipRule="evenodd" />
-              </svg>
+              <CheckIcon className="w-3.5 h-3.5" />
             </span>
             <span className="text-[11px] font-bold text-emerald-950">Inventory Health Score</span>
           </div>
@@ -147,7 +156,7 @@ export function InventoryStockStatus({
           </span>
           <div className="flex-1 h-2 rounded-full bg-emerald-200/50 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-500 transition-all duration-500"
+              className="h-full rounded-full bg-emerald-500 transition-all duration-500"
               style={{ width: `${healthScore}%` }}
             />
           </div>

@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Skeleton } from "@/components/common/loading-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatCurrency, formatNumber } from "@/lib/format";
+import { PackageIcon } from "@/components/ui/icons";
 import type { CategoryDistribution } from "@/types/inventory";
 
 export interface InventoryCategoryChartProps {
@@ -83,9 +84,7 @@ export function InventoryCategoryChart({
       <div className="flex items-center justify-between pb-2 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
+            <PackageIcon className="w-4 h-4" />
           </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
             Inventory by Category
@@ -133,13 +132,15 @@ export function InventoryCategoryChart({
           </div>
         </div>
 
-        {/* Right: Category Legend Rows */}
+        {/* Right: Category Legend Rows - Accessible interactive buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-x-2 gap-y-0.5 flex-1 w-full overflow-hidden">
           {chartData.map((cat) => (
-            <div
+            <button
               key={cat.name}
+              type="button"
               onClick={() => onCategorySelect && onCategorySelect(cat.categoryId)}
-              className="flex items-center justify-between text-xs py-0.5 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer transition"
+              aria-label={`Filter by category ${cat.name} (${cat.percentage}%)`}
+              className="flex items-center justify-between text-xs py-0.5 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer transition text-left w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span
@@ -153,7 +154,7 @@ export function InventoryCategoryChart({
               <span className="text-slate-900 font-bold tabular-nums shrink-0 ml-1.5 text-xs">
                 {cat.percentage}%
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>

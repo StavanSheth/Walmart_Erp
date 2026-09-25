@@ -25,28 +25,8 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
     });
   });
 
-  // Inventory Summary endpoint: GET /api/inventory/summary
-  app.get("/summary", async (request: FastifyRequest, reply: FastifyReply) => {
-    const params = inventoryQuerySchema.parse(request.query || {});
-    const data = await getInventoryList(params);
-    return reply.status(200).send({
-      success: true,
-      data: data.summary
-    });
-  });
-
-  // Inventory Analytics endpoint: GET /api/inventory/analytics
-  app.get("/analytics", async (request: FastifyRequest, reply: FastifyReply) => {
-    const params = inventoryQuerySchema.parse(request.query || {});
-    const data = await getInventoryList(params);
-    return reply.status(200).send({
-      success: true,
-      data: data.analytics
-    });
-  });
-
-  // Inventory Detail endpoint: GET /api/inventory/:id
-  app.get("/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+  // Inventory Detail endpoint: GET /api/inventory/:inventoryId
+  app.get("/:inventoryId", async (request: FastifyRequest, reply: FastifyReply) => {
     const parseResult = inventoryIdParamSchema.safeParse(request.params);
     if (!parseResult.success) {
       return reply.status(400).send({
@@ -60,7 +40,7 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
       });
     }
 
-    const data = await getInventoryById(parseResult.data.id);
+    const data = await getInventoryById(parseResult.data.inventoryId);
     return reply.status(200).send({
       success: true,
       data

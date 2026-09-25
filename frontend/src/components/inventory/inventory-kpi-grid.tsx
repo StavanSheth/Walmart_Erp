@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { formatNumber } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import {
   PackageIcon,
   AlertTriangleIcon,
@@ -17,17 +17,6 @@ export interface InventoryKPIGridProps {
   isLoading?: boolean;
   selectedStatus?: StockStatus;
   onStatusClick?: (status: StockStatus) => void;
-}
-
-function formatInventoryValue(val: number): string {
-  if (isNaN(val) || val === 0) return "$0.00M";
-  if (val >= 1000000) {
-    return `$${(val / 1000000).toFixed(2)}M`;
-  }
-  if (val >= 1000) {
-    return `$${(val / 1000).toFixed(1)}K`;
-  }
-  return `$${formatNumber(val)}`;
 }
 
 export function InventoryKPIGrid({
@@ -112,7 +101,7 @@ export function InventoryKPIGrid({
     {
       id: "inventory-value",
       label: "Inventory Value",
-      value: formatInventoryValue(summary.inventoryValue),
+      value: formatCurrency(summary.inventoryValue, true),
       status: "ALL" as StockStatus,
       iconContainer: "bg-emerald-500/25 border-emerald-400/35 text-emerald-200",
       mobileIconContainer: "bg-emerald-500/30 border-emerald-400/40 text-emerald-300",
@@ -137,7 +126,8 @@ export function InventoryKPIGrid({
       {/* Desktop: 5 Glass Metric Cards */}
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {cards.map((card) => {
-          const isFilterable = card.status !== "ALL" || (card.id === "total-products" && selectedStatus !== "ALL");
+          const isFilterable =
+            card.status !== "ALL" || (card.id === "total-products" && selectedStatus !== "ALL");
           const isSelected = selectedStatus === card.status && card.status !== "ALL";
 
           return (
@@ -163,7 +153,8 @@ export function InventoryKPIGrid({
       {/* Mobile: 2-Column Glass Metric Cards */}
       <div className="grid grid-cols-2 gap-3 md:hidden">
         {cards.map((card, idx) => {
-          const isFilterable = card.status !== "ALL" || (card.id === "total-products" && selectedStatus !== "ALL");
+          const isFilterable =
+            card.status !== "ALL" || (card.id === "total-products" && selectedStatus !== "ALL");
           const isSelected = selectedStatus === card.status && card.status !== "ALL";
 
           return (

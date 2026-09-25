@@ -26,7 +26,7 @@ export interface InventoryProductsProps {
 export function InventoryProducts({
   items = [],
   pagination,
-  currentTab = "most-stocked",
+  currentTab = "all",
   onTabChange,
   onPageChange,
   onPageSizeChange,
@@ -109,24 +109,24 @@ export function InventoryProducts({
           />
         ) : (
           <>
-            {/* Desktop Table View (hidden on mobile, visible on md+) */}
+            {/* Desktop Table View */}
             <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[340px] -mx-4 sm:-mx-5 px-4 sm:px-5">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="sticky top-0 bg-white z-10 shadow-2xs">
                   <tr className="border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-white">
-                    <th className="py-2.5 pr-2 w-6 bg-white">#</th>
-                    <th className="py-2.5 px-2.5 min-w-[150px] bg-white">Product</th>
-                    <th className="py-2.5 px-2 bg-white">SKU</th>
-                    <th className="py-2.5 px-2 bg-white">Store</th>
-                    <th className="py-2.5 px-2 bg-white">Category</th>
-                    <th className="py-2.5 px-2 text-right bg-white">On Hand</th>
-                    <th className="py-2.5 px-2 text-right bg-white">Reserved</th>
-                    <th className="py-2.5 px-2 text-right bg-white">Available</th>
-                    <th className="py-2.5 px-2 text-right bg-white">Reorder</th>
-                    <th className="py-2.5 px-2 text-right bg-white">Cost</th>
-                    <th className="py-2.5 px-2 text-right bg-white">Value</th>
-                    <th className="py-2.5 px-2.5 text-center bg-white">Status</th>
-                    <th className="py-2.5 pl-2 text-right w-8 bg-white"></th>
+                    <th scope="col" className="py-2.5 pr-2 w-6 bg-white">#</th>
+                    <th scope="col" className="py-2.5 px-2.5 min-w-[150px] bg-white">Product</th>
+                    <th scope="col" className="py-2.5 px-2 bg-white">SKU</th>
+                    <th scope="col" className="py-2.5 px-2 bg-white">Store</th>
+                    <th scope="col" className="py-2.5 px-2 bg-white">Category</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">On Hand</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Reserved</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Available</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Reorder</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Cost</th>
+                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Value</th>
+                    <th scope="col" className="py-2.5 px-2.5 text-center bg-white">Status</th>
+                    <th scope="col" className="py-2.5 pl-2 text-right w-8 bg-white"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
@@ -194,7 +194,7 @@ export function InventoryProducts({
               </table>
             </div>
 
-            {/* Mobile Data Card List (visible on mobile, hidden on md+) */}
+            {/* Mobile Data Card List: Product, SKU, Store, Available, Inv. Value, Status */}
             <div className="md:hidden space-y-2.5 py-1 max-h-[380px] overflow-y-auto">
               {items.map((item) => (
                 <MobileDataCard
@@ -207,8 +207,7 @@ export function InventoryProducts({
                   fields={[
                     { label: "Store", value: item.storeName || "All Stores" },
                     { label: "Available", value: formatNumber(item.available) },
-                    { label: "Inv. Value", value: formatCurrency(item.inventoryValue) },
-                    { label: "On Hand", value: formatNumber(item.onHand) }
+                    { label: "Inv. Value", value: formatCurrency(item.inventoryValue) }
                   ]}
                 />
               ))}

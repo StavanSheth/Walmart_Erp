@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { Modal } from "@/components/ui/modal";
+import { Sheet } from "@/components/ui/sheet";
 import { StatusBadge } from "@/components/ui/badge";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { useInventoryDetail } from "@/hooks/use-inventory";
+import { useMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/common/loading-state";
 import { InventoryMovementTable } from "./inventory-movement-table";
 
@@ -17,19 +19,14 @@ export function InventoryDetailModal({
   inventoryId,
   onClose
 }: InventoryDetailModalProps) {
+  const isMobile = useMobile();
   const { data, isLoading, isError, error } = useInventoryDetail(inventoryId);
 
   const item = data?.item;
   const recentMovements = data?.recentMovements || [];
 
-  return (
-    <Modal
-      isOpen={Boolean(inventoryId)}
-      onClose={onClose}
-      title={item ? item.productName : "Inventory Details"}
-      description={item ? `SKU: ${item.sku} • Store: ${item.storeName}` : undefined}
-      size="lg"
-    >
+  const content = (
+    <>
       {isLoading ? (
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -80,7 +77,6 @@ export function InventoryDetailModal({
               </span>
             </div>
           </div>
-
 
           {/* Product & Store Identifiers */}
           <div>
@@ -185,6 +181,32 @@ export function InventoryDetailModal({
           </div>
         </div>
       ) : null}
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet
+        isOpen={Boolean(inventoryId)}
+        onClose={onClose}
+        title={item ? item.productName : "Inventory Details"}
+        side="bottom"
+        className="max-h-[85vh]"
+      >
+        {content}
+      </Sheet>
+    );
+  }
+
+  return (
+    <Modal
+      isOpen={Boolean(inventoryId)}
+      onClose={onClose}
+      title={item ? item.productName : "Inventory Details"}
+      description={item ? `SKU: ${item.sku} • Store: ${item.storeName}` : undefined}
+      size="lg"
+    >
+      {content}
     </Modal>
   );
 }
