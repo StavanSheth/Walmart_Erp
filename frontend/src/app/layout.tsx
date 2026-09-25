@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -21,7 +22,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-surface-page text-slate-900" suppressHydrationWarning>
         <Providers>
-          <AppShell>{children}</AppShell>
+          <AppShell>
+            <React.Suspense fallback={null}>
+              {children}
+            </React.Suspense>
+          </AppShell>
         </Providers>
       </body>
     </html>

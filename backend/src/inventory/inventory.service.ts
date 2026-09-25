@@ -5,7 +5,6 @@ import type { InventoryQueryParams } from "./inventory.schemas.js";
 import type {
   InventoryResponseData,
   InventoryProductItemDto,
-  CategoryDistributionDto,
   StockStatusSummaryDto,
   InventoryDetailData
 } from "./inventory.types.js";

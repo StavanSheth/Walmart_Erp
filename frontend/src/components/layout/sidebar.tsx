@@ -103,7 +103,12 @@ export function Sidebar({ className }: SidebarProps) {
                   sidebarCollapsed ? "hidden" : "hidden lg:block"
                 )}
               >
-                <span className="truncate leading-tight">{item.name}</span>
+                <span className="block truncate leading-tight">{item.name}</span>
+                {item.description && (
+                  <span className="block truncate text-[10px] text-slate-400 group-hover:text-slate-300 font-normal leading-tight mt-0.5">
+                    {item.description}
+                  </span>
+                )}
               </div>
             </Link>
           );

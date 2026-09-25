@@ -188,6 +188,54 @@ export class ApiClient {
     const qs = storeId ? `?storeId=${encodeURIComponent(storeId)}` : "";
     return this.request<InventoryDetailResponse>(`/inventory/${encodeURIComponent(id)}${qs}`);
   }
+
+  /**
+   * Phase 7 Partners Overview Dashboard API
+   */
+  public async getPartnersOverview(
+    params?: import("@/types/partners").PartnersQueryParams
+  ): Promise<{ success: boolean; data: import("@/types/partners").PartnersOverviewData }> {
+    const searchParams = new URLSearchParams();
+    if (params?.tab && params.tab !== "overview") {
+      searchParams.set("tab", params.tab);
+    }
+    if (params?.search && params.search.trim().length > 0) {
+      searchParams.set("search", params.search.trim());
+    }
+    if (params?.type && params.type !== "ALL" && params.type !== "All Types") {
+      searchParams.set("type", params.type);
+    }
+    if (params?.regionId && params.regionId !== "ALL" && params.regionId !== "all") {
+      searchParams.set("regionId", params.regionId);
+    }
+    if (params?.status && params.status !== "ALL") {
+      searchParams.set("status", params.status);
+    }
+    if (params?.page) {
+      searchParams.set("page", String(params.page));
+    }
+    if (params?.pageSize) {
+      searchParams.set("pageSize", String(params.pageSize));
+    }
+    if (params?.period) {
+      searchParams.set("period", params.period);
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/partners/overview?${queryString}` : "/partners/overview";
+    return this.request<{ success: boolean; data: import("@/types/partners").PartnersOverviewData }>(endpoint);
+  }
+
+  /**
+   * Phase 7 Partner / Customer Detail
+   */
+  public async getPartnerDetail(
+    id: string
+  ): Promise<{ success: boolean; data: import("@/types/partners").PartnerDetailData }> {
+    return this.request<{ success: boolean; data: import("@/types/partners").PartnerDetailData }>(
+      `/partners/${encodeURIComponent(id)}`
+    );
+  }
 }
 
 export const apiClient = new ApiClient();

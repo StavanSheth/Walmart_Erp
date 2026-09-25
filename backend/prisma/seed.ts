@@ -131,32 +131,41 @@ async function main() {
 
   // ── 6. Partners ───────────────────────────────────────────────────────────
   const PARTNERS_DATA = [
-    { id: "partner-0001", name: "Raj Enterprises", type: "SUPPLIER" as const, phone: "+91 9800000001", email: "raj@suppliers.local", address: "Andheri, Mumbai", taxId: "27AABCR0001A1Z5", creditLimit: 500000 },
-    { id: "partner-0002", name: "Sharma Distributors", type: "DISTRIBUTOR" as const, phone: "+91 9800000002", email: "sharma@dist.local", address: "Karol Bagh, Delhi", taxId: "07AABCS0002B1Z3", creditLimit: 750000 },
-    { id: "partner-0003", name: "Patel Wholesale", type: "WHOLESALER" as const, phone: "+91 9800000003", email: "patel@wholesale.local", address: "SG Highway, Ahmedabad", taxId: "24AABCP0003C1Z1", creditLimit: 600000 },
-    { id: "partner-0004", name: "Kumar Foods Pvt Ltd", type: "SUPPLIER" as const, phone: "+91 9800000004", email: "kumar@foods.local", address: "Koramangala, Bangalore", taxId: "29AABCK0004D1Z9", creditLimit: 400000 },
-    { id: "partner-0005", name: "Singh Electronics", type: "VENDOR" as const, phone: "+91 9800000005", email: "singh@elec.local", address: "Nehru Place, Delhi", taxId: "07AABCS0005E1Z7", creditLimit: 800000 },
-    { id: "partner-0006", name: "Gupta Textiles", type: "SUPPLIER" as const, phone: "+91 9800000006", email: "gupta@textiles.local", address: "Chandni Chowk, Delhi", taxId: "07AABCG0006F1Z5", creditLimit: 350000 },
-    { id: "partner-0007", name: "Agarwal Home Supplies", type: "WHOLESALER" as const, phone: "+91 9800000007", email: "agarwal@home.local", address: "MG Road, Pune", taxId: "27AABCA0007G1Z3", creditLimit: 450000 },
-    { id: "partner-0008", name: "Reddy FMCG", type: "DISTRIBUTOR" as const, phone: "+91 9800000008", email: "reddy@fmcg.local", address: "Jubilee Hills, Hyderabad", taxId: "36AABCR0008H1Z1", creditLimit: 550000 },
-    { id: "partner-0009", name: "Jain Sports Equipments", type: "VENDOR" as const, phone: "+91 9800000009", email: "jain@sports.local", address: "Jayanagar, Bangalore", taxId: "29AABCJ0009I1Z9", creditLimit: 300000 },
-    { id: "partner-0010", name: "Mehta Dairy Products", type: "SUPPLIER" as const, phone: "+91 9800000010", email: "mehta@dairy.local", address: "Anand, Gujarat", taxId: "24AABCM0010J1Z7", creditLimit: 400000 },
-    { id: "partner-0011", name: "Bose Consumer Goods", type: "WHOLESALER" as const, phone: "+91 9800000011", email: "bose@consumer.local", address: "Salt Lake, Kolkata", taxId: "19AABCB0011K1Z5", creditLimit: 500000 },
-    { id: "partner-0012", name: "Verma Pet Supplies", type: "VENDOR" as const, phone: "+91 9800000012", email: "verma@pets.local", address: "Indiranagar, Bangalore", taxId: "29AABCV0012L1Z3", creditLimit: 200000 },
-    { id: "partner-0013", name: "Nair Cosmetics", type: "SUPPLIER" as const, phone: "+91 9800000013", email: "nair@cosmetics.local", address: "T Nagar, Chennai", taxId: "33AABCN0013M1Z1", creditLimit: 350000 },
-    { id: "partner-0014", name: "Choudhury Bakery Supplies", type: "DISTRIBUTOR" as const, phone: "+91 9800000014", email: "choud@bakery.local", address: "Park Street, Kolkata", taxId: "19AABCC0014N1Z9", creditLimit: 250000 },
-    { id: "partner-0015", name: "Iyer Kitchen Wares", type: "VENDOR" as const, phone: "+91 9800000015", email: "iyer@kitchen.local", address: "Mylapore, Chennai", taxId: "33AABCI0015O1Z7", creditLimit: 300000 },
-    { id: "partner-0016", name: "Banerjee Furniture Co", type: "SUPPLIER" as const, phone: "+91 9800000016", email: "baner@furniture.local", address: "Howrah, Kolkata", taxId: "19AABCB0016P1Z5", creditLimit: 600000 },
+    { id: "partner-ref-0001", name: "ABC Wholesale Co.", type: "WHOLESALER" as const, contactPerson: "John Miller", phone: "+91 9800000101", email: "john@abcwholesale.com", address: "Sector 14, Gurgaon, Delhi NCR", taxId: "06AABCA0001Z1", creditLimit: 25000000, status: "ACTIVE" as const, daysAgo: 160 },
+    { id: "partner-ref-0002", name: "Global Supplies Ltd.", type: "SUPPLIER" as const, contactPerson: "Michael Chen", phone: "+91 9800000103", email: "michael@globalsupplies.com", address: "Andheri East, Mumbai, Maharashtra", taxId: "27AABCG0002Z2", creditLimit: 10000000, status: "ACTIVE" as const, daysAgo: 145 },
+    { id: "partner-ref-0003", name: "Sunrise Distributors", type: "WHOLESALER" as const, contactPerson: "Robert Brown", phone: "+91 9800000105", email: "robert@sunrisedist.com", address: "Park Street, Kolkata, West Bengal", taxId: "19AABCS0003Z3", creditLimit: 7000000, status: "INACTIVE" as const, daysAgo: 130 },
+    { id: "partner-ref-0004", name: "Prime Goods", type: "SUPPLIER" as const, contactPerson: "Jessica Taylor", phone: "+91 9800000107", email: "jessica@primegoods.com", address: "Jubilee Hills, Hyderabad, Telangana", taxId: "36AABCP0004Z4", creditLimit: 5000000, status: "ACTIVE" as const, daysAgo: 115 },
+    { id: "partner-ref-0005", name: "Metro Wholesale", type: "WHOLESALER" as const, contactPerson: "Amy Clark", phone: "+91 9800000109", email: "amy@metrowholesale.com", address: "SG Highway, Ahmedabad, Gujarat", taxId: "24AABCM0005Z5", creditLimit: 4000000, status: "ACTIVE" as const, daysAgo: 100 },
+    { id: "partner-ref-0006", name: "Eco Supplies", type: "SUPPLIER" as const, contactPerson: "William Scott", phone: "+91 9800000110", email: "william@ecosupplies.com", address: "Hinjewadi, Pune, Maharashtra", taxId: "27AABCE0006Z6", creditLimit: 3500000, status: "ACTIVE" as const, daysAgo: 85 },
+    { id: "partner-0001", name: "Raj Enterprises", type: "SUPPLIER" as const, contactPerson: "Rajesh Sharma", phone: "+91 9800000001", email: "raj@suppliers.local", address: "Andheri, Mumbai", taxId: "27AABCR0001A1Z5", creditLimit: 500000, status: "ACTIVE" as const, daysAgo: 175 },
+    { id: "partner-0002", name: "Sharma Distributors", type: "DISTRIBUTOR" as const, contactPerson: "Rohan Sharma", phone: "+91 9800000002", email: "sharma@dist.local", address: "Karol Bagh, Delhi", taxId: "07AABCS0002B1Z3", creditLimit: 750000, status: "ACTIVE" as const, daysAgo: 155 },
+    { id: "partner-0003", name: "Patel Wholesale", type: "WHOLESALER" as const, contactPerson: "Kavita Patel", phone: "+91 9800000003", email: "patel@wholesale.local", address: "SG Highway, Ahmedabad", taxId: "24AABCP0003C1Z1", creditLimit: 600000, status: "ACTIVE" as const, daysAgo: 140 },
+    { id: "partner-0004", name: "Kumar Foods Pvt Ltd", type: "SUPPLIER" as const, contactPerson: "Arjun Kumar", phone: "+91 9800000004", email: "kumar@foods.local", address: "Koramangala, Bangalore", taxId: "29AABCK0004D1Z9", creditLimit: 400000, status: "ACTIVE" as const, daysAgo: 120 },
+    { id: "partner-0005", name: "Singh Electronics", type: "VENDOR" as const, contactPerson: "Vikram Singh", phone: "+91 9800000005", email: "singh@elec.local", address: "Nehru Place, Delhi", taxId: "07AABCS0005E1Z7", creditLimit: 800000, status: "ACTIVE" as const, daysAgo: 110 },
+    { id: "partner-0006", name: "Gupta Textiles", type: "SUPPLIER" as const, contactPerson: "Sanjay Gupta", phone: "+91 9800000006", email: "gupta@textiles.local", address: "Chandni Chowk, Delhi", taxId: "07AABCG0006F1Z5", creditLimit: 350000, status: "ACTIVE" as const, daysAgo: 95 },
+    { id: "partner-0007", name: "Agarwal Home Supplies", type: "WHOLESALER" as const, contactPerson: "Nitin Agarwal", phone: "+91 9800000007", email: "agarwal@home.local", address: "MG Road, Pune", taxId: "27AABCA0007G1Z3", creditLimit: 450000, status: "ACTIVE" as const, daysAgo: 80 },
+    { id: "partner-0008", name: "Reddy FMCG", type: "DISTRIBUTOR" as const, contactPerson: "Suresh Reddy", phone: "+91 9800000008", email: "reddy@fmcg.local", address: "Jubilee Hills, Hyderabad", taxId: "36AABCR0008H1Z1", creditLimit: 550000, status: "ACTIVE" as const, daysAgo: 65 },
+    { id: "partner-0009", name: "Jain Sports Equipments", type: "VENDOR" as const, contactPerson: "Manish Jain", phone: "+91 9800000009", email: "jain@sports.local", address: "Jayanagar, Bangalore", taxId: "29AABCJ0009I1Z9", creditLimit: 300000, status: "ACTIVE" as const, daysAgo: 50 },
+    { id: "partner-0010", name: "Mehta Dairy Products", type: "SUPPLIER" as const, contactPerson: "Deepak Mehta", phone: "+91 980000010", email: "mehta@dairy.local", address: "Anand, Gujarat", taxId: "24AABCM0010J1Z7", creditLimit: 400000, status: "ACTIVE" as const, daysAgo: 35 },
+    { id: "partner-0011", name: "Bose Consumer Goods", type: "WHOLESALER" as const, contactPerson: "Subhash Bose", phone: "+91 9800000011", email: "bose@consumer.local", address: "Salt Lake, Kolkata", taxId: "19AABCB0011K1Z5", creditLimit: 500000, status: "ACTIVE" as const, daysAgo: 25 },
+    { id: "partner-0012", name: "Verma Pet Supplies", type: "VENDOR" as const, contactPerson: "Alok Verma", phone: "+91 9800000012", email: "verma@pets.local", address: "Indiranagar, Bangalore", taxId: "29AABCV0012L1Z3", creditLimit: 200000, status: "ACTIVE" as const, daysAgo: 15 },
+    { id: "partner-0013", name: "Nair Cosmetics", type: "SUPPLIER" as const, contactPerson: "Ananya Nair", phone: "+91 9800000013", email: "nair@cosmetics.local", address: "T Nagar, Chennai", taxId: "33AABCN0013M1Z1", creditLimit: 350000, status: "ACTIVE" as const, daysAgo: 10 },
   ];
 
   for (const p of PARTNERS_DATA) {
+    const pDate = pastDate(p.daysAgo, 2);
     await prisma.partner.upsert({
       where: { id: p.id },
-      update: {},
+      update: {
+        contactPerson: p.contactPerson,
+        status: p.status,
+      },
       create: {
         id: p.id, organizationId: ORG_ID, name: p.name, type: p.type,
+        contactPerson: p.contactPerson,
         phone: p.phone, email: p.email, address: p.address, taxId: p.taxId,
-        creditLimit: D(p.creditLimit), status: "ACTIVE",
+        creditLimit: D(p.creditLimit), status: p.status,
+        createdAt: pDate, updatedAt: pDate,
       },
     });
   }
@@ -164,6 +173,29 @@ async function main() {
   console.log("✅ Partners");
 
   // ── 7. Customers ──────────────────────────────────────────────────────────
+  const referenceBusinessCustomers = [
+    { id: "cust-ref-0001", name: "FreshMart Retail", contactPerson: "Sarah Wilson", phone: "+91 9800000102", email: "sarah@freshmart.com", address: "MG Road, Bangalore, Karnataka", creditLimit: 18500000, daysAgo: 150 },
+    { id: "cust-ref-0002", name: "Value Retailers", contactPerson: "Emily Davis", phone: "+91 9800000104", email: "emily@valueretail.com", address: "Connaught Place, Delhi NCR", creditLimit: 8000000, daysAgo: 135 },
+    { id: "cust-ref-0003", name: "QuickShop", contactPerson: "David Lee", phone: "+91 9800000106", email: "david@quickshop.com", address: "Koramangala, Bangalore, Karnataka", creditLimit: 6000000, daysAgo: 110 },
+    { id: "cust-ref-0004", name: "CityMart", contactPerson: "Daniel Kim", phone: "+91 9800000108", email: "daniel@citymart.com", address: "Anna Nagar, Chennai, Tamil Nadu", creditLimit: 4500000, daysAgo: 90 },
+  ];
+
+  for (const rc of referenceBusinessCustomers) {
+    const rcDate = pastDate(rc.daysAgo, 3);
+    await prisma.customer.upsert({
+      where: { id: rc.id },
+      update: {
+        contactPerson: rc.contactPerson,
+      },
+      create: {
+        id: rc.id, organizationId: ORG_ID, name: rc.name, contactPerson: rc.contactPerson,
+        phone: rc.phone, email: rc.email, address: rc.address, customerType: "BUSINESS",
+        creditLimit: D(rc.creditLimit), status: "ACTIVE",
+        createdAt: rcDate, updatedAt: rcDate,
+      },
+    });
+  }
+
   const firstNames = ["Aarav", "Priya", "Rohan", "Sneha", "Vikram", "Ananya", "Karthik", "Meera", "Arjun", "Divya",
     "Rahul", "Neha", "Sanjay", "Kavita", "Amit", "Pooja", "Deepak", "Shreya", "Rajesh", "Nandini",
     "Suresh", "Lakshmi", "Manoj", "Anjali", "Vishal", "Swati", "Arun", "Isha", "Nitin", "Ritu",
@@ -172,35 +204,43 @@ async function main() {
   const lastNames = ["Sharma", "Patel", "Singh", "Kumar", "Reddy", "Joshi", "Mehta", "Gupta", "Nair", "Verma",
     "Das", "Iyer", "Shah", "Rao", "Mishra", "Banerjee", "Chauhan", "Pillai", "Agarwal", "Bhat"];
 
-  const customersData: Array<{ id: string; name: string; phone: string; email: string; address: string; customerType: "RETAIL" | "BUSINESS"; creditLimit: number }> = [];
+  const customersData: Array<{ id: string; name: string; contactPerson: string; phone: string; email: string; address: string; customerType: "RETAIL" | "BUSINESS"; creditLimit: number; daysAgo: number }> = [];
 
   for (let i = 0; i < 60; i++) {
     const fn = firstNames[i % firstNames.length];
     const ln = lastNames[i % lastNames.length];
-    const isBusiness = i >= 50;
+    const isBusiness = i >= 45;
+    const daysAgo = 180 - Math.floor((i / 60) * 170);
     customersData.push({
       id: seedId("cust", i + 1),
       name: isBusiness ? `${fn} ${ln} Enterprises` : `${fn} ${ln}`,
+      contactPerson: isBusiness ? `${fn} ${ln}` : `${fn}`,
       phone: `+91 98${String(10000000 + i * 137).slice(0, 8)}`,
       email: `${fn.toLowerCase()}.${ln.toLowerCase()}${i}@example.local`,
       address: `${100 + i}, Sector ${(i % 20) + 1}, ${pick(["Delhi", "Mumbai", "Bangalore", "Chennai", "Kolkata", "Pune", "Jaipur", "Hyderabad"], i)}`,
       customerType: isBusiness ? "BUSINESS" : "RETAIL",
       creditLimit: isBusiness ? 100000 + i * 5000 : 0,
+      daysAgo,
     });
   }
 
-  for (const c of customersData) {
+  for (let idx = 0; idx < customersData.length; idx++) {
+    const c = customersData[idx];
+    const cDate = pastDate(c.daysAgo, (idx * 3) % 12);
     await prisma.customer.upsert({
       where: { id: c.id },
-      update: {},
+      update: {
+        contactPerson: c.contactPerson,
+      },
       create: {
-        id: c.id, organizationId: ORG_ID, name: c.name, phone: c.phone,
-        email: c.email, address: c.address, customerType: c.customerType,
+        id: c.id, organizationId: ORG_ID, name: c.name, contactPerson: c.contactPerson,
+        phone: c.phone, email: c.email, address: c.address, customerType: c.customerType,
         creditLimit: D(c.creditLimit), status: "ACTIVE",
+        createdAt: cDate, updatedAt: cDate,
       },
     });
   }
-  count("Customer", customersData.length);
+  count("Customer", customersData.length + referenceBusinessCustomers.length);
   console.log("✅ Customers");
 
   // ── 8. Inventory ──────────────────────────────────────────────────────────
@@ -329,7 +369,8 @@ async function main() {
     const soId = seedId("so", soIdx + 1);
     const soNumber = createRef("SO", soIdx + 1);
     const storeId = pick(STORE_IDS, soIdx);
-    const customerId = soIdx % 5 === 0 ? null : customersData[soIdx % customersData.length].id;
+    const allCustomerIds = [...referenceBusinessCustomers.map((rc) => rc.id), ...customersData.map((c) => c.id)];
+    const customerId = soIdx % 6 === 0 ? null : allCustomerIds[soIdx % allCustomerIds.length];
     const status = SO_STATUSES[soIdx % SO_STATUSES.length];
     const soDate = pastDate(90 - soIdx, soIdx);
     const itemCount = 1 + (soIdx % 8);

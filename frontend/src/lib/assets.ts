@@ -17,7 +17,8 @@ export const ASSETS = {
   },
   banners: {
     store: "/images/banners/store-banner.webp",
-    twilight: "/images/banners/walmart-supercenter-twilight.png"
+    twilight: "/images/banners/walmart-supercenter-twilight.png",
+    associates: "/images/banners/walmart-associates-promo.jpg"
   },
   stores: {
     main: "/images/stores/store-main.webp",

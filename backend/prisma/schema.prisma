@@ -368,6 +368,7 @@ model Partner {
   organizationId String
   name           String
   type           PartnerType
+  contactPerson  String?
   phone          String?
   email          String?
   address        String?
@@ -382,12 +383,15 @@ model Partner {
 
   @@index([organizationId, type])
   @@index([organizationId, status])
+  @@index([organizationId, name])
+  @@index([organizationId, email])
 }
 
 model Customer {
   id             String         @id @default(uuid())
   organizationId String
   name           String
+  contactPerson  String?
   phone          String?
   email          String?
   address        String?
@@ -402,6 +406,8 @@ model Customer {
 
   @@index([organizationId, phone])
   @@index([organizationId, status])
+  @@index([organizationId, name])
+  @@index([organizationId, email])
 }
 
 // ============================================================================

@@ -15,7 +15,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname === "/dashboard" || pathname === "/";
   const isInventory = pathname === "/inventory";
-  const hasBanner = isDashboard || isInventory;
+  const isPartners = pathname === "/partners" || pathname.startsWith("/partners");
+  const hasBanner = isDashboard || isInventory || isPartners;
 
   return (
     <ShellProvider>
@@ -32,6 +33,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 "absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0",
                 isDashboard
                   ? "h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]"
+                  : isPartners
+                  ? "h-[520px] sm:h-[540px] lg:h-[430px] xl:h-[450px]"
                   : "h-[480px] sm:h-[440px] lg:h-[355px] xl:h-[365px]"
               )}
             >
@@ -52,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div
                 className={cn(
                   "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent",
-                  isDashboard ? "h-28" : "h-20"
+                  isDashboard || isPartners ? "h-28" : "h-20"
                 )}
               />
             </div>
@@ -63,7 +66,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Page Content Slot: pb-24 on mobile accommodates fixed floating bottom nav */}
           <main className="flex-1 pb-24 md:pb-8 relative z-10">
-            {children}
+            <React.Suspense fallback={null}>
+              {children}
+            </React.Suspense>
           </main>
 
           {/* Floating Liquid-Glass Mobile Bottom Navigation */}

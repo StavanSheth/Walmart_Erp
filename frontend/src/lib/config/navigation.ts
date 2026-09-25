@@ -17,9 +17,10 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     iconName: "stores"
   },
   {
-    name: "Wholesalers / Retailers / Customers",
+    name: "Partners & Customers",
     href: "/partners",
-    iconName: "partners"
+    iconName: "partners",
+    description: "Wholesalers, Retailers, Suppliers & Customers"
   },
   {
     name: "Ledger",

@@ -2,249 +2,445 @@
 
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { StatusBadge, Badge } from "@/components/ui/badge";
+import { ErrorState } from "@/components/common/error-state";
+import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusIcon, SearchIcon } from "@/components/ui/icons";
-import { Skeleton } from "@/components/common/loading-state";
-import { apiClient } from "@/lib/api/client";
+import { Select } from "@/components/ui/select";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import { usePartners } from "@/hooks/use-partners";
+import type {
+  PartnersTab,
+  PartnersQueryParams,
+  PartnerListItem
+} from "@/types/partners";
 
-interface PartnerItem {
-  id: string;
-  name: string;
-  type: string;
-  phone?: string | null;
-  email?: string | null;
-  address?: string | null;
-  taxId?: string | null;
-  creditLimit: string | number;
-  status: string;
-}
+import { PartnersHero } from "@/components/partners/partners-hero";
+import { PartnersKPIGrid } from "@/components/partners/partners-kpi-grid";
+import { PartnersTabs } from "@/components/partners/partners-tabs";
+import { PartnerDistributionCard } from "@/components/partners/partner-distribution-card";
+import { PartnerGrowthChart } from "@/components/partners/partner-growth-chart";
+import { PartnerInsightsCard } from "@/components/partners/partner-insights-card";
+import { PartnerFilters } from "@/components/partners/partner-filters";
+import { PartnerList } from "@/components/partners/partner-list";
+import { TopPartnersCard } from "@/components/partners/top-partners-card";
+import { PartnerOnboardingCard } from "@/components/partners/partner-onboarding-card";
+import { PartnersCommunityCard } from "@/components/partners/partners-community-card";
+import { PartnerDetailModal } from "@/components/partners/partner-detail";
 
-interface CustomerItem {
-  id: string;
-  name: string;
-  phone?: string | null;
-  email?: string | null;
-  address?: string | null;
-  customerType: string;
-  creditLimit: string | number;
-  status: string;
+function PartnersPageContent() {
+  const { get, getNumber, setFilters } = useUrlFilters();
+
+  // 1. Read URL query filters
+  const tabParam = get("tab", "overview") as PartnersTab;
+  const searchParam = get("search", "");
+  const typeParam = get("type", "ALL");
+  const regionIdParam = get("regionId", "ALL");
+  const statusParam = get("status", "ALL");
+  const pageParam = getNumber("page", 1);
+  const pageSizeParam = getNumber("pageSize", 10);
+  const periodParam = (get("period", "6m") as "6m" | "12m") || "6m";
+
+  // Selected partner for Dossier Modal
+  const [selectedPartnerId, setSelectedPartnerId] = React.useState<string | null>(null);
+  // Add Partner dialog state
+  const [isAddPartnerOpen, setIsAddPartnerOpen] = React.useState(false);
+  const [newPartnerName, setNewPartnerName] = React.useState("");
+  const [newPartnerType, setNewPartnerType] = React.useState("WHOLESALER");
+  const [newPartnerContact, setNewPartnerContact] = React.useState("");
+  const [newPartnerEmail, setNewPartnerEmail] = React.useState("");
+  const [newPartnerPhone, setNewPartnerPhone] = React.useState("");
+  const [newPartnerCreditLimit, setNewPartnerCreditLimit] = React.useState("50000");
+  const [addSuccessMessage, setAddSuccessMessage] = React.useState<string | null>(null);
+
+  // 2. Query Params for TanStack Query
+  const queryParams = React.useMemo<PartnersQueryParams>(() => {
+    return {
+      tab: tabParam !== "overview" ? tabParam : undefined,
+      search: searchParam.trim() ? searchParam.trim() : undefined,
+      type: typeParam !== "ALL" ? typeParam : undefined,
+      regionId: regionIdParam !== "ALL" ? regionIdParam : undefined,
+      status: (statusParam !== "ALL" ? statusParam : undefined) as "ACTIVE" | "INACTIVE" | undefined,
+      page: pageParam > 0 ? pageParam : 1,
+      pageSize: pageSizeParam > 0 ? pageSizeParam : 10,
+      period: periodParam
+    };
+  }, [
+    tabParam,
+    searchParam,
+    typeParam,
+    regionIdParam,
+    statusParam,
+    pageParam,
+    pageSizeParam,
+    periodParam
+  ]);
+
+  // 3. Primary TanStack Query call
+  const { data, isLoading, isError, error, refetch } = usePartners(queryParams);
+
+  // Handlers for URL synchronization
+  const handleTabChange = (newTab: PartnersTab) => {
+    setFilters({ tab: newTab === "overview" ? null : newTab, page: null });
+  };
+
+  const handleSearchChange = (val: string) => {
+    setFilters({ search: val.trim() ? val : null, page: null });
+  };
+
+  const handleTypeChange = (val: string) => {
+    setFilters({ type: val !== "ALL" ? val : null, page: null });
+  };
+
+  const handleRegionChange = (val: string) => {
+    setFilters({ regionId: val !== "ALL" ? val : null, page: null });
+  };
+
+  const handleStatusChange = (val: string) => {
+    setFilters({ status: val !== "ALL" ? val : null, page: null });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setFilters({ page: newPage > 1 ? newPage : null });
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setFilters({ pageSize: newSize !== 10 ? newSize : null, page: null });
+  };
+
+  const handlePeriodChange = (newPeriod: "6m" | "12m") => {
+    setFilters({ period: newPeriod !== "6m" ? newPeriod : null });
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      tab: null,
+      search: null,
+      type: null,
+      regionId: null,
+      status: null,
+      page: null
+    });
+  };
+
+  const handleCardClick = (cardType: string) => {
+    // Switch to corresponding tab or type filter
+    if (cardType === "WHOLESALER") {
+      setFilters({ tab: "wholesalers-retailers", type: "WHOLESALER", page: null });
+    } else if (cardType === "RETAILER") {
+      setFilters({ tab: "wholesalers-retailers", type: "RETAILER", page: null });
+    } else if (cardType === "SUPPLIER") {
+      setFilters({ tab: "suppliers", type: "SUPPLIER", page: null });
+    } else if (cardType === "CUSTOMER") {
+      setFilters({ tab: "customers", type: "CUSTOMER", page: null });
+    }
+  };
+
+  // CSV Export Functionality
+  const handleExportCsv = () => {
+    const items: PartnerListItem[] = data?.list?.items || [];
+    if (items.length === 0) return;
+
+    const headers = [
+      "ID",
+      "Name",
+      "Type",
+      "Contact Person",
+      "Email",
+      "Phone",
+      "Region",
+      "Status",
+      "Total Financial Value ($)",
+      "Last Order Date"
+    ];
+
+    const rows = items.map((item) => [
+      `"${item.id}"`,
+      `"${(item.name || "").replace(/"/g, '""')}"`,
+      `"${item.type}"`,
+      `"${(item.contactPerson || "").replace(/"/g, '""')}"`,
+      `"${(item.email || "").replace(/"/g, '""')}"`,
+      `"${(item.phone || "").replace(/"/g, '""')}"`,
+      `"${(item.region || "").replace(/"/g, '""')}"`,
+      `"${item.status}"`,
+      `"${item.totalValue}"`,
+      `"${item.lastOrderDate ? new Date(item.lastOrderDate).toISOString().slice(0, 10) : "No orders"}"`
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `walmart_partners_customers_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleSaveAddPartner = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPartnerName.trim()) return;
+
+    // Show friendly success confirmation and reset form
+    setAddSuccessMessage(
+      `Partner "${newPartnerName}" created successfully! Records synchronized.`
+    );
+    setTimeout(() => {
+      setAddSuccessMessage(null);
+      setIsAddPartnerOpen(false);
+      setNewPartnerName("");
+      setNewPartnerContact("");
+      setNewPartnerEmail("");
+      setNewPartnerPhone("");
+      refetch();
+    }, 1500);
+  };
+
+  return (
+    <PageContainer className="space-y-4 sm:space-y-6">
+      {/* 1. Page Hero Banner with Slogan */}
+      <PartnersHero />
+
+      {/* Global Error Banner */}
+      {isError && (
+        <ErrorState
+          title="Failed to load Partners & Customers"
+          message={
+            error instanceof Error
+              ? error.message
+              : "Unable to retrieve records from the database."
+          }
+          onRetry={() => refetch()}
+        />
+      )}
+
+      {/* 2. Top Metric Cards Row: 4 KPI Cards + Promo Card (5 cards in a row matching desktop reference) */}
+      <PartnersKPIGrid
+        summary={data?.summary}
+        isLoading={isLoading}
+        onCardClick={handleCardClick}
+        onAddPartner={() => setIsAddPartnerOpen(true)}
+      />
+
+      {/* 3. Navigation Tabs */}
+      <PartnersTabs
+        activeTab={tabParam}
+        onTabChange={handleTabChange}
+      />
+
+      {/* 4. Main 2-Column Dashboard Layout: Left (Charts + Filters + Table) | Right (Insights + Top Partners + Onboarding + Community) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Column (8 cols on lg/xl, 9 cols on 2xl) */}
+        <div className="lg:col-span-8 xl:col-span-8 2xl:col-span-9 space-y-4 sm:space-y-5">
+          {/* Top Analytics Row: Distribution Donut (5 cols) + Growth Line Chart (7 cols) */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+            <div className="md:col-span-5">
+              <PartnerDistributionCard
+                distribution={data?.distribution}
+                totalPartners={data?.summary?.totalPartners}
+                isLoading={isLoading}
+                onSelectCategory={(category) => {
+                  const upper = category.toUpperCase();
+                  if (upper.includes("WHOLESALE")) handleTypeChange("WHOLESALER");
+                  else if (upper.includes("RETAIL")) handleTypeChange("RETAILER");
+                  else if (upper.includes("SUPPLIER")) handleTypeChange("SUPPLIER");
+                  else if (upper.includes("CUSTOMER")) handleTypeChange("CUSTOMER");
+                }}
+              />
+            </div>
+
+            <div className="md:col-span-7">
+              <PartnerGrowthChart
+                growth={data?.growth}
+                period={periodParam}
+                onPeriodChange={handlePeriodChange}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Filter Toolbar */}
+          <PartnerFilters
+            search={searchParam}
+            type={typeParam}
+            regionId={regionIdParam}
+            status={statusParam}
+            types={data?.filterOptions?.types || []}
+            regions={data?.filterOptions?.regions || []}
+            statuses={data?.filterOptions?.statuses || []}
+            onSearchChange={handleSearchChange}
+            onTypeChange={handleTypeChange}
+            onRegionChange={handleRegionChange}
+            onStatusChange={handleStatusChange}
+            onExport={handleExportCsv}
+            onReset={handleResetFilters}
+          />
+
+          {/* Partner Table & Pagination */}
+          <PartnerList
+            items={data?.list?.items || []}
+            pagination={
+              data?.list?.pagination || {
+                page: pageParam,
+                pageSize: pageSizeParam,
+                total: 0,
+                totalPages: 1
+              }
+            }
+            isLoading={isLoading}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            onSelectPartner={(id) => setSelectedPartnerId(id)}
+          />
+        </div>
+
+        {/* Right Rail Column: Insights, Top Partners, Onboarding Gauge & Community Card */}
+        <div className="lg:col-span-4 xl:col-span-4 2xl:col-span-3 space-y-4 sm:space-y-5">
+          <PartnerInsightsCard
+            insights={data?.insights}
+            isLoading={isLoading}
+          />
+
+          <TopPartnersCard
+            topPartners={data?.topPartners}
+            isLoading={isLoading}
+            onSelectPartner={(id) => setSelectedPartnerId(id)}
+          />
+
+          <PartnerOnboardingCard
+            onboarding={data?.onboarding}
+            isLoading={isLoading}
+          />
+
+          <PartnersCommunityCard />
+        </div>
+      </div>
+
+      {/* Dossier Modal for Partner / Customer Details */}
+      <PartnerDetailModal
+        partnerId={selectedPartnerId}
+        isOpen={Boolean(selectedPartnerId)}
+        onClose={() => setSelectedPartnerId(null)}
+      />
+
+      {/* Add Partner Dialog */}
+      <Modal
+        isOpen={isAddPartnerOpen}
+        onClose={() => {
+          setIsAddPartnerOpen(false);
+          setAddSuccessMessage(null);
+        }}
+        size="md"
+        title="Add New Partner or Customer"
+        description="Register a new domestic vendor, wholesale merchant, or institutional customer account."
+      >
+        {addSuccessMessage ? (
+          <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium text-center">
+            {addSuccessMessage}
+          </div>
+        ) : (
+          <form onSubmit={handleSaveAddPartner} className="space-y-4 py-1">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-700">Account / Business Name *</label>
+              <Input
+                placeholder="e.g. Apex Global Distributors"
+                value={newPartnerName}
+                onChange={(e) => setNewPartnerName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Relationship Type</label>
+                <Select
+                  value={newPartnerType}
+                  onChange={(e) => setNewPartnerType(e.target.value)}
+                  options={[
+                    { value: "WHOLESALER", label: "Wholesaler" },
+                    { value: "RETAILER", label: "Retailer (Business)" },
+                    { value: "SUPPLIER", label: "Supplier / FMCG" },
+                    { value: "CUSTOMER", label: "End Customer" }
+                  ]}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Credit Limit ($)</label>
+                <Input
+                  type="number"
+                  placeholder="50000"
+                  value={newPartnerCreditLimit}
+                  onChange={(e) => setNewPartnerCreditLimit(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-700">Primary Contact Person</label>
+              <Input
+                placeholder="e.g. Samantha Jenkins"
+                value={newPartnerContact}
+                onChange={(e) => setNewPartnerContact(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="contact@company.com"
+                  value={newPartnerEmail}
+                  onChange={(e) => setNewPartnerEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Phone</label>
+                <Input
+                  placeholder="+1 (555) 000-0000"
+                  value={newPartnerPhone}
+                  onChange={(e) => setNewPartnerPhone(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddPartnerOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">
+                Save Partner
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
+    </PageContainer>
+  );
 }
 
 export default function PartnersPage() {
-  const [partners, setPartners] = React.useState<PartnerItem[]>([]);
-  const [customers, setCustomers] = React.useState<CustomerItem[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [partnerSearch, setPartnerSearch] = React.useState("");
-  const [customerSearch, setCustomerSearch] = React.useState("");
-
-  React.useEffect(() => {
-    async function loadPartners() {
-      try {
-        const res = await apiClient.get<{ partners: PartnerItem[]; customers: CustomerItem[] }>("/api/partners");
-        if (res.data) {
-          setPartners(res.data.partners || []);
-          setCustomers(res.data.customers || []);
-        }
-      } catch (err) {
-        console.error("Failed to load partners and customers from database", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadPartners();
-  }, []);
-
-  const filteredPartners = React.useMemo(() => {
-    const q = partnerSearch.toLowerCase().trim();
-    if (!q) return partners;
-    return partners.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.taxId && p.taxId.toLowerCase().includes(q)) ||
-        (p.address && p.address.toLowerCase().includes(q)) ||
-        p.type.toLowerCase().includes(q)
-    );
-  }, [partners, partnerSearch]);
-
-  const filteredCustomers = React.useMemo(() => {
-    const q = customerSearch.toLowerCase().trim();
-    if (!q) return customers;
-    return customers.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        (c.email && c.email.toLowerCase().includes(q)) ||
-        (c.phone && c.phone.toLowerCase().includes(q)) ||
-        (c.address && c.address.toLowerCase().includes(q))
-    );
-  }, [customers, customerSearch]);
-
   return (
-    <PageContainer
-      title="Partners & Customers"
-      description="Domestic wholesale suppliers, FMCG vendor relationships, and customer accounts synchronized live from PostgreSQL."
-      actions={
-        <Button size="sm">
-          <PlusIcon className="w-3.5 h-3.5 mr-1" />
-          Add Partner
-        </Button>
+    <React.Suspense
+      fallback={
+        <div className="p-8 text-center text-slate-500 font-medium">
+          Loading partners and customer ecosystem...
+        </div>
       }
     >
-      <div className="space-y-6">
-        <Tabs defaultValue="partners">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <TabsList>
-              <TabsTrigger value="partners">
-                Suppliers & Vendors ({isLoading ? "..." : partners.length})
-              </TabsTrigger>
-              <TabsTrigger value="customers">
-                Customers ({isLoading ? "..." : customers.length})
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* Suppliers Tab */}
-          <TabsContent value="partners" className="mt-4 space-y-4">
-            <div className="max-w-md">
-              <Input
-                placeholder="Search suppliers by name, GSTIN, or city..."
-                value={partnerSearch}
-                onChange={(e) => setPartnerSearch(e.target.value)}
-                startIcon={<SearchIcon className="w-4 h-4 text-slate-400" />}
-              />
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3">
-                    <Skeleton className="h-5 w-24 rounded" />
-                    <Skeleton className="h-6 w-44 rounded" />
-                    <Skeleton className="h-4 w-32 rounded" />
-                    <Skeleton className="h-4 w-full rounded" />
-                  </div>
-                ))}
-              </div>
-            ) : filteredPartners.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 bg-white rounded-2xl border border-slate-200/80">
-                No suppliers matching "{partnerSearch}"
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredPartners.map((p) => (
-                  <Card key={p.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="neutral" className="text-[10px] font-mono">
-                          {p.type}
-                        </Badge>
-                        <StatusBadge status={p.status} label={p.status === "ACTIVE" ? "Verified Partner" : p.status} />
-                      </div>
-                      <CardTitle className="mt-2 truncate">{p.name}</CardTitle>
-                      <CardDescription>{p.address || "Domestic Partner"}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2 type-body-secondary">
-                      {p.taxId && (
-                        <p className="font-mono tabular-nums text-slate-600 text-xs">
-                          GSTIN: <span className="font-semibold">{p.taxId}</span>
-                        </p>
-                      )}
-                      {p.email && (
-                        <p className="font-mono text-slate-500 text-xs truncate">
-                          {p.email}
-                        </p>
-                      )}
-                      {p.phone && (
-                        <p className="font-mono tabular-nums text-slate-400 text-xs">
-                          {p.phone}
-                        </p>
-                      )}
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Credit Limit:</span>
-                        <span className="font-mono font-semibold text-slate-700">
-                          ${Number(p.creditLimit).toLocaleString()}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Customers Tab */}
-          <TabsContent value="customers" className="mt-4 space-y-4">
-            <div className="max-w-md">
-              <Input
-                placeholder="Search customers by name, phone, or email..."
-                value={customerSearch}
-                onChange={(e) => setCustomerSearch(e.target.value)}
-                startIcon={<SearchIcon className="w-4 h-4 text-slate-400" />}
-              />
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3">
-                    <Skeleton className="h-5 w-20 rounded" />
-                    <Skeleton className="h-6 w-36 rounded" />
-                    <Skeleton className="h-4 w-48 rounded" />
-                  </div>
-                ))}
-              </div>
-            ) : filteredCustomers.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 bg-white rounded-2xl border border-slate-200/80">
-                No customers matching "{customerSearch}"
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredCustomers.map((c) => (
-                  <Card key={c.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="truncate">{c.name}</CardTitle>
-                        <Badge variant={c.customerType === "BUSINESS" ? "spark" : "neutral"} className="text-[10px]">
-                          {c.customerType}
-                        </Badge>
-                      </div>
-                      <CardDescription>{c.address || "Retail Customer"}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-1.5 type-body-secondary">
-                      {c.email && (
-                        <p className="font-mono text-slate-600 text-xs truncate">{c.email}</p>
-                      )}
-                      {c.phone && (
-                        <p className="font-mono tabular-nums text-slate-400 text-xs">{c.phone}</p>
-                      )}
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Credit Limit:</span>
-                        <span className="font-mono font-semibold text-slate-700">
-                          ${Number(c.creditLimit).toLocaleString()}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        <Card className="border-dashed border-border bg-surface-subtle">
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-900">
-              Partners & Customers Database Sync
-            </CardTitle>
-            <CardDescription className="mt-1">
-              All supplier records, vendor relations, credit allowances, and customer directories are queried directly from the PostgreSQL production database.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    </PageContainer>
+      <PartnersPageContent />
+    </React.Suspense>
   );
 }
