@@ -8,7 +8,15 @@ import { cn } from "@/lib/cn";
 import type { NotificationItem } from "@/types/store";
 import Link from "next/link";
 
-export function NotificationMenu({ className, isDashboard = false }: { className?: string; isDashboard?: boolean }) {
+export function NotificationMenu({
+  className,
+  isDashboard = false,
+  isScrolled = false
+}: {
+  className?: string;
+  isDashboard?: boolean;
+  isScrolled?: boolean;
+}) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<NotificationItem[]>(DEMO_NOTIFICATIONS);
 
@@ -48,9 +56,11 @@ export function NotificationMenu({ className, isDashboard = false }: { className
         trigger={
           <div
             className={cn(
-              "relative flex items-center justify-center w-9 h-9 rounded-full transition-colors shadow-xs cursor-pointer",
+              "relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 shadow-xs cursor-pointer",
               isDashboard
-                ? "border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md"
+                ? isScrolled
+                  ? "border border-white/45 bg-white/35 hover:bg-white/45 text-white backdrop-blur-md shadow-sm"
+                  : "border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md"
                 : "border border-border bg-surface hover:bg-surface-subtle text-slate-600 rounded-md"
             )}
             aria-label={`Notifications (${unreadCount} unread)`}

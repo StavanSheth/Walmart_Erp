@@ -149,7 +149,15 @@ export function GlobalSearchModal() {
   );
 }
 
-export function GlobalSearchTrigger({ className, isDashboard = false }: { className?: string; isDashboard?: boolean }) {
+export function GlobalSearchTrigger({
+  className,
+  isDashboard = false,
+  isScrolled = false
+}: {
+  className?: string;
+  isDashboard?: boolean;
+  isScrolled?: boolean;
+}) {
   const { setSearchOpen } = useShell();
 
   return (
@@ -160,7 +168,9 @@ export function GlobalSearchTrigger({ className, isDashboard = false }: { classN
       className={cn(
         "flex items-center justify-between w-full h-10 px-4 rounded-2xl transition-all duration-200 shadow-xs group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary cursor-pointer",
         isDashboard
-          ? "border border-white/25 bg-white/20 hover:bg-white/25 text-white backdrop-blur-md"
+          ? isScrolled
+            ? "border border-white/50 bg-white/40 hover:bg-white/50 text-white backdrop-blur-md shadow-sm"
+            : "border border-white/25 bg-white/20 hover:bg-white/25 text-white backdrop-blur-md"
           : "border border-border bg-surface text-slate-400 hover:border-border-strong hover:bg-surface-subtle",
         className
       )}
@@ -180,7 +190,9 @@ export function GlobalSearchTrigger({ className, isDashboard = false }: { classN
         className={cn(
           "hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-semibold rounded-lg",
           isDashboard
-            ? "text-white/95 bg-white/20 border border-white/25"
+            ? isScrolled
+              ? "text-white bg-white/35 border border-white/45"
+              : "text-white/95 bg-white/20 border border-white/25"
             : "text-slate-500 bg-surface-muted border border-border"
         )}
       >

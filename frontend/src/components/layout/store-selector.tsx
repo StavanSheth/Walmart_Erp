@@ -7,7 +7,15 @@ import { Dropdown } from "../ui/dropdown";
 import { cn } from "@/lib/cn";
 import type { StoreInfo } from "@/types/store";
 
-export function StoreSelector({ className, isDashboard = false }: { className?: string; isDashboard?: boolean }) {
+export function StoreSelector({
+  className,
+  isDashboard = false,
+  isScrolled = false
+}: {
+  className?: string;
+  isDashboard?: boolean;
+  isScrolled?: boolean;
+}) {
   const { currentStore, setCurrentStore, stores } = useShell();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -25,7 +33,14 @@ export function StoreSelector({ className, isDashboard = false }: { className?: 
         contentClassName="w-72 sm:w-80 p-2"
         trigger={
           isDashboard ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md transition-colors shadow-xs cursor-pointer text-xs font-medium">
+            <div
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-full text-white backdrop-blur-md transition-all duration-200 shadow-xs cursor-pointer text-xs font-medium",
+                isScrolled
+                  ? "bg-white/35 border border-white/45 hover:bg-white/45 shadow-sm"
+                  : "bg-white/15 border border-white/20 hover:bg-white/25"
+              )}
+            >
               <StoreIcon className="w-3.5 h-3.5 text-white/90" />
               <span className="truncate max-w-[130px] font-semibold">{currentStore.name}</span>
               <ChevronDownIcon

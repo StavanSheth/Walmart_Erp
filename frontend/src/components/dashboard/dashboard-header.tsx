@@ -67,21 +67,21 @@ export function DashboardHeader({
 
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
             {/* Date Badge */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md border border-white/25 text-white shadow-xs">
-              <svg className="w-3.5 h-3.5 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="h-8 inline-flex items-center gap-1.5 px-3 rounded-full text-xs font-semibold bg-white/20 hover:bg-white/25 backdrop-blur-md border border-white/25 text-white shadow-xs leading-none shrink-0 whitespace-nowrap">
+              <svg className="w-3.5 h-3.5 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span>{formattedDate}</span>
-            </span>
+            </div>
 
             {/* Store Filter Control */}
-            <div className="relative inline-flex items-center">
-              <StoreIcon className="w-3.5 h-3.5 absolute left-3 text-white/70 pointer-events-none" />
+            <div className="relative inline-flex items-center h-8 shrink-0">
+              <StoreIcon className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none z-10 shrink-0" />
               <select
                 aria-label="Filter store"
                 value={selectedStoreId || ""}
                 onChange={(e) => onStoreChange(e.target.value || undefined)}
-                className="pl-8.5 pr-7 py-1 text-xs font-semibold rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition"
+                className="h-8 pl-8 pr-7 text-xs font-semibold rounded-full border border-white/25 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition leading-none whitespace-nowrap"
               >
                 <option value="" className="text-slate-900 bg-white">All Stores ({stores.length})</option>
                 {stores.map((s) => (
@@ -90,23 +90,27 @@ export function DashboardHeader({
                   </option>
                 ))}
               </select>
-              <span className="absolute right-2.5 pointer-events-none text-white/70 text-[9px]">▼</span>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/80 text-[8px] flex items-center justify-center leading-none">
+                ▼
+              </span>
             </div>
 
             {/* Date Range Selector */}
-            <div className="relative inline-flex items-center">
-              <FilterIcon className="w-3.5 h-3.5 absolute left-3 text-white/70 pointer-events-none" />
+            <div className="relative inline-flex items-center h-8 shrink-0">
+              <FilterIcon className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none z-10 shrink-0" />
               <select
                 aria-label="Filter range"
                 value={selectedDateRange}
                 onChange={(e) => onDateRangeChange(e.target.value)}
-                className="pl-8.5 pr-7 py-1 text-xs font-semibold rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition"
+                className="h-8 pl-8 pr-7 text-xs font-semibold rounded-full border border-white/25 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition leading-none whitespace-nowrap"
               >
                 <option value="30d" className="text-slate-900 bg-white">Last 30 Days</option>
                 <option value="90d" className="text-slate-900 bg-white">Last 90 Days</option>
                 <option value="all" className="text-slate-900 bg-white">All Period</option>
               </select>
-              <span className="absolute right-2.5 pointer-events-none text-white/70 text-[9px]">▼</span>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/80 text-[8px] flex items-center justify-center leading-none">
+                ▼
+              </span>
             </div>
 
             {/* Refresh trigger */}
@@ -115,7 +119,7 @@ export function DashboardHeader({
               onClick={onRefresh}
               disabled={isFetching}
               aria-label="Refresh metrics"
-              className="inline-flex items-center justify-center p-1.5 rounded-full border border-white/25 bg-white/20 backdrop-blur-md text-white hover:bg-white/30 shadow-xs transition active:scale-95"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-white/25 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white shadow-xs transition active:scale-95 shrink-0"
               title="Refresh metrics"
             >
               <RefreshCwIcon

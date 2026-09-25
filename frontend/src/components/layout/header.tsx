@@ -17,13 +17,25 @@ export interface HeaderProps {
 
 export function Header({ className, isDashboard = true }: HeaderProps) {
   const { setMobileDrawerOpen, setSearchOpen } = useShell();
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <header
       className={cn(
-        "sticky top-0 z-header flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 transition-colors duration-200",
+        "sticky top-0 z-header flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 transition-all duration-200",
         isDashboard
-          ? "bg-transparent border-b border-white/10 text-white"
+          ? isScrolled
+            ? "bg-[#06182c]/85 backdrop-blur-xl border-b border-white/20 shadow-lg text-white"
+            : "bg-transparent border-b border-white/10 text-white"
           : "glass-subtle border-b border-border shadow-xs text-slate-900",
         className
       )}
@@ -61,6 +73,7 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         <div className="hidden md:block w-72 lg:w-96">
           <GlobalSearchTrigger
             isDashboard={isDashboard}
+            isScrolled={isScrolled}
             className="w-full"
           />
         </div>
@@ -83,7 +96,9 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           className={cn(
             "flex md:hidden items-center justify-center w-9 h-9 rounded-full transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
             isDashboard
-              ? "bg-white/15 border border-white/20 text-white hover:bg-white/25 backdrop-blur-md"
+              ? isScrolled
+                ? "bg-white/35 border border-white/45 text-white hover:bg-white/45 backdrop-blur-md shadow-sm"
+                : "bg-white/15 border border-white/20 text-white hover:bg-white/25 backdrop-blur-md"
               : "border border-border bg-surface text-slate-600 hover:bg-surface-subtle"
           )}
         >
@@ -92,12 +107,19 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
 
         {/* Store Selector (Desktop & Tablet) */}
         <div className="hidden sm:block">
-          <StoreSelector isDashboard={isDashboard} />
+          <StoreSelector isDashboard={isDashboard} isScrolled={isScrolled} />
         </div>
 
         {/* Weather Widget (Desktop) */}
         {isDashboard && (
-          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 text-white text-xs backdrop-blur-md">
+          <div
+            className={cn(
+              "hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-white text-xs backdrop-blur-md transition-all duration-200",
+              isScrolled
+                ? "bg-white/35 border border-white/45 shadow-sm"
+                : "bg-white/15 border border-white/20"
+            )}
+          >
             <span className="text-base">☀️</span>
             <div className="leading-tight">
               <span className="font-bold">26°C</span>
@@ -108,10 +130,10 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         )}
 
         {/* Notifications Dropdown */}
-        <NotificationMenu isDashboard={isDashboard} />
+        <NotificationMenu isDashboard={isDashboard} isScrolled={isScrolled} />
 
         {/* User / Avatar Dropdown */}
-        <UserMenu isDashboard={isDashboard} />
+        <UserMenu isDashboard={isDashboard} isScrolled={isScrolled} />
       </div>
     </header>
   );
