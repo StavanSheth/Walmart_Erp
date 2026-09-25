@@ -8,12 +8,10 @@ import { DashboardKPIGrid } from "@/components/dashboard/dashboard-kpi-grid";
 import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions";
 import { SalesOverviewChart } from "@/components/dashboard/sales-overview-chart";
 import { InventoryDistributionCard } from "@/components/dashboard/inventory-distribution-card";
-import { OrderFulfillmentCard } from "@/components/dashboard/order-fulfillment-card";
 import { StorePerformanceCard } from "@/components/dashboard/store-performance-card";
 import { RecentInventoryActivity } from "@/components/dashboard/recent-inventory-activity";
 import { TopCategoriesCard } from "@/components/dashboard/top-categories-card";
 import { DashboardAlerts } from "@/components/dashboard/dashboard-alerts";
-import { RecentSalesTable } from "@/components/dashboard/recent-sales-table";
 import { DashboardPromoBanner } from "@/components/dashboard/dashboard-promo-banner";
 import { useDashboardOverview } from "@/hooks/use-dashboard";
 import type { DashboardQueryParams } from "@/types/dashboard";
@@ -135,32 +133,47 @@ export default function DashboardPage() {
         </div>
 
         {/* ======================================================== */}
-        {/* MOBILE LAYOUT (md:hidden) */}
+        {/* MOBILE LAYOUT (md:hidden) — Same 6 Cards as Desktop */}
         {/* ======================================================== */}
         <div className="md:hidden space-y-4">
-          {/* Sales Overview Mobile Chart */}
+          {/* 1. Sales Overview Mobile Chart */}
           <SalesOverviewChart
             salesOverview={data?.salesOverview}
             isLoading={isLoading}
           />
 
-          {/* Inventory Status & Order Fulfillment in 2 cols or 1 col on small mobile */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <InventoryDistributionCard
-              data={data?.inventoryDistribution}
-              isLoading={isLoading}
-            />
-            <OrderFulfillmentCard
-              data={data?.orderFulfillment}
-              isLoading={isLoading}
-            />
-          </div>
-
-          {/* Recent Transactions List Card */}
-          <RecentSalesTable
-            transactions={data?.recentTransactions}
+          {/* 2. Inventory Distribution Card */}
+          <InventoryDistributionCard
+            data={data?.inventoryDistribution}
             isLoading={isLoading}
           />
+
+          {/* 3. Store Performance Card */}
+          <StorePerformanceCard
+            stores={data?.storePerformance}
+            isLoading={isLoading}
+          />
+
+          {/* 4. Recent Inventory Activity */}
+          <RecentInventoryActivity
+            activities={data?.recentInventoryActivity}
+            isLoading={isLoading}
+          />
+
+          {/* 5. Top Categories Card */}
+          <TopCategoriesCard
+            categories={data?.topCategories}
+            isLoading={isLoading}
+          />
+
+          {/* 6. Alerts & Notifications */}
+          <DashboardAlerts
+            alerts={data?.alerts}
+            isLoading={isLoading}
+          />
+
+          {/* 7. Promotional Glass Banner */}
+          <DashboardPromoBanner />
         </div>
       </div>
     </PageContainer>
