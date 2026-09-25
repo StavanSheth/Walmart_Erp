@@ -7,27 +7,40 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@/components/ui/icons";
+import { apiClient } from "@/lib/api/client";
+import { formatCurrency } from "@/lib/format";
 
-interface DemoAccountItem {
+interface AccountItem {
+  id: string;
   code: string;
   name: string;
   type: "ASSET" | "LIABILITY" | "EQUITY" | "REVENUE" | "EXPENSE";
-  balance: string;
+  currency: string;
+  balance: number;
+  status: string;
 }
 
-const DEMO_ACCOUNTS: DemoAccountItem[] = [
-  { code: "1010", name: "HDFC Operating Bank Account", type: "ASSET", balance: "₹45,20,000.00" },
-  { code: "1020", name: "Cash on Hand / POS Till", type: "ASSET", balance: "₹1,85,400.00" },
-  { code: "1030", name: "Accounts Receivable", type: "ASSET", balance: "₹12,40,000.00" },
-  { code: "1040", name: "Merchandise Inventory", type: "ASSET", balance: "₹88,50,000.00" },
-  { code: "2010", name: "Accounts Payable (Trade Vendors)", type: "LIABILITY", balance: "₹34,10,000.00" },
-  { code: "2020", name: "GST Output Tax Payable", type: "LIABILITY", balance: "₹8,45,200.00" },
-  { code: "4010", name: "Retail Merchandise Sales Revenue", type: "REVENUE", balance: "₹1,42,80,000.00" },
-  { code: "5010", name: "Cost of Goods Sold (COGS)", type: "EXPENSE", balance: "₹92,30,000.00" }
-];
-
 export default function LedgerPage() {
-  const columns: Column<DemoAccountItem>[] = [
+  const [accounts, setAccounts] = React.useState<AccountItem[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function loadAccounts() {
+      try {
+        const res = await apiClient.get<AccountItem[]>("/api/ledger/accounts");
+        if (res.data) {
+          setAccounts(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch ledger accounts from database", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadAccounts();
+  }, []);
+
+  const columns: Column<AccountItem>[] = [
     {
       key: "code",
       header: "Account Code",
@@ -60,7 +73,11 @@ export default function LedgerPage() {
       header: "Current Balance",
       align: "right",
       isNumeric: true,
-      render: (item) => <span className="font-semibold text-slate-900 font-mono tabular-nums">{item.balance}</span>
+      render: (item) => (
+        <span className="font-semibold text-slate-900 font-mono tabular-nums">
+          {formatCurrency(item.balance, true)}
+        </span>
+      )
     }
   ];
 
@@ -77,9 +94,10 @@ export default function LedgerPage() {
     >
       <div className="space-y-6">
         <ResponsiveTable
-          data={DEMO_ACCOUNTS}
+          data={accounts}
           columns={columns}
           keyExtractor={(item) => item.code}
+          isLoading={isLoading}
           mobileView="card"
           renderMobileCard={(item) => (
             <div className="space-y-1">
@@ -91,7 +109,7 @@ export default function LedgerPage() {
               </div>
               <p className="font-semibold text-sm text-slate-900">{item.name}</p>
               <p className="text-sm font-mono font-bold text-slate-800 text-right pt-2 border-t border-border-subtle tabular-nums">
-                {item.balance}
+                {formatCurrency(item.balance, true)}
               </p>
             </div>
           )}
@@ -100,10 +118,10 @@ export default function LedgerPage() {
         <Card className="border-dashed border-border bg-surface-subtle">
           <CardHeader>
             <CardTitle className="text-sm font-semibold text-slate-900">
-              General Ledger Module Scope
+              General Ledger Chart of Accounts
             </CardTitle>
             <CardDescription className="mt-1">
-              Financial journal posting, trial balance reconciliation, P&L reporting, and balance sheet generation will be implemented in future phases.
+              All accounts and live opening balances are retrieved in real-time from the PostgreSQL database ledger.
             </CardDescription>
           </CardHeader>
         </Card>

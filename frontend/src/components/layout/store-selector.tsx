@@ -75,7 +75,10 @@ export function StoreSelector({
           </p>
         </div>
         <div className="max-h-64 overflow-y-auto space-y-1">
-          {stores.map((store) => {
+          {stores.length === 0 ? (
+            <div className="p-4 text-center text-xs text-slate-400">Loading store network...</div>
+          ) : (
+            stores.map((store) => {
             const isSelected = store.code === currentStore.code;
             return (
               <button
@@ -115,7 +118,8 @@ export function StoreSelector({
                 )}
               </button>
             );
-          })}
+          })
+        )}
         </div>
       </Dropdown>
     </div>

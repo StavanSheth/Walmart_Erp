@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { BellIcon, CheckIcon, AlertTriangleIcon, PackageIcon, AlertCircleIcon } from "../ui/icons";
-import { DEMO_NOTIFICATIONS } from "@/lib/config/demo-data";
+import { apiClient } from "@/lib/api/client";
 import { Dropdown } from "../ui/dropdown";
 import { cn } from "@/lib/cn";
 import type { NotificationItem } from "@/types/store";
@@ -16,7 +16,22 @@ export function NotificationMenu({
   isDashboard?: boolean;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [notifications, setNotifications] = React.useState<NotificationItem[]>(DEMO_NOTIFICATIONS);
+  const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
+
+  // Fetch live notifications directly from PostgreSQL database
+  React.useEffect(() => {
+    async function loadNotifications() {
+      try {
+        const res = await apiClient.get<NotificationItem[]>("/api/notifications");
+        if (res.data) {
+          setNotifications(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to load notifications from API", err);
+      }
+    }
+    loadNotifications();
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 

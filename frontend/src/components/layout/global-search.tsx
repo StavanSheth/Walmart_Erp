@@ -3,7 +3,8 @@
 import * as React from "react";
 import { useShell } from "@/context/shell-context";
 import { SearchIcon, XIcon } from "../ui/icons";
-import { DEMO_SEARCH_DATA } from "@/lib/config/demo-data";
+import { apiClient } from "@/lib/api/client";
+import type { SearchResultItem } from "@/types/store";
 import { StatusBadge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/cn";
@@ -15,30 +16,43 @@ export function GlobalSearchModal() {
   const { searchOpen, setSearchOpen } = useShell();
   const [query, setQuery] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<typeof CATEGORIES[number]>("All");
+  const [searchResults, setSearchResults] = React.useState<SearchResultItem[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  // Load search results dynamically from PostgreSQL database
   React.useEffect(() => {
-    if (searchOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
+    if (!searchOpen) {
       setQuery("");
       setSelectedCategory("All");
+      return;
     }
-  }, [searchOpen]);
+
+    setTimeout(() => inputRef.current?.focus(), 50);
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const res = await apiClient.get<SearchResultItem[]>("/api/search", {
+          params: query ? { q: query } : undefined
+        });
+        if (res.data) {
+          setSearchResults(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to query live search API", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [searchOpen, query]);
 
   const filteredResults = React.useMemo(() => {
-    return DEMO_SEARCH_DATA.filter((item) => {
-      const matchesCategory =
-        selectedCategory === "All" || item.category === selectedCategory;
-      const q = query.toLowerCase().trim();
-      if (!q) return matchesCategory;
-      const matchesText =
-        item.title.toLowerCase().includes(q) ||
-        item.subtitle.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q);
-      return matchesCategory && matchesText;
-    });
-  }, [query, selectedCategory]);
+    if (selectedCategory === "All") return searchResults;
+    return searchResults.filter((item) => item.category === selectedCategory);
+  }, [searchResults, selectedCategory]);
 
   return (
     <Modal
@@ -50,7 +64,11 @@ export function GlobalSearchModal() {
     >
       {/* Search Input Bar */}
       <div className="flex items-center px-4 py-3.5 border-b border-border gap-3">
-        <SearchIcon className="w-5 h-5 text-slate-400 shrink-0" />
+        {isSearching ? (
+          <div className="w-5 h-5 rounded-full border-2 border-brand-primary border-t-transparent animate-spin shrink-0" />
+        ) : (
+          <SearchIcon className="w-5 h-5 text-slate-400 shrink-0" />
+        )}
         <input
           ref={inputRef}
           type="text"

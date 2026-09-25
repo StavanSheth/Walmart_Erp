@@ -6,6 +6,12 @@ import { AppError } from "./common/errors/app-error.js";
 import { getLoggerConfig } from "./common/logging/logger.js";
 import { dashboardRoutes } from "./dashboard/dashboard.routes.js";
 import { inventoryRoutes } from "./inventory/inventory.routes.js";
+import { storesRoutes } from "./stores/stores.routes.js";
+import { partnersRoutes } from "./partners/partners.routes.js";
+import { ledgerRoutes } from "./ledger/ledger.routes.js";
+import { searchRoutes } from "./search/search.routes.js";
+import { notificationsRoutes } from "./notifications/notifications.routes.js";
+import { settingsRoutes } from "./settings/settings.routes.js";
 
 export interface HealthResponse {
   success: boolean;
@@ -126,6 +132,24 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
 
   // Phase 6 Inventory Routes
   app.register(inventoryRoutes, { prefix: "/api/inventory" });
+
+  // Stores Routes (Direct from Database)
+  app.register(storesRoutes, { prefix: "/api/stores" });
+
+  // Partners & Customers Routes (Direct from Database)
+  app.register(partnersRoutes, { prefix: "/api/partners" });
+
+  // Ledger Routes (Direct from Database)
+  app.register(ledgerRoutes, { prefix: "/api/ledger" });
+
+  // Live Database Search Routes
+  app.register(searchRoutes, { prefix: "/api/search" });
+
+  // Live Database Notifications Routes
+  app.register(notificationsRoutes, { prefix: "/api/notifications" });
+
+  // Live Database Settings Routes
+  app.register(settingsRoutes, { prefix: "/api/settings" });
 
   return app;
 }

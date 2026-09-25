@@ -521,7 +521,7 @@ export async function getInventoryList(
     })
     .sort((a, b) => b.totalStock - a.totalStock);
 
-  // 9. Real Historical Inventory Movements (12 months supporting 6m and 1y filters)
+  // 9. Real Historical Inventory Movements from Database
   const now = new Date();
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
@@ -541,42 +541,44 @@ export async function getInventoryList(
       unitCost: true,
       productId: true,
       createdAt: true
-    }
+    },
+    orderBy: { createdAt: "desc" }
   });
 
-  const monthlyBuckets = new Map<
-    string,
-    { units: number; value: number; skus: Set<string>; netMovements: number }
-  >();
+  // Calculate monthly metrics by stepping backwards from live database inventory
+  let runningUnits = totalUnits;
+  let runningVal = totalInventoryValue;
+  const rawTrendReversed: InventoryTrendPointDto[] = [];
 
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    monthlyBuckets.set(key, { units: 0, value: 0, skus: new Set<string>(), netMovements: 0 });
-  }
+  for (let i = 0; i < 12; i++) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const nextMonthDate = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const monthLabel = monthNames[monthDate.getMonth()];
 
-  for (const m of historicalMovements) {
-    const d = new Date(m.createdAt);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    const bucket = monthlyBuckets.get(key);
-    if (bucket) {
-      bucket.units += Math.abs(m.quantity);
-      bucket.netMovements += m.quantity;
+    // Movements that happened strictly within this month
+    const monthMovs = historicalMovements.filter((m) => {
+      const d = new Date(m.createdAt);
+      return d >= monthDate && d < nextMonthDate;
+    });
+
+    let netUnitsThisMonth = 0;
+    let netValThisMonth = 0;
+    const activeSkusThisMonth = new Set<string>();
+
+    for (const m of monthMovs) {
+      netUnitsThisMonth += m.quantity;
       if (m.unitCost) {
-        bucket.value += Math.abs(m.quantity) * Number(m.unitCost);
+        netValThisMonth += m.quantity * Number(m.unitCost);
       }
-      bucket.skus.add(m.productId);
+      activeSkusThisMonth.add(m.productId);
     }
-  }
 
-  const inventoryTrend: InventoryTrendPointDto[] = [];
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthLabel = monthNames[d.getMonth()];
+    const currentUnits = Math.max(0, Math.round(runningUnits));
+    const currentVal = Math.max(0, Math.round(runningVal));
 
-    // Current month reflects exact live summary; previous months reflect real movement activity
     if (i === 0) {
-      inventoryTrend.push({
+      // Live current month
+      rawTrendReversed.push({
         month: monthLabel,
         inventoryValue: Math.round(totalInventoryValue),
         inStock: inStockItems,
@@ -587,19 +589,26 @@ export async function getInventoryList(
         skuCount: totalProducts
       });
     } else {
-      const histFactor = 0.72 + 0.025 * (11 - i);
-      inventoryTrend.push({
+      // Historical months derived directly from real movement ledger
+      const ratio = totalUnits > 0 ? currentUnits / totalUnits : 0;
+      rawTrendReversed.push({
         month: monthLabel,
-        inventoryValue: Math.round(totalInventoryValue * histFactor),
-        inStock: Math.max(1, Math.round(inStockItems * histFactor)),
-        lowStock: Math.max(1, Math.round(lowStockItems * (0.85 + 0.015 * (11 - i)))),
-        outOfStock: Math.max(0, Math.round(outOfStockItems * (0.85 + 0.015 * (11 - i)))),
-        inTransit: Math.max(0, Math.round(inTransitItemsCount * (0.7 + 0.025 * (11 - i)))),
-        units: Math.max(1, Math.round(totalUnits * histFactor)),
-        skuCount: totalProducts
+        inventoryValue: currentVal,
+        inStock: Math.max(0, Math.round(inStockItems * ratio)),
+        lowStock: Math.max(0, Math.round(lowStockItems * ratio)),
+        outOfStock: Math.max(0, Math.round(outOfStockItems * ratio)),
+        inTransit: Math.max(0, Math.round(inTransitItemsCount * ratio)),
+        units: currentUnits,
+        skuCount: currentUnits > 0 ? Math.min(totalProducts, Math.max(activeSkusThisMonth.size, Math.round(totalProducts * ratio))) : 0
       });
     }
+
+    // Step backwards to get the inventory at the start of this month (i.e. end of previous month)
+    runningUnits -= netUnitsThisMonth;
+    runningVal -= netValThisMonth;
   }
+
+  const inventoryTrend: InventoryTrendPointDto[] = rawTrendReversed.reverse();
 
   const analytics: InventoryAnalyticsDto = {
     inventoryTrend,

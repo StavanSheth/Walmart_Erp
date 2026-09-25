@@ -79,6 +79,34 @@ export class ApiClient {
     }
   }
 
+  public async get<T>(
+    endpoint: string,
+    options?: { params?: Record<string, string | number | undefined> }
+  ): Promise<{ success: boolean; data: T }> {
+    let url = endpoint;
+    if (options?.params) {
+      const sp = new URLSearchParams();
+      Object.entries(options.params).forEach(([k, v]) => {
+        if (v !== undefined) sp.set(k, String(v));
+      });
+      const qs = sp.toString();
+      if (qs) {
+        url += url.includes("?") ? `&${qs}` : `?${qs}`;
+      }
+    }
+    return this.request<{ success: boolean; data: T }>(url, { method: "GET" });
+  }
+
+  public async post<T>(
+    endpoint: string,
+    body?: unknown
+  ): Promise<{ success: boolean; data: T }> {
+    return this.request<{ success: boolean; data: T }>(endpoint, {
+      method: "POST",
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
   /**
    * Phase 1 Health Endpoint verification
    */

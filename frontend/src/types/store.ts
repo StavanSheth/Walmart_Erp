@@ -8,6 +8,7 @@ export interface StoreInfo {
   phone?: string;
   pincode?: string;
   imageUrl?: string;
+  region?: string;
 }
 
 export interface NotificationItem {
