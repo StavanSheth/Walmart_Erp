@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "../common/database/prisma.js";
 import { NotFoundError } from "../common/errors/app-error.js";
 import type { DashboardQueryParams } from "./dashboard.schemas.js";
@@ -9,7 +8,10 @@ import type {
   RecentInventoryActivityItem,
   TopCategoryItem,
   DashboardAlertItem,
-  RecentTransactionItem
+  DesktopSummary,
+  MobileSummary,
+  SalesOverviewData,
+  InventoryDistributionData
 } from "./dashboard.types.js";
 
 export async function getDashboardOverview(
@@ -30,87 +32,101 @@ export async function getDashboardOverview(
 
   const organizationId = org.id;
 
-  // 2. Build where filter for SalesOrder and PurchaseOrder
-  const orderWhere: Prisma.SalesOrderWhereInput = {
-    organizationId
-  };
-  const poWhere: Prisma.PurchaseOrderWhereInput = {
-    organizationId
-  };
+  // 2. Consistent Date Boundaries for Selected Period
+  const period = params.period ?? "30d";
+  const now = new Date();
+  let currentStart: Date;
+  let currentEnd = now;
+  let previousStart: Date;
+  let previousEnd: Date;
 
-  if (params.storeId) {
-    orderWhere.storeId = params.storeId;
-    poWhere.storeId = params.storeId;
-  } else if (params.regionId) {
-    orderWhere.store = { regionId: params.regionId };
-    poWhere.store = { regionId: params.regionId };
+  if (period === "today") {
+    // start = beginning of current local business day, end = current time
+    currentStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    currentEnd = now;
+    // previous period = immediately preceding day
+    previousStart = new Date(currentStart);
+    previousStart.setDate(previousStart.getDate() - 1);
+    previousEnd = currentStart;
+  } else if (period === "7d") {
+    // current period = last 7 days
+    currentStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    currentEnd = now;
+    // previous period = immediately preceding 7 days
+    previousStart = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    previousEnd = currentStart;
+  } else {
+    // 30d: current period = last 30 days
+    currentStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    currentEnd = now;
+    // previous period = immediately preceding 30 days
+    previousStart = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    previousEnd = currentStart;
   }
 
-  if (params.from || params.to) {
-    orderWhere.createdAt = {};
-    poWhere.createdAt = {};
-    if (params.from) {
-      const fromDate = new Date(params.from);
-      if (!isNaN(fromDate.getTime())) {
-        orderWhere.createdAt.gte = fromDate;
-        poWhere.createdAt.gte = fromDate;
-      }
-    }
-    if (params.to) {
-      const toDate = new Date(params.to);
-      if (!isNaN(toDate.getTime())) {
-        if (params.to.length === 10) {
-          toDate.setHours(23, 59, 59, 999);
-        }
-        orderWhere.createdAt.lte = toDate;
-        poWhere.createdAt.lte = toDate;
-      }
-    }
-  }
+  const storeFilter = params.storeId ? { storeId: params.storeId } : {};
 
   // 3. Concurrent Database Queries
   const [
-    // Completed sales aggregation
-    salesAgg,
+    // Current period sales aggregation
+    currentSalesAgg,
+    // Previous period sales aggregation
+    previousSalesAgg,
     // Active stores count
     activeStoresCount,
     // Active stores list
     storesList,
-    // Store grouped sales
+    // Store grouped sales in current period
     storeGroupedSales,
     // Inventory with product details
     inventoryRecords,
     // Active catalog products count
     totalProductsCount,
-    // Completed orders for sales trend
+    // Completed sales orders in current period for trend
     completedSalesOrders,
-    // Purchase orders for purchase trend & procurement metrics
+    // Purchase orders in current period for trend
     purchaseOrders,
-    // Sales orders by status for order fulfillment breakdown
-    salesOrdersByStatus,
-    // Recent inventory movements
+    // Recent inventory movements (5 records)
     recentMovements,
-    // Categories with products & stock
-    categoriesWithStock,
-    // Recent sales transactions
-    recentSalesOrders,
+    // Active categories
+    categoriesList,
     // Pending purchase orders count
-    pendingPoCount
+    pendingPoCount,
+    // Today's actual sales aggregation
+    todaySalesAgg
   ] = await Promise.all([
-    // Sales aggregation for completed orders
+    // Current period completed sales
     prisma.salesOrder.aggregate({
       where: {
-        ...orderWhere,
-        status: "COMPLETED"
+        organizationId,
+        status: "COMPLETED",
+        ...storeFilter,
+        createdAt: {
+          gte: currentStart,
+          lte: currentEnd
+        }
       },
       _sum: {
-        subtotal: true,
-        discount: true,
-        tax: true,
         total: true
       },
       _count: {
         id: true
+      }
+    }),
+
+    // Previous period completed sales for comparison
+    prisma.salesOrder.aggregate({
+      where: {
+        organizationId,
+        status: "COMPLETED",
+        ...storeFilter,
+        createdAt: {
+          gte: previousStart,
+          lt: previousEnd
+        }
+      },
+      _sum: {
+        total: true
       }
     }),
 
@@ -119,11 +135,7 @@ export async function getDashboardOverview(
       where: {
         organizationId,
         status: "ACTIVE",
-        ...(params.storeId
-          ? { id: params.storeId }
-          : params.regionId
-            ? { regionId: params.regionId }
-            : {})
+        ...(params.storeId ? { id: params.storeId } : {})
       }
     }),
 
@@ -132,11 +144,7 @@ export async function getDashboardOverview(
       where: {
         organizationId,
         status: "ACTIVE",
-        ...(params.storeId
-          ? { id: params.storeId }
-          : params.regionId
-            ? { regionId: params.regionId }
-            : {})
+        ...(params.storeId ? { id: params.storeId } : {})
       },
       select: {
         id: true,
@@ -144,12 +152,17 @@ export async function getDashboardOverview(
       }
     }),
 
-    // Store sales grouped
+    // Store sales grouped in current period
     prisma.salesOrder.groupBy({
       by: ["storeId"],
       where: {
-        ...orderWhere,
-        status: "COMPLETED"
+        organizationId,
+        status: "COMPLETED",
+        ...storeFilter,
+        createdAt: {
+          gte: currentStart,
+          lte: currentEnd
+        }
       },
       _sum: {
         total: true
@@ -159,15 +172,11 @@ export async function getDashboardOverview(
       }
     }),
 
-    // Inventory
+    // Inventory records
     prisma.inventory.findMany({
       where: {
         organizationId,
-        ...(params.storeId
-          ? { storeId: params.storeId }
-          : params.regionId
-            ? { store: { regionId: params.regionId } }
-            : {})
+        ...storeFilter
       },
       include: {
         product: {
@@ -177,6 +186,12 @@ export async function getDashboardOverview(
             costPrice: true,
             reorderLevel: true,
             categoryId: true
+          }
+        },
+        store: {
+          select: {
+            id: true,
+            name: true
           }
         }
       }
@@ -190,11 +205,16 @@ export async function getDashboardOverview(
       }
     }),
 
-    // Completed sales orders
+    // Completed sales orders for sales trend in current period
     prisma.salesOrder.findMany({
       where: {
-        ...orderWhere,
-        status: "COMPLETED"
+        organizationId,
+        status: "COMPLETED",
+        ...storeFilter,
+        createdAt: {
+          gte: currentStart,
+          lte: currentEnd
+        }
       },
       select: {
         createdAt: true,
@@ -205,37 +225,30 @@ export async function getDashboardOverview(
       }
     }),
 
-    // Purchase orders
+    // Purchase orders in current period
     prisma.purchaseOrder.findMany({
-      where: poWhere,
+      where: {
+        organizationId,
+        ...storeFilter,
+        createdAt: {
+          gte: currentStart,
+          lte: currentEnd
+        }
+      },
       select: {
         createdAt: true,
-        total: true,
-        status: true
+        total: true
       },
       orderBy: {
         createdAt: "asc"
       }
     }),
 
-    // Sales orders grouped by status
-    prisma.salesOrder.groupBy({
-      by: ["status"],
-      where: orderWhere,
-      _count: {
-        id: true
-      }
-    }),
-
-    // Recent inventory movements (5 records)
+    // Recent inventory movements (take 5)
     prisma.inventoryMovement.findMany({
       where: {
         organizationId,
-        ...(params.storeId
-          ? { storeId: params.storeId }
-          : params.regionId
-            ? { store: { regionId: params.regionId } }
-            : {})
+        ...storeFilter
       },
       take: 5,
       orderBy: {
@@ -267,49 +280,35 @@ export async function getDashboardOverview(
       }
     }),
 
-    // Recent transactions (5 orders)
-    prisma.salesOrder.findMany({
-      where: orderWhere,
-      take: 5,
-      orderBy: {
-        createdAt: "desc"
-      },
-      include: {
-        store: {
-          select: {
-            name: true
-          }
-        },
-        customer: {
-          select: {
-            name: true
-          }
-        },
-        items: {
-          take: 1,
-          include: {
-            product: {
-              select: {
-                name: true
-              }
-            }
-          }
-        }
-      }
-    }),
-
     // Pending purchase orders count
     prisma.purchaseOrder.count({
       where: {
         organizationId,
+        ...storeFilter,
         status: {
           in: ["DRAFT", "ORDERED", "PARTIALLY_RECEIVED"]
         }
       }
+    }),
+
+    // Actual today's sales (calendar day)
+    prisma.salesOrder.aggregate({
+      where: {
+        organizationId,
+        status: "COMPLETED",
+        ...storeFilter,
+        createdAt: {
+          gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0),
+          lte: now
+        }
+      },
+      _sum: {
+        total: true
+      }
     })
   ]);
 
-  // 4. Inventory Metrics & Distribution Calculations
+  // 4. Inventory Calculations
   let totalUnits = 0;
   let inStockUnits = 0;
   let lowStockUnits = 0;
@@ -320,6 +319,9 @@ export async function getDashboardOverview(
   const productIds = new Set<string>();
   const categoryValueMap = new Map<string, number>();
 
+  const outOfStockRecords: typeof inventoryRecords = [];
+  const lowStockRecords: typeof inventoryRecords = [];
+
   for (const inv of inventoryRecords) {
     productIds.add(inv.productId);
     totalUnits += inv.onHand;
@@ -327,19 +329,20 @@ export async function getDashboardOverview(
     const stockVal = inv.onHand * itemCost;
     totalInventoryValue += stockVal;
 
-    // Attribute stock value to category
     if (inv.product.categoryId) {
       const currentCatVal = categoryValueMap.get(inv.product.categoryId) ?? 0;
       categoryValueMap.set(inv.product.categoryId, currentCatVal + stockVal);
     }
 
-    const availableStock = inv.onHand - inv.reserved;
-    if (availableStock <= 0) {
+    const available = inv.onHand - inv.reserved;
+    if (available <= 0) {
       outOfStockItemCount++;
-      outOfStockUnits += inv.onHand;
-    } else if (availableStock <= inv.product.reorderLevel) {
+      outOfStockUnits += Math.max(0, inv.onHand);
+      outOfStockRecords.push(inv);
+    } else if (available <= inv.product.reorderLevel) {
       lowStockItemCount++;
       lowStockUnits += inv.onHand;
+      lowStockRecords.push(inv);
     } else {
       inStockUnits += inv.onHand;
     }
@@ -347,15 +350,24 @@ export async function getDashboardOverview(
 
   const inStockPercentage = totalUnits > 0 ? Math.round((inStockUnits / totalUnits) * 100) : 0;
   const lowStockPercentage = totalUnits > 0 ? Math.round((lowStockUnits / totalUnits) * 100) : 0;
-  const outOfStockPercentage = totalUnits > 0 ? Math.round((outOfStockUnits / totalUnits) * 100) : 0;
-  const inTransitPercentage = Math.max(0, 100 - inStockPercentage - lowStockPercentage - outOfStockPercentage);
+  const outOfStockPercentage = totalUnits > 0 ? Math.max(0, 100 - inStockPercentage - lowStockPercentage) : 0;
 
-  // 5. Desktop 5 KPIs
+  const inventoryDistribution: InventoryDistributionData = {
+    totalUnits,
+    inStock: inStockUnits,
+    inStockPercentage,
+    lowStock: lowStockUnits,
+    lowStockPercentage,
+    outOfStock: outOfStockUnits,
+    outOfStockPercentage
+  };
+
+  // 5. Desktop Summary KPIs
   const totalProducts = params.storeId
     ? productIds.size
     : totalProductsCount || productIds.size;
 
-  const desktopSummary = {
+  const desktopSummary: DesktopSummary = {
     totalProducts,
     inStockUnits,
     lowStockItems: lowStockItemCount,
@@ -363,27 +375,26 @@ export async function getDashboardOverview(
     totalStores: activeStoresCount
   };
 
-  // 6. Mobile 2x2 KPIs
-  const totalSalesAmount = Number(salesAgg._sum.total ?? 0);
-  const totalOrdersCount = salesAgg._count.id;
+  // 6. Mobile Summary KPIs
+  const totalSalesToday = Math.round(Number(todaySalesAgg._sum.total ?? 0) * 100) / 100;
+  const totalOrdersCount = currentSalesAgg._count.id;
 
-  // Derive latest sales for today/recent day
-  const latestOrder = completedSalesOrders[completedSalesOrders.length - 1];
-  const latestDateKey = latestOrder ? latestOrder.createdAt.toISOString().slice(0, 10) : null;
-  const todaySales = latestDateKey
-    ? completedSalesOrders
-        .filter((o) => o.createdAt.toISOString().slice(0, 10) === latestDateKey)
-        .reduce((sum, o) => sum + Number(o.total), 0)
-    : totalSalesAmount;
-
-  const mobileSummary = {
-    totalSalesToday: Math.round(todaySales * 100) / 100,
+  const mobileSummary: MobileSummary = {
+    totalSalesToday,
     totalOrders: totalOrdersCount,
     activeStores: activeStoresCount,
     inventoryValue: Math.round(totalInventoryValue * 100) / 100
   };
 
-  // 7. Sales & Purchases Over Time Series
+  // 7. Sales Overview (Current vs Database-Calculated Previous Period)
+  const currentSalesTotal = Number(currentSalesAgg._sum.total ?? 0);
+  const previousSalesTotal = Number(previousSalesAgg._sum.total ?? 0);
+
+  const changePercent =
+    previousSalesTotal === 0
+      ? 0
+      : Math.round(((currentSalesTotal - previousSalesTotal) / previousSalesTotal) * 1000) / 10;
+
   const salesMap = new Map<string, { amount: number; orders: number }>();
   for (const s of completedSalesOrders) {
     const k = s.createdAt.toISOString().slice(0, 10);
@@ -402,7 +413,6 @@ export async function getDashboardOverview(
     purchaseMap.set(k, curr);
   }
 
-  // Combined sorted dates
   const allDates = Array.from(new Set([...salesMap.keys(), ...purchaseMap.keys()])).sort();
   const salesSeries: ChartSeriesPoint[] = [];
   const purchasesSeries: ChartSeriesPoint[] = [];
@@ -422,44 +432,15 @@ export async function getDashboardOverview(
     });
   }
 
-  // Comparison metric (e.g. +10.2%)
-  const salesOverview = {
-    totalSales: Math.round(totalSalesAmount * 100) / 100,
-    previousPeriodSales: Math.round((totalSalesAmount * 0.907) * 100) / 100,
-    changePercent: 10.2,
+  const salesOverview: SalesOverviewData = {
+    totalSales: Math.round(currentSalesTotal * 100) / 100,
+    previousPeriodSales: Math.round(previousSalesTotal * 100) / 100,
+    changePercent,
     sales: salesSeries,
     purchases: purchasesSeries
   };
 
-  // 8. Order Fulfillment Metrics
-  let fulfilled = 0;
-  let pending = 0;
-  let cancelled = 0;
-
-  for (const row of salesOrdersByStatus) {
-    if (row.status === "COMPLETED") {
-      fulfilled += row._count.id;
-    } else if (row.status === "CANCELLED" || row.status === "REFUNDED") {
-      cancelled += row._count.id;
-    } else {
-      pending += row._count.id;
-    }
-  }
-
-  const totalTrackedOrders = fulfilled + pending + cancelled;
-  const fulfillmentRate =
-    totalTrackedOrders > 0
-      ? Math.round((fulfilled / totalTrackedOrders) * 100)
-      : 0;
-
-  const orderFulfillment = {
-    fulfilled,
-    pending,
-    cancelled,
-    fulfillmentRate
-  };
-
-  // 9. Store Performance Ranked
+  // 8. Store Performance (Neutral metrics: storeName, sales, orders, AOV)
   const storeSalesMap = new Map(
     storeGroupedSales.map((item) => [
       item.storeId,
@@ -470,31 +451,23 @@ export async function getDashboardOverview(
     ])
   );
 
-  const allStorePerformance: StorePerformanceItem[] = storesList
+  const storePerformance: StorePerformanceItem[] = storesList
     .map((store) => {
       const stats = storeSalesMap.get(store.id) ?? { sales: 0, orders: 0 };
       const aov =
         stats.orders > 0 ? Math.round((stats.sales / stats.orders) * 100) / 100 : 0;
       return {
-        rank: 0,
         storeId: store.id,
         storeName: store.name,
         sales: Math.round(stats.sales * 100) / 100,
         orders: stats.orders,
-        averageOrderValue: aov,
-        relativePercentage: 0
+        averageOrderValue: aov
       };
     })
-    .sort((a, b) => b.sales - a.sales);
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 5);
 
-  const highestStoreSales = allStorePerformance[0]?.sales || 1;
-  const topStorePerformance = allStorePerformance.slice(0, 5).map((s, idx) => ({
-    ...s,
-    rank: idx + 1,
-    relativePercentage: Math.max(10, Math.round((s.sales / highestStoreSales) * 100))
-  }));
-
-  // 10. Recent Inventory Activity
+  // 9. Recent Inventory Activity
   const activityMap: Record<
     string,
     { label: string; color: "success" | "warning" | "danger" | "info" }
@@ -508,7 +481,7 @@ export async function getDashboardOverview(
     OPENING: { label: "Opening Stock", color: "info" }
   };
 
-  const recentInventoryActivity: RecentInventoryActivityItem[] = recentMovements.map(
+  const recentActivity: RecentInventoryActivityItem[] = recentMovements.map(
     (mv) => {
       const meta = activityMap[mv.type] ?? {
         label: "Stock Movement",
@@ -530,15 +503,14 @@ export async function getDashboardOverview(
     }
   );
 
-  // 11. Top Categories by Stock Value
-  const sortedCategories: TopCategoryItem[] = categoriesWithStock
+  // 10. Top Categories by Stock Value
+  const sortedCategories = categoriesList
     .map((cat) => {
       const stockVal = categoryValueMap.get(cat.id) ?? 0;
       return {
         categoryId: cat.id,
         categoryName: cat.name,
-        stockValue: Math.round(stockVal),
-        relativePercentage: 0
+        stockValue: Math.round(stockVal)
       };
     })
     .filter((c) => c.stockValue > 0)
@@ -546,94 +518,53 @@ export async function getDashboardOverview(
     .slice(0, 5);
 
   const highestCatVal = sortedCategories[0]?.stockValue || 1;
-  const topCategories = sortedCategories.map((c) => ({
+  const topCategories: TopCategoryItem[] = sortedCategories.map((c) => ({
     ...c,
-    relativePercentage: Math.max(15, Math.round((c.stockValue / highestCatVal) * 100))
+    relativePercentage: Math.round((c.stockValue / highestCatVal) * 100)
   }));
 
-  // 12. Alerts & Notifications derived from actual DB state
-  const alerts: DashboardAlertItem[] = [];
+  // 11. Alerts & Notifications (100% Real Database Derived)
+  const inventoryAlerts: DashboardAlertItem[] = [];
 
-  // Low stock item alert from DB
-  const lowStockRecord = inventoryRecords.find(
-    (i) => i.onHand - i.reserved > 0 && i.onHand - i.reserved <= i.product.reorderLevel
-  );
-  if (lowStockRecord) {
-    alerts.push({
-      id: "alert-low-stock",
-      title: `Low stock: ${lowStockRecord.product.name} (${lowStockRecord.onHand - lowStockRecord.reserved} units)`,
+  // Out of stock alerts
+  for (const inv of outOfStockRecords.slice(0, 2)) {
+    inventoryAlerts.push({
+      id: `alert-oos-${inv.id}`,
+      title: `Out of stock: ${inv.product.name} (${inv.store.name})`,
       type: "danger",
-      timestamp: "2 hours ago"
+      timestamp: "Immediate reorder required"
     });
   }
 
-  // Active operational maintenance alert
-  alerts.push({
-    id: "alert-maintenance",
-    title: "Maintenance scheduled - HVAC Supercenter",
-    type: "warning",
-    timestamp: "1 day ago"
-  });
+  // Low stock alerts
+  for (const inv of lowStockRecords.slice(0, 2)) {
+    const avail = inv.onHand - inv.reserved;
+    inventoryAlerts.push({
+      id: `alert-low-${inv.id}`,
+      title: `Low stock: ${inv.product.name} (${avail} units in ${inv.store.name})`,
+      type: "warning",
+      timestamp: "Below reorder threshold"
+    });
+  }
 
   // Pending purchase orders alert
-  alerts.push({
-    id: "alert-po-pending",
-    title: `${pendingPoCount} purchase orders awaiting approval`,
-    type: "info",
-    timestamp: "1 day ago"
-  });
-
-  // Health inspection
-  alerts.push({
-    id: "alert-inspection",
-    title: "Health inspection passed - All Outlets",
-    type: "success",
-    timestamp: "3 days ago"
-  });
-
-  // Supplier requests
-  alerts.push({
-    id: "alert-supplier",
-    title: "New supplier procurement catalog synced",
-    type: "info",
-    timestamp: "3 days ago"
-  });
-
-  // 13. Recent Transactions
-  const recentTransactions: RecentTransactionItem[] = recentSalesOrders.map((so) => {
-    const firstItem = so.items[0];
-    return {
-      id: so.id,
-      orderNumber: so.orderNumber,
-      productName: firstItem?.product?.name ?? "Retail Order",
-      customerName: so.customer?.name ?? "Walk-in Customer",
-      storeName: so.store.name,
-      total: Number(so.total),
-      status: so.status,
-      createdAt: so.createdAt.toISOString()
-    };
-  });
+  if (pendingPoCount > 0) {
+    inventoryAlerts.push({
+      id: "alert-po-pending",
+      title: `${pendingPoCount} purchase ${pendingPoCount === 1 ? "order" : "orders"} awaiting receipt / approval`,
+      type: "info",
+      timestamp: "Procurement pending"
+    });
+  }
 
   return {
     summary: desktopSummary,
     mobileSummary,
     salesOverview,
-    inventoryDistribution: {
-      totalUnits,
-      inStock: inStockUnits,
-      inStockPercentage,
-      lowStock: lowStockUnits,
-      lowStockPercentage,
-      outOfStock: outOfStockItemCount,
-      outOfStockPercentage,
-      inTransit: Math.round(totalUnits * 0.06),
-      inTransitPercentage
-    },
-    orderFulfillment,
-    storePerformance: topStorePerformance,
-    recentInventoryActivity,
-    topCategories,
-    alerts,
-    recentTransactions
+    inventoryDistribution,
+    storePerformance,
+    inventoryAlerts,
+    recentActivity,
+    topCategories
   };
 }

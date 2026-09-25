@@ -86,9 +86,7 @@ export class ApiClient {
   ): Promise<DashboardOverviewResponse> {
     const searchParams = new URLSearchParams();
     if (params?.storeId) searchParams.set("storeId", params.storeId);
-    if (params?.regionId) searchParams.set("regionId", params.regionId);
-    if (params?.from) searchParams.set("from", params.from);
-    if (params?.to) searchParams.set("to", params.to);
+    if (params?.period) searchParams.set("period", params.period);
     const queryString = searchParams.toString();
     const endpoint = queryString
       ? `/dashboard/overview?${queryString}`

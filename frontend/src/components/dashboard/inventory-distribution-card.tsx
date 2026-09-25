@@ -3,6 +3,7 @@
 import * as React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/common/loading-state";
+import { EmptyState } from "@/components/common/empty-state";
 import { formatNumber } from "@/lib/format";
 import type { InventoryDistributionData } from "@/types/dashboard";
 
@@ -15,7 +16,7 @@ export function InventoryDistributionCard({
   data,
   isLoading = false
 }: InventoryDistributionCardProps) {
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex items-center justify-between gap-3 h-full overflow-hidden">
         <Skeleton className="h-[130px] w-[130px] sm:h-[175px] sm:w-[175px] rounded-full shrink-0" />
@@ -28,10 +29,28 @@ export function InventoryDistributionCard({
     );
   }
 
+  if (!data || data.totalUnits === 0) {
+    return (
+      <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
+        <div className="flex items-center justify-between pb-1 min-w-0">
+          <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
+            Inventory Distribution
+          </h3>
+          <span className="text-xs text-slate-400 font-medium shrink-0">Status</span>
+        </div>
+        <EmptyState
+          title="No inventory units"
+          description="No stock records available for the selected store."
+          className="py-8"
+        />
+      </div>
+    );
+  }
+
   const chartData = [
-    { name: "In Stock", value: data.inStock || 76, color: "#10B981" },
-    { name: "Low Stock", value: data.lowStock || 17, color: "#F59E0B" },
-    { name: "Out of Stock", value: data.outOfStock || 7, color: "#EF4444" }
+    { name: "In Stock", value: data.inStock, color: "#10B981" },
+    { name: "Low Stock", value: data.lowStock, color: "#F59E0B" },
+    { name: "Out of Stock", value: data.outOfStock, color: "#EF4444" }
   ];
 
   return (
@@ -67,7 +86,7 @@ export function InventoryDistributionCard({
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Donut Center Text - Larger & clear on mobile */}
+          {/* Donut Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
             <span className="text-xl sm:text-xl lg:text-2xl xl:text-3xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
               {formatNumber(data.totalUnits)}
@@ -78,7 +97,7 @@ export function InventoryDistributionCard({
           </div>
         </div>
 
-        {/* Right Side: Content / Legend Breakdown - Larger text, tabular right-aligned */}
+        {/* Right Side: Content / Legend Breakdown */}
         <div className="space-y-2 sm:space-y-2.5 w-auto min-w-[125px] sm:min-w-[135px] text-xs sm:text-xs lg:text-sm font-semibold shrink-0">
           <div className="flex items-center justify-between gap-2.5 sm:gap-3">
             <div className="flex items-center gap-2 min-w-0">

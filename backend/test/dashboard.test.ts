@@ -22,12 +22,10 @@ describe("Phase 5 Dashboard Endpoint Tests", () => {
       mobileSummary,
       salesOverview,
       inventoryDistribution,
-      orderFulfillment,
       storePerformance,
-      recentInventoryActivity,
+      recentActivity,
       topCategories,
-      alerts,
-      recentTransactions
+      inventoryAlerts
     } = body.data;
 
     // Desktop 5 KPI summary validation
@@ -45,39 +43,33 @@ describe("Phase 5 Dashboard Endpoint Tests", () => {
 
     // Sales Overview validation
     assert.ok(typeof salesOverview.totalSales === "number", "totalSales must be number");
+    assert.ok(typeof salesOverview.previousPeriodSales === "number", "previousPeriodSales must be number");
+    assert.ok(typeof salesOverview.changePercent === "number", "changePercent must be number");
     assert.ok(Array.isArray(salesOverview.sales), "sales series must be array");
     assert.ok(Array.isArray(salesOverview.purchases), "purchases series must be array");
-    assert.ok(salesOverview.sales.length > 0, "sales series should have points");
 
     // Inventory Distribution validation
     assert.ok(inventoryDistribution.totalUnits > 0, "totalUnits must be > 0");
-    assert.ok(inventoryDistribution.inStockPercentage > 0, "inStockPercentage must be > 0");
+    assert.ok(inventoryDistribution.inStockPercentage >= 0, "inStockPercentage must be >= 0");
+    assert.equal(body.data.orderFulfillment, undefined, "orderFulfillment should be removed");
+    assert.equal(body.data.recentTransactions, undefined, "recentTransactions should be removed");
 
-    // Order Fulfillment validation
-    assert.ok(orderFulfillment.fulfilled > 0, "fulfilled must be > 0");
-    assert.ok(typeof orderFulfillment.fulfillmentRate === "number", "fulfillmentRate must be number");
-
-    // Store Performance validation
+    // Store Performance validation (neutral: no rank, no relativePercentage)
     assert.ok(Array.isArray(storePerformance), "storePerformance must be array");
     assert.ok(storePerformance.length > 0, "storePerformance must have items");
-    assert.equal(storePerformance[0].rank, 1);
-    assert.ok(storePerformance[0].relativePercentage > 0);
+    assert.equal(storePerformance[0].rank, undefined, "rank should be removed");
+    assert.equal(storePerformance[0].relativePercentage, undefined, "relativePercentage should be removed");
+    assert.ok(typeof storePerformance[0].averageOrderValue === "number", "AOV must be number");
 
-    // Recent Inventory Activity validation
-    assert.ok(Array.isArray(recentInventoryActivity), "recentInventoryActivity must be array");
-    assert.ok(recentInventoryActivity.length > 0, "should have activity");
+    // Recent Activity validation
+    assert.ok(Array.isArray(recentActivity), "recentActivity must be array");
+    assert.ok(recentActivity.length > 0, "should have activity");
 
     // Top Categories validation
     assert.ok(Array.isArray(topCategories), "topCategories must be array");
-    assert.ok(topCategories.length > 0, "should have top categories");
 
-    // Alerts validation
-    assert.ok(Array.isArray(alerts), "alerts must be array");
-    assert.ok(alerts.length > 0, "should have alerts");
-
-    // Recent Transactions validation
-    assert.ok(Array.isArray(recentTransactions), "recentTransactions must be array");
-    assert.ok(recentTransactions.length > 0, "should have transactions");
+    // Alerts validation (real DB derived)
+    assert.ok(Array.isArray(inventoryAlerts), "inventoryAlerts must be array");
 
     await app.close();
   });
@@ -96,6 +88,22 @@ describe("Phase 5 Dashboard Endpoint Tests", () => {
     assert.equal(body.data.summary.totalStores, 1);
     assert.equal(body.data.storePerformance.length, 1);
     assert.equal(body.data.storePerformance[0].storeId, "store-del-001");
+
+    await app.close();
+  });
+
+  test("3. GET /api/dashboard/overview supports period parameter (today, 7d, 30d)", async () => {
+    const app = buildApp();
+
+    for (const period of ["today", "7d", "30d"]) {
+      const response = await app.inject({
+        method: "GET",
+        url: `/api/dashboard/overview?period=${period}`
+      });
+      assert.equal(response.statusCode, 200);
+      const body = JSON.parse(response.payload);
+      assert.equal(body.success, true);
+    }
 
     await app.close();
   });

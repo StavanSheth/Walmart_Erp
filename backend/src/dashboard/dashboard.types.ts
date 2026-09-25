@@ -35,25 +35,14 @@ export interface InventoryDistributionData {
   lowStockPercentage: number;
   outOfStock: number;
   outOfStockPercentage: number;
-  inTransit: number;
-  inTransitPercentage: number;
-}
-
-export interface OrderFulfillmentData {
-  fulfilled: number;
-  pending: number;
-  cancelled: number;
-  fulfillmentRate: number;
 }
 
 export interface StorePerformanceItem {
-  rank: number;
   storeId: string;
   storeName: string;
   sales: number;
   orders: number;
   averageOrderValue: number;
-  relativePercentage: number;
 }
 
 export interface RecentInventoryActivityItem {
@@ -81,28 +70,15 @@ export interface DashboardAlertItem {
   timestamp: string;
 }
 
-export interface RecentTransactionItem {
-  id: string;
-  orderNumber: string;
-  productName: string;
-  customerName: string;
-  storeName: string;
-  total: number;
-  status: string;
-  createdAt: string;
-}
-
 export interface DashboardOverviewData {
   summary: DesktopSummary;
   mobileSummary: MobileSummary;
   salesOverview: SalesOverviewData;
   inventoryDistribution: InventoryDistributionData;
-  orderFulfillment: OrderFulfillmentData;
   storePerformance: StorePerformanceItem[];
-  recentInventoryActivity: RecentInventoryActivityItem[];
+  inventoryAlerts: DashboardAlertItem[];
+  recentActivity: RecentInventoryActivityItem[];
   topCategories: TopCategoryItem[];
-  alerts: DashboardAlertItem[];
-  recentTransactions: RecentTransactionItem[];
 }
 
 export interface DashboardOverviewResponse {

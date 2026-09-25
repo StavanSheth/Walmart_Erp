@@ -18,24 +18,17 @@ import type { DashboardQueryParams } from "@/types/dashboard";
 
 export default function DashboardPage() {
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | undefined>(undefined);
-  const [selectedDateRange, setSelectedDateRange] = React.useState<string>("30d");
+  const [selectedPeriod, setSelectedPeriod] = React.useState<"today" | "7d" | "30d">("30d");
 
   const queryParams = React.useMemo<DashboardQueryParams>(() => {
-    const params: DashboardQueryParams = {};
+    const params: DashboardQueryParams = {
+      period: selectedPeriod
+    };
     if (selectedStoreId) {
       params.storeId = selectedStoreId;
     }
-    if (selectedDateRange === "30d") {
-      const d = new Date();
-      d.setDate(d.getDate() - 30);
-      params.from = d.toISOString();
-    } else if (selectedDateRange === "90d") {
-      const d = new Date();
-      d.setDate(d.getDate() - 90);
-      params.from = d.toISOString();
-    }
     return params;
-  }, [selectedStoreId, selectedDateRange]);
+  }, [selectedStoreId, selectedPeriod]);
 
   const { data, isLoading, isError, error, refetch, isFetching } =
     useDashboardOverview(queryParams);
@@ -43,12 +36,12 @@ export default function DashboardPage() {
   return (
     <PageContainer>
       <div className="space-y-5 pb-20 md:pb-6">
-        {/* 1. Dashboard Header / Hero with filters & greeting */}
+        {/* 1. Dashboard Header / Hero with store & period filters */}
         <DashboardHeader
           selectedStoreId={selectedStoreId}
           onStoreChange={setSelectedStoreId}
-          selectedDateRange={selectedDateRange}
-          onDateRangeChange={setSelectedDateRange}
+          selectedPeriod={selectedPeriod}
+          onPeriodChange={setSelectedPeriod}
           onRefresh={() => refetch()}
           isFetching={isFetching}
         />
@@ -75,7 +68,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* 3. Mobile Quick Actions Row (Inventory, Stores, Partners, Reports) */}
+        {/* 3. Mobile Quick Actions Row */}
         <div className="md:hidden">
           <DashboardQuickActions />
         </div>
@@ -110,7 +103,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 lg:gap-5 items-stretch">
             <div className="lg:col-span-4 h-full min-h-[290px] sm:min-h-[305px]">
               <RecentInventoryActivity
-                activities={data?.recentInventoryActivity}
+                activities={data?.recentActivity}
                 isLoading={isLoading}
               />
             </div>
@@ -122,7 +115,7 @@ export default function DashboardPage() {
             </div>
             <div className="lg:col-span-3 h-full min-h-[290px] sm:min-h-[305px]">
               <DashboardAlerts
-                alerts={data?.alerts}
+                alerts={data?.inventoryAlerts}
                 isLoading={isLoading}
               />
             </div>
@@ -133,7 +126,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ======================================================== */}
-        {/* MOBILE LAYOUT (md:hidden) — Same 6 Cards as Desktop */}
+        {/* MOBILE LAYOUT (md:hidden) */}
         {/* ======================================================== */}
         <div className="md:hidden space-y-4">
           {/* 1. Sales Overview Mobile Chart */}
@@ -156,7 +149,7 @@ export default function DashboardPage() {
 
           {/* 4. Recent Inventory Activity */}
           <RecentInventoryActivity
-            activities={data?.recentInventoryActivity}
+            activities={data?.recentActivity}
             isLoading={isLoading}
           />
 
@@ -168,7 +161,7 @@ export default function DashboardPage() {
 
           {/* 6. Alerts & Notifications */}
           <DashboardAlerts
-            alerts={data?.alerts}
+            alerts={data?.inventoryAlerts}
             isLoading={isLoading}
           />
 

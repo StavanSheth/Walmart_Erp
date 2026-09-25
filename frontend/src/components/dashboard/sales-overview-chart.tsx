@@ -16,7 +16,6 @@ import { formatCurrency, formatShortDate } from "@/lib/format";
 import type { SalesOverviewData } from "@/types/dashboard";
 
 export interface SalesOverviewChartProps {
-  data?: SalesOverviewData;
   salesOverview?: SalesOverviewData;
   isLoading?: boolean;
 }
@@ -56,11 +55,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   return null;
 }
 
-export function SalesOverviewChart({ data, salesOverview, isLoading = false }: SalesOverviewChartProps) {
-  const chartData = salesOverview || data;
-  const [selectedRange, setSelectedRange] = React.useState("30d");
-
-  if (isLoading || !chartData) {
+export function SalesOverviewChart({ salesOverview, isLoading = false }: SalesOverviewChartProps) {
+  if (isLoading || !salesOverview) {
     return (
       <div className="p-4 sm:p-5 rounded-2xl glass-card space-y-3 h-full overflow-hidden">
         <div className="flex justify-between items-center">
@@ -73,9 +69,9 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
     );
   }
 
-  // Combine sales and purchases into one chart series
-  const allPoints = chartData.sales.map((sPoint) => {
-    const pPoint = chartData.purchases.find((p) => p.date === sPoint.date);
+  // Combine sales and purchases returned for the selected period
+  const combinedPoints = salesOverview.sales.map((sPoint) => {
+    const pPoint = salesOverview.purchases.find((p) => p.date === sPoint.date);
     return {
       date: sPoint.date,
       sales: sPoint.amount,
@@ -83,37 +79,18 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
     };
   });
 
-  // Filter points based on selectedRange to prevent crowding
-  const combinedPoints =
-    selectedRange === "7d"
-      ? allPoints.slice(-7)
-      : selectedRange === "30d"
-        ? allPoints.slice(-30)
-        : allPoints;
-
   const hasData = combinedPoints.length > 0;
+  const isPositive = salesOverview.changePercent > 0;
+  const isNegative = salesOverview.changePercent < 0;
 
   return (
     <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex flex-col justify-between h-full shadow-md overflow-hidden">
-      {/* Header with Title & Selector */}
+      {/* Header with Title */}
       <div className="flex items-center justify-between pb-1 min-w-0">
         <div className="flex items-center min-w-0">
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">
             Sales Overview
           </h3>
-        </div>
-
-        <div className="relative inline-flex items-center shrink-0">
-          <select
-            value={selectedRange}
-            onChange={(e) => setSelectedRange(e.target.value)}
-            className="pl-3 pr-6 py-1 text-xs font-semibold rounded-full border border-slate-200/80 bg-white/80 text-slate-700 hover:border-slate-300 focus:outline-none appearance-none cursor-pointer shadow-xs"
-          >
-            <option value="30d">Last 30 Days</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="all">All Period</option>
-          </select>
-          <span className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</span>
         </div>
       </div>
 
@@ -121,10 +98,20 @@ export function SalesOverviewChart({ data, salesOverview, isLoading = false }: S
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 my-1.5 min-w-0">
         <div className="flex items-baseline gap-2.5 min-w-0">
           <span className="text-2xl sm:text-3xl font-black text-slate-900 tabular-nums tracking-tight truncate">
-            {formatCurrency(chartData.totalSales)}
+            {formatCurrency(salesOverview.totalSales)}
           </span>
           <div className="inline-flex items-center gap-1 text-xs shrink-0">
-            <span className="font-bold text-emerald-600">↑ {chartData.changePercent}%</span>
+            <span
+              className={`font-bold ${
+                isPositive
+                  ? "text-emerald-600"
+                  : isNegative
+                    ? "text-rose-600"
+                    : "text-slate-500"
+              }`}
+            >
+              {isPositive ? `↑ ${salesOverview.changePercent}%` : isNegative ? `↓ ${Math.abs(salesOverview.changePercent)}%` : "0%"}
+            </span>
             <span className="text-slate-500 font-medium hidden xs:inline">vs. previous period</span>
           </div>
         </div>

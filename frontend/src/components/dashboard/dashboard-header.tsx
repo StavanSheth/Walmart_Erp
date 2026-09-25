@@ -7,8 +7,8 @@ import { SearchIcon, StoreIcon, FilterIcon, RefreshCwIcon } from "@/components/u
 export interface DashboardHeaderProps {
   selectedStoreId?: string;
   onStoreChange: (storeId: string | undefined) => void;
-  selectedDateRange: string;
-  onDateRangeChange: (range: string) => void;
+  selectedPeriod: "today" | "7d" | "30d";
+  onPeriodChange: (period: "today" | "7d" | "30d") => void;
   onRefresh: () => void;
   isFetching?: boolean;
 }
@@ -16,8 +16,8 @@ export interface DashboardHeaderProps {
 export function DashboardHeader({
   selectedStoreId,
   onStoreChange,
-  selectedDateRange,
-  onDateRangeChange,
+  selectedPeriod,
+  onPeriodChange,
   onRefresh,
   isFetching = false
 }: DashboardHeaderProps) {
@@ -82,14 +82,14 @@ export function DashboardHeader({
                 <div className="relative inline-flex items-center h-8 shrink-0">
                   <FilterIcon className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none z-10 shrink-0" />
                   <select
-                    aria-label="Filter range"
-                    value={selectedDateRange}
-                    onChange={(e) => onDateRangeChange(e.target.value)}
+                    aria-label="Filter period"
+                    value={selectedPeriod}
+                    onChange={(e) => onPeriodChange(e.target.value as "today" | "7d" | "30d")}
                     className="h-8 pl-8 pr-7 text-xs font-semibold rounded-full border border-white/25 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none cursor-pointer shadow-xs transition leading-none whitespace-nowrap"
                   >
+                    <option value="today" className="text-slate-900 bg-white">Today</option>
+                    <option value="7d" className="text-slate-900 bg-white">Last 7 Days</option>
                     <option value="30d" className="text-slate-900 bg-white">Last 30 Days</option>
-                    <option value="90d" className="text-slate-900 bg-white">Last 90 Days</option>
-                    <option value="all" className="text-slate-900 bg-white">All Period</option>
                   </select>
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/80 text-[8px] flex items-center justify-center leading-none">
                     ▼

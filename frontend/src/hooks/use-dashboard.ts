@@ -6,7 +6,7 @@ import type { DashboardQueryParams, DashboardOverviewData } from "@/types/dashbo
 
 export function useDashboardOverview(params?: DashboardQueryParams) {
   return useQuery<DashboardOverviewData>({
-    queryKey: ["dashboard", "overview", params],
+    queryKey: ["dashboard", "overview", params?.storeId, params?.period],
     queryFn: async () => {
       const response = await apiClient.getDashboardOverview(params);
       return response.data;
