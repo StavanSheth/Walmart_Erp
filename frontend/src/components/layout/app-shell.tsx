@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 isDashboard
                   ? "h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]"
                   : isPartners
-                  ? "h-[520px] sm:h-[540px] lg:h-[430px] xl:h-[450px]"
+                  ? "h-[620px] sm:h-[580px] lg:h-[370px] xl:h-[385px]"
                   : "h-[480px] sm:h-[440px] lg:h-[355px] xl:h-[365px]"
               )}
             >
@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div
                 className={cn(
                   "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent",
-                  isDashboard || isPartners ? "h-28" : "h-20"
+                  isDashboard ? "h-28" : isPartners ? "h-20 sm:h-24" : "h-20"
                 )}
               />
             </div>

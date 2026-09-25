@@ -53,7 +53,7 @@ export function TopPartnersCard({
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-          Top Partners (By Sales)
+          Top Partners (By Purchase Value)
         </h3>
         <Link
           href="/partners?tab=performance"

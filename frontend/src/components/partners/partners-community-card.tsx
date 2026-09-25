@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { SparkIcon, ArrowRightIcon } from "@/components/ui/icons";
+import { SparkIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 
 export interface PartnersCommunityCardProps {
@@ -29,13 +28,9 @@ export function PartnersCommunityCard({ className }: PartnersCommunityCardProps)
           <p className="text-[11px] text-emerald-800/80 leading-tight mt-0.5 truncate">
             Reliable partners. Stronger communities.
           </p>
-          <Link
-            href="/reports"
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 mt-1.5 transition"
-          >
-            <span>Learn More</span>
-            <ArrowRightIcon className="w-3 h-3" />
-          </Link>
+          <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700/80 mt-1.5">
+            <span>Verified Network</span>
+          </div>
         </div>
       </div>
     </div>

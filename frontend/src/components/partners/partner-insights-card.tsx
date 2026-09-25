@@ -1,13 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import {
   ShoppingCartIcon,
   TruckIcon,
   UsersIcon,
-  CheckCircleIcon,
-  ArrowRightIcon
+  CheckCircleIcon
 } from "@/components/ui/icons";
 import { Skeleton } from "@/components/common/loading-state";
 import type { PartnerInsights } from "@/types/partners";
@@ -75,10 +73,10 @@ export function PartnerInsightsCard({
     {
       key: "satisfaction",
       icon: CheckCircleIcon,
-      bg: "bg-amber-50 text-amber-600",
-      value: `${insights.satisfactionScore}%`,
-      label: "Partner Satisfaction",
-      trend: insights.satisfactionTrend
+      bg: "bg-emerald-50 text-emerald-600",
+      value: `${insights.activityHealth ?? insights.satisfactionScore}%`,
+      label: "Partner Activity Health",
+      trend: insights.activityHealthTrend ?? insights.satisfactionTrend
     }
   ];
 
@@ -94,20 +92,18 @@ export function PartnerInsightsCard({
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
           Partner Insights
         </h3>
-        <Link
-          href="/reports"
-          className="text-xs font-semibold text-[#0071DC] hover:text-[#005bb5] flex items-center gap-1 transition"
-        >
-          <span>View Reports</span>
-          <ArrowRightIcon className="w-3 h-3" />
-        </Link>
+        <span className="text-xs font-medium text-slate-400">
+          Monthly View
+        </span>
       </div>
 
       {/* 4 Metric Rows */}
       <div className="space-y-3.5 my-auto py-2">
         {rows.map((row) => {
           const Icon = row.icon;
-          const hasPositiveTrend = row.trend !== null && row.trend >= 0;
+          const trend = row.trend;
+          const hasTrend = typeof trend === "number";
+          const hasPositiveTrend = hasTrend && trend >= 0;
 
           return (
             <div
@@ -135,7 +131,7 @@ export function PartnerInsightsCard({
 
               {/* Trend Pill */}
               <div className="shrink-0 text-right">
-                {row.trend !== null ? (
+                {hasTrend ? (
                   <span
                     className={cn(
                       "text-xs font-semibold inline-flex items-center gap-0.5",
@@ -143,7 +139,7 @@ export function PartnerInsightsCard({
                     )}
                   >
                     <span>{hasPositiveTrend ? "↑" : "↓"}</span>
-                    <span>{Math.abs(row.trend)}%</span>
+                    <span>{Math.abs(trend)}%</span>
                   </span>
                 ) : (
                   <span className="text-xs text-slate-400 font-medium">—</span>

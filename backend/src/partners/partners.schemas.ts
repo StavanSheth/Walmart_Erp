@@ -35,3 +35,35 @@ export const partnerIdParamSchema = z.object({
 });
 
 export type PartnerIdParam = z.infer<typeof partnerIdParamSchema>;
+
+export const partnerTypeEnum = z.enum(["SUPPLIER", "WHOLESALER", "DISTRIBUTOR", "VENDOR"]);
+export type PartnerTypeEnum = z.infer<typeof partnerTypeEnum>;
+
+export const createPartnerBodySchema = z.object({
+  name: z.string().trim().min(2, "Partner name must be at least 2 characters"),
+  type: partnerTypeEnum,
+  contactPerson: z.string().trim().optional().nullable(),
+  phone: z.string().trim().optional().nullable(),
+  email: z
+    .string()
+    .trim()
+    .email("Invalid email format")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
+  address: z.string().trim().optional().nullable(),
+  taxId: z.string().trim().optional().nullable(),
+  creditLimit: z.coerce.number().min(0, "Credit limit must be positive").default(0)
+});
+
+export type CreatePartnerBody = z.infer<typeof createPartnerBodySchema>;
+
+export const partnersExportQuerySchema = z.object({
+  tab: partnersTabSchema.optional().default("overview"),
+  search: z.string().trim().optional(),
+  type: z.string().trim().optional(),
+  regionId: z.string().trim().optional(),
+  status: partnerStatusFilterSchema.optional().default("ALL")
+});
+
+export type PartnersExportQueryParams = z.infer<typeof partnersExportQuerySchema>;

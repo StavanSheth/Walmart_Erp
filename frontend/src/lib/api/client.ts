@@ -236,6 +236,57 @@ export class ApiClient {
       `/partners/${encodeURIComponent(id)}`
     );
   }
+
+  /**
+   * Phase 7 Create Partner Persistence
+   */
+  public async createPartner(
+    payload: import("@/types/partners").CreatePartnerInput
+  ): Promise<{ success: boolean; data: unknown }> {
+    return this.request<{ success: boolean; data: unknown }>("/partners", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  }
+
+  /**
+   * Phase 7 CSV Export (full filtered dataset)
+   */
+  public async exportPartnersCsv(
+    params?: import("@/types/partners").PartnersQueryParams
+  ): Promise<string> {
+    const searchParams = new URLSearchParams();
+    if (params?.tab && params.tab !== "overview") {
+      searchParams.set("tab", params.tab);
+    }
+    if (params?.search && params.search.trim().length > 0) {
+      searchParams.set("search", params.search.trim());
+    }
+    if (params?.type && params.type !== "ALL" && params.type !== "All Types") {
+      searchParams.set("type", params.type);
+    }
+    if (params?.regionId && params.regionId !== "ALL" && params.regionId !== "all") {
+      searchParams.set("regionId", params.regionId);
+    }
+    if (params?.status && params.status !== "ALL") {
+      searchParams.set("status", params.status);
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/partners/export?${queryString}` : "/partners/export";
+
+    let formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    if (this.baseUrl.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
+      formattedEndpoint = formattedEndpoint.slice(4);
+    }
+    const url = `${this.baseUrl}${formattedEndpoint}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new ApiError(`Export failed with status ${response.status}`, response.status);
+    }
+    return response.text();
+  }
 }
 
 export const apiClient = new ApiClient();

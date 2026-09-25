@@ -131,7 +131,7 @@ export function PartnerList({
                   <th className="py-3 px-3">Email</th>
                   <th className="py-3 px-3">Status</th>
                   <th className="py-3 px-3">Last Order</th>
-                  <th className="py-3 px-3 text-right">Total Sales</th>
+                  <th className="py-3 px-3 text-right">Total Value</th>
                   <th className="py-3 px-4 text-center w-12">Actions</th>
                 </tr>
               </thead>

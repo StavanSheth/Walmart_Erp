@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowRightIcon } from "@/components/ui/icons";
 import { Skeleton } from "@/components/common/loading-state";
 import type { PartnerOnboardingMetric } from "@/types/partners";
 import { cn } from "@/lib/cn";
@@ -53,13 +51,9 @@ export function PartnerOnboardingCard({
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
           Partner Onboarding
         </h3>
-        <Link
-          href="/reports"
-          className="text-xs font-semibold text-[#0071DC] hover:text-[#005bb5] flex items-center gap-1 transition"
-        >
-          <span>View Details</span>
-          <ArrowRightIcon className="w-3 h-3" />
-        </Link>
+        <span className="text-xs font-medium text-slate-400">
+          Annual Scope
+        </span>
       </div>
 
       {/* Circular Progress & Metric Row */}
@@ -101,7 +95,7 @@ export function PartnerOnboardingCard({
             {onboarded.toLocaleString()} / {eligible.toLocaleString()}
           </div>
           <div className="text-xs text-slate-500 font-medium leading-tight mt-1">
-            Onboarded This Year
+            New Records This Year
           </div>
         </div>
       </div>

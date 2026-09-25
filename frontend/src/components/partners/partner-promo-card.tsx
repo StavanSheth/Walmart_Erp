@@ -15,8 +15,8 @@ export function PartnerPromoCard({ className, onAddPartner }: PartnerPromoCardPr
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/30 shadow-sm select-none p-4 sm:p-5 flex flex-col justify-between",
-        "bg-[#0A2540] text-white h-full min-h-[145px]",
+        "relative overflow-hidden rounded-2xl border border-white/25 shadow-lg select-none p-4 sm:p-5 flex flex-col justify-between transition-all duration-200",
+        "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md text-white h-full min-h-[145px]",
         className
       )}
     >
@@ -30,9 +30,9 @@ export function PartnerPromoCard({ className, onAddPartner }: PartnerPromoCardPr
           sizes="240px"
           className="object-cover object-top"
         />
-        {/* Smooth gradient fade to the navy background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A2540] via-[#0A2540]/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A2540]/80 via-transparent to-transparent" />
+        {/* Smooth gradient fade to the liquid glass background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#051A33]/90 via-[#051A33]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#051A33]/70 via-transparent to-transparent" />
       </div>
 
       {/* Content on Left */}

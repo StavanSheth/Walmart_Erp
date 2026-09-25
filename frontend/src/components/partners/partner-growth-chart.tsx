@@ -60,7 +60,7 @@ export function PartnerGrowthChart({
       <div className={cn("p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs h-full flex flex-col", className)}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-            Partner Growth
+            Partner Base Growth
           </h3>
         </div>
         <EmptyState
@@ -89,7 +89,7 @@ export function PartnerGrowthChart({
       {/* Header with Title and Period Dropdown */}
       <div className="flex items-center justify-between pb-2">
         <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-          Partner Growth
+          Partner Base Growth
         </h3>
 
         {/* Period Selector matching screenshot */}

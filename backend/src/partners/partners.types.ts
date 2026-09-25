@@ -43,11 +43,24 @@ export interface PartnerInsights {
   activeRetailers: number;
   activeSuppliers: number;
   newPartnersYtd: number;
-  satisfactionScore: number;
+  activityHealth: number;
+  satisfactionScore: number; // alias for backwards compatibility
   retailersTrend: number | null;
   suppliersTrend: number | null;
   newPartnersTrend: number | null;
-  satisfactionTrend: number | null;
+  activityHealthTrend: number | null;
+  satisfactionTrend: number | null; // alias for backwards compatibility
+}
+
+export interface CreatePartnerInput {
+  name: string;
+  type: "SUPPLIER" | "WHOLESALER" | "DISTRIBUTOR" | "VENDOR";
+  contactPerson?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  taxId?: string | null;
+  creditLimit?: number;
 }
 
 export interface PartnerListItem {

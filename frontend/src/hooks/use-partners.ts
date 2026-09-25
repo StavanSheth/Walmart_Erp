@@ -1,11 +1,12 @@
 "use client";
 
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import type {
   PartnersQueryParams,
   PartnersOverviewData,
-  PartnerDetailData
+  PartnerDetailData,
+  CreatePartnerInput
 } from "@/types/partners";
 
 export function usePartners(params?: PartnersQueryParams) {
@@ -43,5 +44,18 @@ export function usePartnerDetail(id: string | null) {
     enabled: Boolean(id),
     staleTime: 30 * 1000,
     retry: 1
+  });
+}
+
+export function useCreatePartner() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreatePartnerInput) => {
+      return await apiClient.createPartner(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["partners", "overview"] });
+    }
   });
 }

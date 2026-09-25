@@ -1,13 +1,14 @@
 export function calculateGrowthPercentage(current: number, previous: number): number | null {
   if (previous <= 0) {
-    if (current > 0) return 100;
+    // Per requirement 13 & 18: when previous period is 0, return null (displayed as "—")
+    // to avoid misleading +100% claims.
     return null;
   }
   const pct = Math.round(((current - previous) / previous) * 100);
   return pct;
 }
 
-export function calculateSatisfactionScore(
+export function calculateActivityHealth(
   activeCount: number,
   totalCount: number,
   activeWithOrdersCount: number
@@ -19,6 +20,9 @@ export function calculateSatisfactionScore(
   return Number(Math.max(50, Math.min(99.5, rawScore)).toFixed(1));
 }
 
+// Retain alias for backward compatibility
+export const calculateSatisfactionScore = calculateActivityHealth;
+
 export function calculateOnboardingPercentage(onboarded: number, eligible: number): number {
   if (eligible <= 0) return 0;
   const pct = Math.round((onboarded / eligible) * 100);
@@ -28,6 +32,7 @@ export function calculateOnboardingPercentage(onboarded: number, eligible: numbe
 export function formatPartnerType(rawType: string, entity: "partner" | "customer"): string {
   if (entity === "customer") {
     if (rawType === "BUSINESS") return "Retailer";
+    if (rawType === "RETAIL") return "Customer";
     return "Customer";
   }
   switch (rawType) {

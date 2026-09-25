@@ -21,6 +21,18 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Robust SVG defaults preventing FOUC or unbounded scaling */
+  svg {
+    max-width: 100%;
+    vertical-align: middle;
+  }
+
+  /* Default constraint for icons without explicit width/height */
+  svg:not([width]):not([height]):not(.w-full) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
   /* Accessible focus-visible behavior */
   :focus-visible {
     outline: 2px solid var(--color-brand-primary);

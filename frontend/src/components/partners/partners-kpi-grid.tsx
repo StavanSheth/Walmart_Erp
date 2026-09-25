@@ -15,10 +15,10 @@ export interface PartnersKPIGridProps {
   onAddPartner?: () => void;
 }
 
-// Mini SVG Sparkline Component
+// Mini SVG Sparkline Component matching Dashboard luminous styling
 function MiniSparkline({
   data,
-  color = "#0071DC",
+  color = "#38BDF8",
   width = 90,
   height = 36
 }: {
@@ -84,18 +84,18 @@ export function PartnersKPIGrid({
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="p-4 sm:p-5 rounded-2xl bg-white/70 backdrop-blur-md border border-white/60 shadow-sm space-y-3"
+            className="p-4 sm:p-5 rounded-2xl bg-[#051A33]/25 backdrop-blur-md border border-white/20 shadow-lg space-y-3"
           >
             <div className="flex items-center justify-between">
-              <Skeleton className="w-10 h-10 rounded-xl" />
-              <Skeleton className="w-16 h-7 rounded" />
+              <Skeleton className="w-10 h-10 rounded-xl bg-white/20" />
+              <Skeleton className="w-16 h-7 rounded bg-white/20" />
             </div>
-            <Skeleton className="w-20 h-4 rounded" />
-            <Skeleton className="w-28 h-7 rounded" />
-            <Skeleton className="w-32 h-3.5 rounded" />
+            <Skeleton className="w-20 h-4 rounded bg-white/20" />
+            <Skeleton className="w-28 h-7 rounded bg-white/20" />
+            <Skeleton className="w-32 h-3.5 rounded bg-white/20" />
           </div>
         ))}
-        <div className="col-span-2 sm:col-span-1 lg:col-span-1 xl:col-span-1 p-4 sm:p-5 rounded-2xl bg-[#0A2540] border border-white/20 shadow-sm space-y-3">
+        <div className="col-span-2 sm:col-span-1 lg:col-span-1 xl:col-span-1 p-4 sm:p-5 rounded-2xl bg-[#051A33]/30 backdrop-blur-md border border-white/20 shadow-lg space-y-3">
           <Skeleton className="h-6 w-32 bg-white/20 rounded" />
           <Skeleton className="h-4 w-24 bg-white/20 rounded" />
           <Skeleton className="h-8 w-28 bg-[#0071DC] rounded-lg mt-4" />
@@ -112,8 +112,8 @@ export function PartnersKPIGrid({
       trend: summary.trends.totalPartners.changePercent,
       sparkline: summary.trends.totalPartners.sparkline,
       filterType: "ALL",
-      color: "#0071DC",
-      bgIcon: "bg-blue-50 text-[#0071DC]",
+      color: "#38BDF8",
+      bgIcon: "bg-blue-500/25 border border-blue-400/35 text-blue-200",
       icon: UsersIcon
     },
     {
@@ -123,8 +123,8 @@ export function PartnersKPIGrid({
       trend: summary.trends.retailers.changePercent,
       sparkline: summary.trends.retailers.sparkline,
       filterType: "RETAILER",
-      color: "#10B981",
-      bgIcon: "bg-emerald-50 text-emerald-600",
+      color: "#34D399",
+      bgIcon: "bg-emerald-500/25 border border-emerald-400/35 text-emerald-200",
       icon: ShoppingCartIcon
     },
     {
@@ -134,8 +134,8 @@ export function PartnersKPIGrid({
       trend: summary.trends.suppliers.changePercent,
       sparkline: summary.trends.suppliers.sparkline,
       filterType: "SUPPLIER",
-      color: "#8B5CF6",
-      bgIcon: "bg-purple-50 text-purple-600",
+      color: "#A78BFA",
+      bgIcon: "bg-purple-500/25 border border-purple-400/35 text-purple-200",
       icon: TruckIcon
     },
     {
@@ -145,8 +145,8 @@ export function PartnersKPIGrid({
       trend: summary.trends.endCustomers.changePercent,
       sparkline: summary.trends.endCustomers.sparkline,
       filterType: "CUSTOMER",
-      color: "#F59E0B",
-      bgIcon: "bg-amber-50 text-amber-600",
+      color: "#FBBF24",
+      bgIcon: "bg-amber-500/25 border border-amber-400/35 text-amber-200",
       icon: UsersIcon
     }
   ];
@@ -164,14 +164,15 @@ export function PartnersKPIGrid({
             onClick={() => onCardClick?.(card.filterType)}
             className={cn(
               "relative overflow-hidden rounded-2xl p-4 sm:p-5 transition-all duration-200 select-none flex flex-col justify-between",
-              "bg-white/80 hover:bg-white/95 backdrop-blur-md border border-white/70 shadow-sm hover:shadow-md cursor-pointer group"
+              "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md border border-white/25 text-white shadow-lg hover:shadow-xl cursor-pointer group",
+              "hover:scale-[1.01] active:scale-[0.99]"
             )}
           >
             {/* Top row: Icon on left */}
             <div className="flex items-center justify-between">
               <div
                 className={cn(
-                  "flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition group-hover:scale-105",
+                  "flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition group-hover:scale-105 shadow-xs",
                   card.bgIcon
                 )}
               >
@@ -181,10 +182,10 @@ export function PartnersKPIGrid({
 
             {/* Middle: Label & Metric Value */}
             <div className="mt-3">
-              <span className="text-xs sm:text-sm font-medium text-slate-500">
+              <span className="text-xs sm:text-sm font-medium text-white/80">
                 {card.label}
               </span>
-              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-0.5">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-0.5 drop-shadow-xs">
                 {card.value.toLocaleString()}
               </div>
             </div>
@@ -196,20 +197,20 @@ export function PartnersKPIGrid({
                   <span
                     className={cn(
                       "font-semibold flex items-center gap-0.5",
-                      hasPositiveTrend ? "text-emerald-600" : "text-rose-600"
+                      hasPositiveTrend ? "text-emerald-300" : "text-rose-300"
                     )}
                   >
                     <span>{hasPositiveTrend ? "↑" : "↓"}</span>
                     <span>{Math.abs(trendVal)}%</span>
                   </span>
                 ) : (
-                  <span className="text-slate-400 font-medium">—</span>
+                  <span className="text-white/50 font-medium">—</span>
                 )}
-                <span className="text-slate-400 font-normal">vs. last month</span>
+                <span className="text-white/60 font-normal">vs prev 30d</span>
               </div>
 
               {/* Sparkline */}
-              <div className="shrink-0 group-hover:scale-105 transition-transform duration-200">
+              <div className="shrink-0 group-hover:scale-105 transition-transform duration-200 drop-shadow-xs">
                 <MiniSparkline data={card.sparkline} color={card.color} />
               </div>
             </div>
@@ -217,7 +218,7 @@ export function PartnersKPIGrid({
         );
       })}
 
-      {/* 5th Card: Promo Card matching reference image desktop top row */}
+      {/* 5th Card: Promo Card matching liquid glass opacity and styling */}
       <div className="col-span-2 sm:col-span-1 lg:col-span-1 xl:col-span-1">
         <PartnerPromoCard onAddPartner={onAddPartner} />
       </div>
