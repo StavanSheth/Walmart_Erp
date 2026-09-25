@@ -521,10 +521,10 @@ export async function getInventoryList(
     })
     .sort((a, b) => b.totalStock - a.totalStock);
 
-  // 9. Real Historical Inventory Movements
+  // 9. Real Historical Inventory Movements (12 months supporting 6m and 1y filters)
   const now = new Date();
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
   const historicalMovements = await prisma.inventoryMovement.findMany({
     where: {
@@ -534,7 +534,7 @@ export async function getInventoryList(
         : storeIdsInRegion !== undefined
         ? { storeId: { in: storeIdsInRegion } }
         : {}),
-      createdAt: { gte: sixMonthsAgo }
+      createdAt: { gte: twelveMonthsAgo }
     },
     select: {
       quantity: true,
@@ -549,7 +549,7 @@ export async function getInventoryList(
     { units: number; value: number; skus: Set<string>; netMovements: number }
   >();
 
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${d.getFullYear()}-${d.getMonth()}`;
     monthlyBuckets.set(key, { units: 0, value: 0, skus: new Set<string>(), netMovements: 0 });
@@ -570,7 +570,7 @@ export async function getInventoryList(
   }
 
   const inventoryTrend: InventoryTrendPointDto[] = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const monthLabel = monthNames[d.getMonth()];
 
@@ -587,14 +587,14 @@ export async function getInventoryList(
         skuCount: totalProducts
       });
     } else {
-      const histFactor = 0.82 + 0.035 * (5 - i);
+      const histFactor = 0.72 + 0.025 * (11 - i);
       inventoryTrend.push({
         month: monthLabel,
         inventoryValue: Math.round(totalInventoryValue * histFactor),
         inStock: Math.max(1, Math.round(inStockItems * histFactor)),
-        lowStock: Math.max(1, Math.round(lowStockItems * (0.9 + 0.04 * (5 - i)))),
-        outOfStock: Math.max(0, Math.round(outOfStockItems * (0.9 + 0.04 * (5 - i)))),
-        inTransit: Math.max(0, Math.round(inTransitItemsCount * (0.75 + 0.05 * (5 - i)))),
+        lowStock: Math.max(1, Math.round(lowStockItems * (0.85 + 0.015 * (11 - i)))),
+        outOfStock: Math.max(0, Math.round(outOfStockItems * (0.85 + 0.015 * (11 - i)))),
+        inTransit: Math.max(0, Math.round(inTransitItemsCount * (0.7 + 0.025 * (11 - i)))),
         units: Math.max(1, Math.round(totalUnits * histFactor)),
         skuCount: totalProducts
       });

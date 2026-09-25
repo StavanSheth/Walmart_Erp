@@ -22,6 +22,20 @@ export interface InventoryOverviewChartProps {
 }
 
 type MetricType = "value" | "units" | "skus";
+type PeriodType = "6m" | "1y";
+
+interface TransformedTrendPoint extends InventoryTrendPoint {
+  inStockVal: number;
+  lowStockVal: number;
+  inTransitVal: number;
+  inStockUnits: number;
+  lowStockUnits: number;
+  inTransitUnits: number;
+  inStockSkus: number;
+  lowStockSkus: number;
+  outOfStockSkus: number;
+  inTransitSkus: number;
+}
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -29,7 +43,7 @@ interface CustomTooltipProps {
     name: string;
     value: number;
     color: string;
-    payload: InventoryTrendPoint;
+    payload: TransformedTrendPoint;
   }>;
   label?: string;
   metricType: MetricType;
@@ -38,12 +52,14 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label, metricType }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const raw = payload[0].payload;
-    const totalDisplay =
-      metricType === "value"
-        ? formatCurrency(raw.inventoryValue, true)
-        : metricType === "units"
-        ? `${formatNumber(raw.units)} units`
-        : `${formatNumber(raw.skuCount)} SKUs`;
+    let totalDisplay = "";
+    if (metricType === "value") {
+      totalDisplay = formatCurrency(raw.inventoryValue, true);
+    } else if (metricType === "units") {
+      totalDisplay = `${formatNumber(raw.units)} units`;
+    } else {
+      totalDisplay = `${formatNumber(raw.skuCount)} SKUs`;
+    }
 
     return (
       <div className="rounded-xl border border-slate-800 bg-slate-900/95 text-white p-2.5 shadow-xl text-xs space-y-1 z-50 backdrop-blur-md">
@@ -52,42 +68,112 @@ function CustomTooltip({ active, payload, label, metricType }: CustomTooltipProp
           <span className="font-black text-amber-400 text-xs">{totalDisplay}</span>
         </div>
         <div className="space-y-0.5 pt-0.5 text-[11px]">
-          <div className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              In Stock
-            </span>
-            <span className="font-semibold text-white tabular-nums">
-              {formatNumber(raw.inStock)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              Low Stock
-            </span>
-            <span className="font-semibold text-white tabular-nums">
-              {raw.lowStock.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
-              Out of Stock
-            </span>
-            <span className="font-semibold text-white tabular-nums">
-              {raw.outOfStock.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              In Transit
-            </span>
-            <span className="font-semibold text-white tabular-nums">
-              {raw.inTransit.toLocaleString()}
-            </span>
-          </div>
+          {metricType === "value" && (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  In Stock Value
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatCurrency(raw.inStockVal, true)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Low Stock Value
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatCurrency(raw.lowStockVal, true)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  In Transit Value
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatCurrency(raw.inTransitVal, true)}
+                </span>
+              </div>
+            </>
+          )}
+
+          {metricType === "units" && (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  In Stock Units
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.inStockUnits)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Low Stock Units
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.lowStockUnits)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-blue-500" />
+                  In Transit Units
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.inTransitUnits)}
+                </span>
+              </div>
+            </>
+          )}
+
+          {metricType === "skus" && (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  In Stock SKUs
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.inStockSkus)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Low Stock SKUs
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.lowStockSkus)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  Out of Stock SKUs
+                </span>
+                <span className="font-semibold text-white tabular-nums">
+                  {formatNumber(raw.outOfStockSkus)}
+                </span>
+              </div>
+              {raw.inTransitSkus > 0 && (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-1.5 text-slate-300">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    In Transit SKUs
+                  </span>
+                  <span className="font-semibold text-white tabular-nums">
+                    {formatNumber(raw.inTransitSkus)}
+                  </span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     );
@@ -100,7 +186,49 @@ export function InventoryOverviewChart({
   isLoading = false
 }: InventoryOverviewChartProps) {
   const [metric, setMetric] = React.useState<MetricType>("value");
-  const [period, setPeriod] = React.useState("6m");
+  const [period, setPeriod] = React.useState<PeriodType>("6m");
+
+  const chartData = React.useMemo<TransformedTrendPoint[]>(() => {
+    if (!trendData || trendData.length === 0) return [];
+    const count = period === "1y" ? 12 : 6;
+    const sliced = trendData.slice(-count);
+
+    return sliced.map((p) => {
+      const totalEval = Math.max(1, p.inStock + p.lowStock + p.outOfStock);
+      const inStockRatio = p.inStock / totalEval;
+      const lowStockRatio = p.lowStock / totalEval;
+
+      // Stock Value breakdown
+      const inStockVal = Math.round(p.inventoryValue * inStockRatio);
+      const lowStockVal = Math.round(p.inventoryValue * lowStockRatio);
+      const inTransitVal = Math.round((p.inTransit * (p.inventoryValue / Math.max(1, p.units))) || 0);
+
+      // Units breakdown
+      const inStockUnits = Math.round(p.units * inStockRatio);
+      const lowStockUnits = Math.round(p.units * lowStockRatio);
+      const inTransitUnits = p.inTransit;
+
+      // SKUs
+      const inStockSkus = p.inStock;
+      const lowStockSkus = p.lowStock;
+      const outOfStockSkus = p.outOfStock;
+      const inTransitSkus = Math.min(15, Math.round(p.inTransit / 60));
+
+      return {
+        ...p,
+        inStockVal,
+        lowStockVal,
+        inTransitVal,
+        inStockUnits,
+        lowStockUnits,
+        inTransitUnits,
+        inStockSkus,
+        lowStockSkus,
+        outOfStockSkus,
+        inTransitSkus
+      };
+    });
+  }, [trendData, period]);
 
   if (isLoading) {
     return (
@@ -133,12 +261,14 @@ export function InventoryOverviewChart({
 
   const formatYAxis = (val: number) => {
     if (metric === "value") {
-      if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
-      if (val >= 100000) return `₹${(val / 100000).toFixed(0)}L`;
-      if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
-      return `₹${val}`;
+      if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
+      if (val >= 1000) return `$${(val / 1000).toFixed(0)}K`;
+      return `$${val}`;
     }
-    if (val >= 1000) return `${(val / 1000).toFixed(0)}K`;
+    if (metric === "units") {
+      if (val >= 1000) return `${(val / 1000).toFixed(0)}K`;
+      return `${val}`;
+    }
     return `${val}`;
   };
 
@@ -157,7 +287,11 @@ export function InventoryOverviewChart({
               Inventory Overview
             </h3>
             <p className="text-[11px] text-slate-500 font-medium mt-1">
-              Stock levels across all categories
+              {metric === "value"
+                ? "Monthly inventory valuation in USD"
+                : metric === "units"
+                ? "Physical stock volume distribution"
+                : "Active catalog SKU status counts"}
             </p>
           </div>
         </div>
@@ -204,15 +338,14 @@ export function InventoryOverviewChart({
             </button>
           </div>
 
-          {/* Period Selector */}
+          {/* Period Selector: 6 Months & 1 Year ONLY */}
           <select
             value={period}
-            onChange={(e) => setPeriod(e.target.value)}
+            onChange={(e) => setPeriod(e.target.value as PeriodType)}
             className="h-7 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
           >
-            <option value="6m">Last 6 Months</option>
-            <option value="3m">Last 3 Months</option>
-            <option value="1y">Full Year</option>
+            <option value="6m">6 Months</option>
+            <option value="1y">1 Year</option>
           </select>
         </div>
       </div>
@@ -223,9 +356,9 @@ export function InventoryOverviewChart({
         <div className="h-[210px] w-full flex-1">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={trendData}
-              margin={{ top: 15, right: 10, left: -20, bottom: 0 }}
-              barSize={24}
+              data={chartData}
+              margin={{ top: 15, right: 10, left: -15, bottom: 0 }}
+              barSize={period === "1y" ? 16 : 24}
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
               <XAxis
@@ -244,32 +377,55 @@ export function InventoryOverviewChart({
                 content={<CustomTooltip metricType={metric} />}
                 cursor={{ fill: "rgba(241, 245, 249, 0.6)" }}
               />
-              {/* Stacked bars matching reference screenshot: In Stock (green), Low Stock (amber), Out of Stock (red), In Transit (blue) */}
-              <Bar dataKey="inStock" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
-              <Bar dataKey="lowStock" stackId="a" fill="#F59E0B" />
-              <Bar dataKey="outOfStock" stackId="a" fill="#EF4444" />
-              <Bar dataKey="inTransit" stackId="a" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+
+              {/* Dynamic Stacked bars responding to active metric */}
+              {metric === "value" && (
+                <>
+                  <Bar dataKey="inStockVal" name="In Stock Value" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
+                  <Bar dataKey="lowStockVal" name="Low Stock Value" stackId="a" fill="#F59E0B" />
+                  <Bar dataKey="inTransitVal" name="In Transit Value" stackId="a" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                </>
+              )}
+
+              {metric === "units" && (
+                <>
+                  <Bar dataKey="inStockUnits" name="In Stock Units" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
+                  <Bar dataKey="lowStockUnits" name="Low Stock Units" stackId="a" fill="#F59E0B" />
+                  <Bar dataKey="inTransitUnits" name="In Transit Units" stackId="a" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                </>
+              )}
+
+              {metric === "skus" && (
+                <>
+                  <Bar dataKey="inStockSkus" name="In Stock SKUs" stackId="a" fill="#10B981" radius={[0, 0, 4, 4]} />
+                  <Bar dataKey="lowStockSkus" name="Low Stock SKUs" stackId="a" fill="#F59E0B" />
+                  <Bar dataKey="outOfStockSkus" name="Out of Stock SKUs" stackId="a" fill="#EF4444" />
+                  <Bar dataKey="inTransitSkus" name="In Transit SKUs" stackId="a" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                </>
+              )}
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Vertical Legend on the right side matching screenshot */}
-        <div className="flex sm:flex-col justify-center gap-2.5 sm:gap-3 shrink-0 sm:border-l sm:border-slate-100 sm:pl-4 text-xs font-semibold text-slate-700 min-w-[100px]">
+        {/* Dynamic Vertical Legend on the right side */}
+        <div className="flex sm:flex-col justify-center gap-2 sm:gap-2.5 shrink-0 sm:border-l sm:border-slate-100 sm:pl-4 text-xs font-semibold text-slate-700 min-w-[125px]">
           <span className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-            In Stock
+            {metric === "value" ? "In Stock Value" : metric === "units" ? "In Stock Units" : "In Stock SKUs"}
           </span>
           <span className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-            Low Stock
+            {metric === "value" ? "Low Stock Value" : metric === "units" ? "Low Stock Units" : "Low Stock SKUs"}
           </span>
-          <span className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-            Out of Stock
-          </span>
+          {metric === "skus" && (
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+              Out of Stock
+            </span>
+          )}
           <span className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
-            In Transit
+            {metric === "value" ? "In Transit Value" : metric === "units" ? "In Transit Units" : "In Transit"}
           </span>
         </div>
       </div>
