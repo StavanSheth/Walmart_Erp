@@ -138,21 +138,23 @@ export function PartnerFilters({
         <div className="relative inline-flex items-center">
           <select
             aria-label="Filter by status"
-            value={status || "ALL"}
+            value={status ? status.toUpperCase() : "ALL"}
             onChange={(e) => onStatusChange(e.target.value)}
             className="h-10 pl-3 pr-7 text-xs font-semibold rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0071DC]/30 focus:border-[#0071DC] appearance-none cursor-pointer transition shadow-xs"
           >
             <option value="ALL">All Status</option>
             {statuses.length > 0
-              ? statuses.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))
+              ? statuses
+                  .filter((s) => s.toUpperCase() !== "ALL STATUS" && s.toUpperCase() !== "ALL")
+                  .map((s) => (
+                    <option key={s} value={s.toUpperCase()}>
+                      {s.toUpperCase() === "ACTIVE" ? "Active" : s.toUpperCase() === "INACTIVE" ? "Inactive" : s}
+                    </option>
+                  ))
               : (
                   <>
-                    <option value="ACTIVE">ACTIVE</option>
-                    <option value="INACTIVE">INACTIVE</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
                   </>
                 )}
           </select>

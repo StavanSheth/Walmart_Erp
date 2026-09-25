@@ -6,7 +6,17 @@ export const partnersTabSchema = z
 
 export type PartnersTab = z.infer<typeof partnersTabSchema>;
 
-export const partnerStatusFilterSchema = z.enum(["ALL", "ACTIVE", "INACTIVE"]).default("ALL");
+export const partnerStatusFilterSchema = z
+  .preprocess((val) => {
+    if (typeof val === "string") {
+      const upper = val.trim().toUpperCase();
+      if (!upper || upper === "ALL" || upper === "ALL STATUS") return "ALL";
+      if (upper === "ACTIVE") return "ACTIVE";
+      if (upper === "INACTIVE") return "INACTIVE";
+    }
+    return val;
+  }, z.enum(["ALL", "ACTIVE", "INACTIVE"]))
+  .default("ALL");
 export type PartnerStatusFilter = z.infer<typeof partnerStatusFilterSchema>;
 
 export const partnersPeriodSchema = z.enum(["6m", "12m"]).default("6m");

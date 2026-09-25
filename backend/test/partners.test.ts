@@ -93,16 +93,29 @@ describe("Phase 7 Partners & Customers - Complete 25 Required Verification Tests
   });
 
   // 9. Status filtering
-  it("9. Status filtering returns only matching status", async () => {
+  it("9. Status filtering returns only matching status with case-insensitivity", async () => {
     const res = await app.inject({
       method: "GET",
       url: "/api/partners/overview?status=INACTIVE"
     });
+    assert.equal(res.statusCode, 200);
     const { list } = JSON.parse(res.payload).data;
     assert.ok(list.items.length > 0);
     list.items.forEach((item: { status: string }) => {
       assert.equal(item.status, "INACTIVE");
     });
+
+    const resTitle = await app.inject({
+      method: "GET",
+      url: "/api/partners/overview?status=Inactive"
+    });
+    assert.equal(resTitle.statusCode, 200);
+
+    const resActive = await app.inject({
+      method: "GET",
+      url: "/api/partners/overview?status=Active"
+    });
+    assert.equal(resActive.statusCode, 200);
   });
 
   // 10. Tab filtering
