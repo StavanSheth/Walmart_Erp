@@ -73,7 +73,6 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         <div className="hidden md:block w-72 lg:w-96">
           <GlobalSearchTrigger
             isDashboard={isDashboard}
-            isScrolled={isScrolled}
             className="w-full"
           />
         </div>
@@ -96,9 +95,7 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           className={cn(
             "flex md:hidden items-center justify-center w-9 h-9 rounded-full transition-colors shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
             isDashboard
-              ? isScrolled
-                ? "bg-white/35 border border-white/45 text-white hover:bg-white/45 backdrop-blur-md shadow-sm"
-                : "bg-white/15 border border-white/20 text-white hover:bg-white/25 backdrop-blur-md"
+              ? "bg-white/15 border border-white/20 text-white hover:bg-white/25 backdrop-blur-md"
               : "border border-border bg-surface text-slate-600 hover:bg-surface-subtle"
           )}
         >
@@ -107,19 +104,12 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
 
         {/* Store Selector (Desktop & Tablet) */}
         <div className="hidden sm:block">
-          <StoreSelector isDashboard={isDashboard} isScrolled={isScrolled} />
+          <StoreSelector isDashboard={isDashboard} />
         </div>
 
         {/* Weather Widget (Desktop) */}
         {isDashboard && (
-          <div
-            className={cn(
-              "hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-white text-xs backdrop-blur-md transition-all duration-200",
-              isScrolled
-                ? "bg-white/35 border border-white/45 shadow-sm"
-                : "bg-white/15 border border-white/20"
-            )}
-          >
+          <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-white text-xs backdrop-blur-md bg-white/15 border border-white/20">
             <span className="text-base">☀️</span>
             <div className="leading-tight">
               <span className="font-bold">26°C</span>
@@ -130,10 +120,10 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         )}
 
         {/* Notifications Dropdown */}
-        <NotificationMenu isDashboard={isDashboard} isScrolled={isScrolled} />
+        <NotificationMenu isDashboard={isDashboard} />
 
         {/* User / Avatar Dropdown */}
-        <UserMenu isDashboard={isDashboard} isScrolled={isScrolled} />
+        <UserMenu isDashboard={isDashboard} />
       </div>
     </header>
   );

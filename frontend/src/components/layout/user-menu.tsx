@@ -8,12 +8,10 @@ import { cn } from "@/lib/cn";
 
 export function UserMenu({
   className,
-  isDashboard = false,
-  isScrolled = false
+  isDashboard = false
 }: {
   className?: string;
   isDashboard?: boolean;
-  isScrolled?: boolean;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -27,12 +25,8 @@ export function UserMenu({
         trigger={
           <div
             className={cn(
-              "flex items-center gap-2 p-1 rounded-full transition-all duration-200 cursor-pointer",
-              isDashboard
-                ? isScrolled
-                  ? "bg-white/20 border border-white/30 px-2 shadow-sm hover:bg-white/30"
-                  : "hover:bg-white/10"
-                : "hover:bg-surface-muted rounded-md"
+              "flex items-center gap-2 p-1 rounded-full transition-colors cursor-pointer",
+              isDashboard ? "hover:bg-white/10" : "hover:bg-surface-muted rounded-md"
             )}
           >
             <Avatar name="Stavan Sheth" size="sm" />
