@@ -17,9 +17,13 @@ export function InventoryDistributionCard({
 }: InventoryDistributionCardProps) {
   if (isLoading || !data) {
     return (
-      <div className="p-4 sm:p-5 rounded-2xl glass-card space-y-4 h-full overflow-hidden">
-        <Skeleton className="h-5 w-40 rounded" />
-        <Skeleton className="h-[180px] w-[180px] mx-auto rounded-full" />
+      <div className="p-3.5 sm:p-4 rounded-2xl glass-card flex items-center justify-between gap-3 h-full overflow-hidden">
+        <Skeleton className="h-[130px] w-[130px] sm:h-[175px] sm:w-[175px] rounded-full shrink-0" />
+        <div className="space-y-2 flex-1 max-w-[135px]">
+          <Skeleton className="h-3.5 w-full rounded" />
+          <Skeleton className="h-3.5 w-4/5 rounded" />
+          <Skeleton className="h-3.5 w-3/4 rounded" />
+        </div>
       </div>
     );
   }
@@ -39,17 +43,17 @@ export function InventoryDistributionCard({
         <span className="text-xs text-slate-400 font-medium shrink-0">Status</span>
       </div>
 
-      <div className="flex items-center justify-center gap-3 sm:gap-5 lg:gap-6 my-auto py-1 min-w-0 w-full">
-        {/* Donut Chart with Centered Total Units - Seamless joint ring, sized to balance with legend */}
-        <div className="relative w-[165px] h-[165px] sm:w-[175px] sm:h-[175px] lg:w-[170px] lg:h-[170px] xl:w-[185px] xl:h-[185px] shrink-0">
+      <div className="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 lg:gap-6 my-auto py-1 min-w-0 w-full">
+        {/* Left Side: Donut Chart with Centered Total Units */}
+        <div className="relative w-[135px] h-[135px] sm:w-[165px] sm:h-[165px] lg:w-[170px] lg:h-[170px] xl:w-[185px] xl:h-[185px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={58}
-                outerRadius={84}
+                innerRadius="64%"
+                outerRadius="92%"
                 paddingAngle={0}
                 dataKey="value"
                 strokeWidth={0}
@@ -65,43 +69,43 @@ export function InventoryDistributionCard({
 
           {/* Donut Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
+            <span className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
               {formatNumber(data.totalUnits)}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
               Total Units
             </span>
           </div>
         </div>
 
-        {/* Legend & Breakdown - Clean tabular alignment preventing overflow */}
-        <div className="space-y-2 sm:space-y-2.5 w-auto min-w-[125px] sm:min-w-[135px] text-xs sm:text-sm font-semibold shrink-0">
-          <div className="flex items-center justify-between gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-2xs" />
+        {/* Right Side: Content / Legend Breakdown with guaranteed tabular alignment */}
+        <div className="space-y-1.5 sm:space-y-2.5 w-auto min-w-[115px] sm:min-w-[135px] text-[11px] sm:text-xs lg:text-sm font-semibold shrink-0">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-2xs" />
               <span className="text-slate-700 whitespace-nowrap">In Stock</span>
             </div>
-            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
               {data.inStockPercentage}%
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-2xs" />
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500 shrink-0 shadow-2xs" />
               <span className="text-slate-700 whitespace-nowrap">Low Stock</span>
             </div>
-            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
               {data.lowStockPercentage}%
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-2xs" />
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500 shrink-0 shadow-2xs" />
               <span className="text-slate-700 whitespace-nowrap">Out of Stock</span>
             </div>
-            <span className="w-9 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
+            <span className="w-8 sm:w-10 text-right text-slate-900 tabular-nums font-bold shrink-0">
               {data.outOfStockPercentage}%
             </span>
           </div>
