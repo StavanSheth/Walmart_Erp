@@ -18,6 +18,93 @@ const CATEGORY_COLORS = [
   { bg: "bg-rose-100", text: "text-rose-600", bar: "bg-rose-500" },
 ];
 
+function getCategoryIcon(name: string) {
+  const n = name.toLowerCase();
+
+  // 1. Groceries / Food / Snacks / Pantry / Produce
+  if (n.includes("grocer") || n.includes("food") || n.includes("snack") || n.includes("pantry")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+    );
+  }
+
+  // 2. Dairy / Milk / Cheese / Butter / Yogurt
+  if (n.includes("dairy") || n.includes("milk") || n.includes("cheese") || n.includes("butter")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 2h8m-6 3h4m-5 4v11a2 2 0 002 2h4a2 2 0 002-2V9l-1-4H10L9 9zm2 4h2" />
+      </svg>
+    );
+  }
+
+  // 3. Home Appliances / Appliances / Kitchen / Home
+  if (n.includes("appliance") || n.includes("home") || n.includes("kitchen")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <rect x="4" y="2" width="16" height="20" rx="2" strokeWidth={2} />
+        <line x1="4" y1="10" x2="20" y2="10" strokeWidth={2} strokeLinecap="round" />
+        <line x1="8" y1="6" x2="8" y2="7" strokeWidth={2} strokeLinecap="round" />
+        <line x1="8" y1="14" x2="8" y2="16" strokeWidth={2} strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  // 4. Personal Care / Beauty / Cosmetics / Hygiene
+  if (n.includes("personal") || n.includes("care") || n.includes("beauty") || n.includes("hygiene")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 4h-4V2h4v2zm-2 0v4m-4 3h8a2 2 0 012 2v7a2 2 0 01-2 2H8a2 2 0 01-2-2v-7a2 2 0 012-2zm4 4v3" />
+      </svg>
+    );
+  }
+
+  // 5. Audio / Music / Headphones / Speakers / Sound
+  if (n.includes("audio") || n.includes("sound") || n.includes("music") || n.includes("headphone") || n.includes("speaker")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 18v-6a9 9 0 0118 0v6M3 18a3 3 0 003 3h1a1 1 0 001-1v-4a1 1 0 00-1-1H4a1 1 0 00-1 1v1zm18 0a3 3 0 01-3 3h-1a1 1 0 01-1-1v-4a1 1 0 011-1h3a1 1 0 011 1v1z" />
+      </svg>
+    );
+  }
+
+  // 6. Electronics / Mobile / Computing / Tech
+  if (n.includes("electron") || n.includes("tech") || n.includes("comput") || n.includes("mobile")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <rect x="2" y="3" width="20" height="14" rx="2" strokeWidth={2} />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21h8m-4-4v4" />
+      </svg>
+    );
+  }
+
+  // 7. Clothing / Apparel / Fashion
+  if (n.includes("cloth") || n.includes("apparel") || n.includes("fashion") || n.includes("wear")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 4l4 4-2 3-3-2v11H9V9L6 11 4 8l4-4h2a2 2 0 004 0h2z" />
+      </svg>
+    );
+  }
+
+  // 8. Beverages / Drinks
+  if (n.includes("beverag") || n.includes("drink") || n.includes("juice") || n.includes("water")) {
+    return (
+      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v20m-7-9h14M7 5l1 8h8l1-8H7z" />
+      </svg>
+    );
+  }
+
+  // Fallback: Package Box
+  return (
+    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+  );
+}
+
 export function TopCategoriesCard({ categories = [], isLoading = false }: TopCategoriesCardProps) {
   const topList = categories.slice(0, 5);
 
@@ -64,9 +151,7 @@ export function TopCategoriesCard({ categories = [], isLoading = false }: TopCat
               <div key={cat.categoryId || idx} className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                 {/* Category Icon */}
                 <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg ${style.bg} ${style.text} flex items-center justify-center shrink-0`}>
-                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
+                  {getCategoryIcon(cat.categoryName)}
                 </div>
 
                 {/* Category Name */}
