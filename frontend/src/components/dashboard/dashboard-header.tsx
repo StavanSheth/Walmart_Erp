@@ -129,15 +129,6 @@ export function DashboardHeader({
           </div>
         </div>
 
-        {/* Right Slogan (matching desktop and mobile screenshots) */}
-        <div className="hidden sm:block text-right text-white max-w-xs self-end">
-          <p className="text-xs font-bold text-white/90 leading-tight">
-            People. Products.
-          </p>
-          <p className="text-sm font-extrabold text-[#FFC220] tracking-tight">
-            A Better Tomorrow.
-          </p>
-        </div>
       </div>
     </div>
   );
