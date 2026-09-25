@@ -8,19 +8,22 @@ import { formatCurrency, formatNumber } from "@/lib/format";
 import { useInventoryDetail } from "@/hooks/use-inventory";
 import { useMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/common/loading-state";
+import { ProductImage } from "@/components/common/product-image";
 import { InventoryMovementTable } from "./inventory-movement-table";
 
 export interface InventoryDetailModalProps {
   inventoryId: string | null;
+  storeId?: string;
   onClose: () => void;
 }
 
 export function InventoryDetailModal({
   inventoryId,
+  storeId,
   onClose
 }: InventoryDetailModalProps) {
   const isMobile = useMobile();
-  const { data, isLoading, isError, error } = useInventoryDetail(inventoryId);
+  const { data, isLoading, isError, error } = useInventoryDetail(inventoryId, storeId);
 
   const item = data?.item;
   const recentMovements = data?.recentMovements || [];
@@ -51,16 +54,7 @@ export function InventoryDetailModal({
           {/* Status and Top summary */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-surface-subtle border border-border-subtle">
             <div className="flex items-center gap-3 min-w-0">
-              {item.image ? (
-                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white border border-border shrink-0 shadow-2xs">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image} alt={item.productName} className="w-full h-full object-cover" />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/80 text-brand-primary flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs select-none">
-                  {item.productName.slice(0, 2).toUpperCase()}
-                </div>
-              )}
+              <ProductImage src={item.image} alt={item.productName} size="md" />
               <div className="min-w-0">
                 <span className="text-xs font-bold text-slate-900 block leading-tight truncate">
                   {item.productName}
@@ -126,7 +120,7 @@ export function InventoryDetailModal({
               <div className="p-2.5 rounded-lg border border-blue-200 bg-blue-50/40">
                 <span className="text-brand-primary block text-[10px] font-semibold">Available Stock</span>
                 <span className="font-bold text-slate-900 text-sm tabular-nums">
-                  {formatNumber(item.available ?? (item.onHand - item.reserved))}
+                  {formatNumber(item.available)}
                 </span>
               </div>
               <div className="p-2.5 rounded-lg border border-border bg-surface">
@@ -203,7 +197,7 @@ export function InventoryDetailModal({
       isOpen={Boolean(inventoryId)}
       onClose={onClose}
       title={item ? item.productName : "Inventory Details"}
-      description={item ? `SKU: ${item.sku} • Store: ${item.storeName}` : undefined}
+      description={item ? `SKU: ${item.sku} • ${item.storeName}` : undefined}
       size="lg"
     >
       {content}

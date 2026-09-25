@@ -58,9 +58,7 @@ export function InventoryKPIGrid({
       iconContainer: "bg-blue-500/25 border-blue-400/35 text-blue-200",
       mobileIconContainer: "bg-blue-500/30 border-blue-400/40 text-blue-300",
       icon: <PackageIcon className="w-5 h-5" />,
-      subLabel: "Active catalog items",
-      sparkColor: "#38BDF8",
-      sparkTrend: "up" as const
+      subLabel: "Active catalog items"
     },
     {
       id: "low-stock",
@@ -70,9 +68,7 @@ export function InventoryKPIGrid({
       iconContainer: "bg-amber-500/25 border-amber-400/35 text-amber-200",
       mobileIconContainer: "bg-amber-500/30 border-amber-400/40 text-amber-300",
       icon: <AlertTriangleIcon className="w-5 h-5" />,
-      subLabel: "Requires reorder",
-      sparkColor: "#FBBF24",
-      sparkTrend: "steady" as const
+      subLabel: "Requires reorder"
     },
     {
       id: "out-of-stock",
@@ -82,21 +78,17 @@ export function InventoryKPIGrid({
       iconContainer: "bg-rose-500/25 border-rose-400/35 text-rose-200",
       mobileIconContainer: "bg-rose-500/30 border-rose-400/40 text-rose-300",
       icon: <AlertCircleIcon className="w-5 h-5" />,
-      subLabel: "Immediate attention",
-      sparkColor: "#FB7185",
-      sparkTrend: "down" as const
+      subLabel: "Immediate attention"
     },
     {
       id: "in-transit",
-      label: "In Transit",
+      label: "Incoming Stock",
       value: formatNumber(summary.inTransitItems),
       status: "ALL" as StockStatus,
       iconContainer: "bg-purple-500/25 border-purple-400/35 text-purple-200",
       mobileIconContainer: "bg-purple-500/30 border-purple-400/40 text-purple-300",
       icon: <TruckIcon className="w-5 h-5" />,
-      subLabel: "Pending purchase orders",
-      sparkColor: "#C084FC",
-      sparkTrend: "up" as const
+      subLabel: "Ordered purchase orders"
     },
     {
       id: "inventory-value",
@@ -106,9 +98,7 @@ export function InventoryKPIGrid({
       iconContainer: "bg-emerald-500/25 border-emerald-400/35 text-emerald-200",
       mobileIconContainer: "bg-emerald-500/30 border-emerald-400/40 text-emerald-300",
       icon: <LedgerIcon className="w-5 h-5" />,
-      subLabel: "Total valuation",
-      sparkColor: "#34D399",
-      sparkTrend: "surge" as const
+      subLabel: "Total valuation"
     }
   ];
 
@@ -139,8 +129,6 @@ export function InventoryKPIGrid({
               subLabel={card.subLabel}
               icon={card.icon}
               iconContainerClassName={card.iconContainer}
-              sparklineTrend={card.sparkTrend}
-              sparklineColor={card.sparkColor}
               isSelected={isSelected}
               isFilterable={isFilterable}
               onClick={() => handleCardClick(card)}
@@ -166,8 +154,6 @@ export function InventoryKPIGrid({
               subLabel={card.subLabel}
               icon={card.icon}
               iconContainerClassName={card.mobileIconContainer}
-              sparklineTrend={card.sparkTrend}
-              sparklineColor={card.sparkColor}
               isSelected={isSelected}
               isFilterable={isFilterable}
               onClick={() => handleCardClick(card)}

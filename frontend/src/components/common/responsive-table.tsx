@@ -29,6 +29,7 @@ export interface ResponsiveTableProps<T> {
   className?: string;
   onRowClick?: (item: T) => void;
   density?: "compact" | "normal";
+  maxHeight?: string;
 }
 
 export function ResponsiveTable<T>({
@@ -42,7 +43,8 @@ export function ResponsiveTable<T>({
   emptyDescription = "There are no records to display at this time.",
   className,
   onRowClick,
-  density = "normal"
+  density = "normal",
+  maxHeight
 }: ResponsiveTableProps<T>) {
   if (isLoading) {
     return <SkeletonTable cols={columns.length} rows={5} className={className} />;
@@ -67,7 +69,12 @@ export function ResponsiveTable<T>({
     <div className={cn("w-full space-y-4", className)}>
       {/* Mobile Card View (if enabled and card renderer provided) */}
       {mobileView === "card" && renderMobileCard ? (
-        <div className="block md:hidden space-y-3">
+        <div
+          className={cn(
+            "block md:hidden space-y-3",
+            maxHeight && cn(maxHeight, "overflow-y-auto")
+          )}
+        >
           {data.map((item, index) => (
             <div
               key={keyExtractor(item, index)}
@@ -90,9 +97,14 @@ export function ResponsiveTable<T>({
           mobileView === "card" && renderMobileCard ? "hidden md:block" : "block"
         )}
       >
-        <div className="overflow-x-auto">
+        <div className={cn("overflow-x-auto", maxHeight && cn(maxHeight, "overflow-y-auto"))}>
           <table className="w-full text-left text-slate-700">
-            <thead className="bg-surface-subtle border-b border-border type-table-header">
+            <thead
+              className={cn(
+                "bg-surface-subtle border-b border-border type-table-header",
+                maxHeight && "sticky top-0 z-10 shadow-2xs"
+              )}
+            >
               <tr>
                 {columns.map((col) => (
                   <th

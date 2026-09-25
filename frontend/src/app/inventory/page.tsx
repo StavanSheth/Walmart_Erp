@@ -37,6 +37,7 @@ function InventoryPageContent() {
 
   // Detail Modal state & Mobile Filter drawer state
   const [selectedInventoryId, setSelectedInventoryId] = React.useState<string | null>(null);
+  const [selectedStoreId, setSelectedStoreId] = React.useState<string | undefined>(undefined);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = React.useState(false);
 
   // 2. Query parameters for TanStack Query
@@ -199,7 +200,10 @@ function InventoryPageContent() {
               onTabChange={handleTabChange}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              onRowClick={(item: InventoryItem) => setSelectedInventoryId(item.id)}
+              onRowClick={(item: InventoryItem) => {
+                setSelectedInventoryId(item.id);
+                setSelectedStoreId(item.storeId);
+              }}
               isLoading={isLoading}
             />
           </div>
@@ -226,7 +230,11 @@ function InventoryPageContent() {
         {/* 7. Product Detail View (Modal on desktop, Sheet on mobile) */}
         <InventoryDetailModal
           inventoryId={selectedInventoryId}
-          onClose={() => setSelectedInventoryId(null)}
+          storeId={selectedStoreId}
+          onClose={() => {
+            setSelectedInventoryId(null);
+            setSelectedStoreId(undefined);
+          }}
         />
       </div>
     </PageContainer>

@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Skeleton } from "@/components/common/loading-state";
-import { EmptyState } from "@/components/common/empty-state";
+import { ResponsiveTable, type Column } from "@/components/common/responsive-table";
 import { StatusBadge } from "@/components/ui/badge";
 import { PackageIcon } from "@/components/ui/icons";
 import { ProductImage } from "@/components/common/product-image";
@@ -44,6 +43,141 @@ export function InventoryProducts({
   const pageSize = pagination?.pageSize ?? 25;
   const totalItems = pagination?.total ?? items.length;
   const totalPages = pagination?.totalPages ?? Math.max(1, Math.ceil(totalItems / pageSize));
+
+  // Consolidated table column specifications using shared ResponsiveTable
+  const columns: Column<InventoryItem>[] = [
+    {
+      key: "index",
+      header: "#",
+      className: "w-6 pr-2 text-slate-400 font-semibold",
+      render: (_item, index) => (
+        <span>{(currentPage - 1) * pageSize + index + 1}</span>
+      )
+    },
+    {
+      key: "product",
+      header: "Product",
+      className: "min-w-[150px] px-2.5",
+      render: (item) => (
+        <div className="flex items-center gap-2.5 min-w-0">
+          <ProductImage src={item.image} alt={item.productName} size="sm" />
+          <span className="font-bold text-slate-900 truncate group-hover:text-brand-primary transition">
+            {item.productName}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: "sku",
+      header: "SKU",
+      className: "px-2 font-mono text-[11px] text-slate-500",
+      render: (item) => item.sku
+    },
+    {
+      key: "store",
+      header: "Store",
+      className: "px-2 text-slate-600 truncate max-w-[120px]",
+      render: (item) => item.storeName || "—"
+    },
+    {
+      key: "category",
+      header: "Category",
+      className: "px-2 text-slate-600 truncate max-w-[110px]",
+      render: (item) => item.categoryName
+    },
+    {
+      key: "onHand",
+      header: "On Hand",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 font-bold text-slate-900 tabular-nums",
+      render: (item) => formatNumber(item.onHand)
+    },
+    {
+      key: "reserved",
+      header: "Reserved",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 text-slate-500 tabular-nums",
+      render: (item) => formatNumber(item.reserved)
+    },
+    {
+      key: "available",
+      header: "Available",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 font-bold text-emerald-600 tabular-nums",
+      render: (item) => formatNumber(item.available)
+    },
+    {
+      key: "reorderLevel",
+      header: "Reorder",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 text-slate-400 tabular-nums",
+      render: (item) => formatNumber(item.reorderLevel)
+    },
+    {
+      key: "costPrice",
+      header: "Cost",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 text-slate-600 tabular-nums",
+      render: (item) => formatCurrency(item.costPrice)
+    },
+    {
+      key: "inventoryValue",
+      header: "Value",
+      align: "right",
+      isNumeric: true,
+      className: "px-2 font-bold text-slate-900 tabular-nums",
+      render: (item) => formatCurrency(item.inventoryValue)
+    },
+    {
+      key: "status",
+      header: "Status",
+      align: "center",
+      className: "px-2.5",
+      render: (item) => <StatusBadge status={item.status} />
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      className: "w-8 pl-2",
+      render: (item) => (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRowClick(item);
+          }}
+          className="w-6 h-6 rounded-lg hover:bg-slate-200/60 inline-flex items-center justify-center text-slate-400 hover:text-slate-700 transition"
+          title="View Details"
+          aria-label={`View details for ${item.productName}`}
+        >
+          •••
+        </button>
+      )
+    }
+  ];
+
+  // Mobile card presentation using MobileDataCard
+  const renderMobileCard = (item: InventoryItem) => (
+    <MobileDataCard
+      key={item.id}
+      title={item.productName}
+      subtitle={item.sku}
+      thumbnail={<ProductImage src={item.image} alt={item.productName} size="sm" />}
+      badge={<StatusBadge status={item.status} />}
+      onClick={() => onRowClick(item)}
+      fields={[
+        { label: "Store", value: item.storeName || "All Stores" },
+        { label: "Available", value: formatNumber(item.available) },
+        { label: "Inv. Value", value: formatCurrency(item.inventoryValue) }
+      ]}
+    />
+  );
 
   return (
     <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between h-full">
@@ -87,133 +221,21 @@ export function InventoryProducts({
         </div>
       </div>
 
-      {/* Content Area */}
+      {/* Content Area using Shared ResponsiveTable with Vertical Scroll Bar */}
       <div className="pt-2 flex-1 flex flex-col justify-between">
-        {isLoading ? (
-          <div className="space-y-3 py-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 py-2 border-b border-slate-100">
-                <Skeleton className="h-4 w-6 rounded" />
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <Skeleton className="h-4 w-32 rounded" />
-                <Skeleton className="h-4 w-16 rounded ml-auto" />
-                <Skeleton className="h-4 w-14 rounded" />
-              </div>
-            ))}
-          </div>
-        ) : items.length === 0 ? (
-          <EmptyState
-            title="No products found"
-            description="No inventory records match the current criteria."
-            className="py-10"
-          />
-        ) : (
-          <>
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[340px] -mx-4 sm:-mx-5 px-4 sm:px-5">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead className="sticky top-0 bg-white z-10 shadow-2xs">
-                  <tr className="border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-white">
-                    <th scope="col" className="py-2.5 pr-2 w-6 bg-white">#</th>
-                    <th scope="col" className="py-2.5 px-2.5 min-w-[150px] bg-white">Product</th>
-                    <th scope="col" className="py-2.5 px-2 bg-white">SKU</th>
-                    <th scope="col" className="py-2.5 px-2 bg-white">Store</th>
-                    <th scope="col" className="py-2.5 px-2 bg-white">Category</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">On Hand</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Reserved</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Available</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Reorder</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Cost</th>
-                    <th scope="col" className="py-2.5 px-2 text-right bg-white">Value</th>
-                    <th scope="col" className="py-2.5 px-2.5 text-center bg-white">Status</th>
-                    <th scope="col" className="py-2.5 pl-2 text-right w-8 bg-white"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                  {items.map((item, index) => {
-                    const rowNumber = (currentPage - 1) * pageSize + index + 1;
-                    return (
-                      <tr
-                        key={item.id}
-                        onClick={() => onRowClick(item)}
-                        className="hover:bg-slate-50/80 cursor-pointer transition group"
-                      >
-                        <td className="py-2.5 pr-2 text-slate-400 font-semibold">{rowNumber}</td>
-                        <td className="py-2.5 px-2.5">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <ProductImage src={item.image} alt={item.productName} size="sm" />
-                            <div className="min-w-0 flex flex-col">
-                              <span className="font-bold text-slate-900 truncate group-hover:text-brand-primary transition">
-                                {item.productName}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-2.5 px-2 text-slate-500 font-mono text-[11px]">{item.sku}</td>
-                        <td className="py-2.5 px-2 text-slate-600 truncate max-w-[120px]">{item.storeName || "—"}</td>
-                        <td className="py-2.5 px-2 text-slate-600 truncate max-w-[110px]">{item.categoryName}</td>
-                        <td className="py-2.5 px-2 text-right font-bold text-slate-900 tabular-nums">
-                          {formatNumber(item.onHand)}
-                        </td>
-                        <td className="py-2.5 px-2 text-right text-slate-500 tabular-nums">
-                          {formatNumber(item.reserved)}
-                        </td>
-                        <td className="py-2.5 px-2 text-right font-bold text-emerald-600 tabular-nums">
-                          {formatNumber(item.available)}
-                        </td>
-                        <td className="py-2.5 px-2 text-right text-slate-400 tabular-nums">
-                          {formatNumber(item.reorderLevel)}
-                        </td>
-                        <td className="py-2.5 px-2 text-right text-slate-600 tabular-nums">
-                          {formatCurrency(item.costPrice)}
-                        </td>
-                        <td className="py-2.5 px-2 text-right font-bold text-slate-900 tabular-nums">
-                          {formatCurrency(item.inventoryValue)}
-                        </td>
-                        <td className="py-2.5 px-2.5 text-center">
-                          <StatusBadge status={item.status} />
-                        </td>
-                        <td className="py-2.5 pl-2 text-right">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRowClick(item);
-                            }}
-                            className="w-6 h-6 rounded-lg hover:bg-slate-200/60 inline-flex items-center justify-center text-slate-400 hover:text-slate-700 transition"
-                            title="View Details"
-                            aria-label={`View details for ${item.productName}`}
-                          >
-                            •••
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Data Card List: Product, SKU, Store, Available, Inv. Value, Status */}
-            <div className="md:hidden space-y-2.5 py-1 max-h-[380px] overflow-y-auto">
-              {items.map((item) => (
-                <MobileDataCard
-                  key={item.id}
-                  title={item.productName}
-                  subtitle={item.sku}
-                  thumbnail={<ProductImage src={item.image} alt={item.productName} size="sm" />}
-                  badge={<StatusBadge status={item.status} />}
-                  onClick={() => onRowClick(item)}
-                  fields={[
-                    { label: "Store", value: item.storeName || "All Stores" },
-                    { label: "Available", value: formatNumber(item.available) },
-                    { label: "Inv. Value", value: formatCurrency(item.inventoryValue) }
-                  ]}
-                />
-              ))}
-            </div>
-          </>
-        )}
+        <ResponsiveTable<InventoryItem>
+          data={items}
+          columns={columns}
+          keyExtractor={(item) => item.id}
+          isLoading={isLoading}
+          onRowClick={onRowClick}
+          density="compact"
+          mobileView="card"
+          renderMobileCard={renderMobileCard}
+          maxHeight="max-h-[355px]"
+          emptyTitle="No products found"
+          emptyDescription="No inventory records match the current criteria."
+        />
       </div>
 
       {/* Centralized Pagination Footer */}

@@ -10,12 +10,12 @@ export interface InventorySummaryDto {
 export interface InventoryTrendPointDto {
   month: string;
   inventoryValue: number;
-  inStock: number;
-  lowStock: number;
-  outOfStock: number;
-  inTransit: number;
   units: number;
   skuCount: number;
+  inStock?: number;
+  lowStock?: number;
+  outOfStock?: number;
+  inTransit?: number;
 }
 
 export interface CategoryDistributionDto {

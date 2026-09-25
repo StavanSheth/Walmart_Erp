@@ -94,20 +94,6 @@ export function InventoryOverviewChart({
     return trendData.slice(-count);
   }, [trendData, period]);
 
-  const summaryStats = React.useMemo(() => {
-    if (!chartData || chartData.length === 0) {
-      return { average: 0, peak: 0, current: 0 };
-    }
-    const values = chartData.map((d) =>
-      metric === "value" ? d.inventoryValue : metric === "units" ? d.units : d.skuCount
-    );
-    const sum = values.reduce((a, b) => a + b, 0);
-    const average = Math.round(sum / values.length);
-    const peak = Math.max(...values);
-    const current = values[values.length - 1] ?? 0;
-    return { average, peak, current };
-  }, [chartData, metric]);
-
   if (isLoading) {
     return (
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4 h-full min-h-[310px]">
@@ -241,7 +227,7 @@ export function InventoryOverviewChart({
       </div>
 
       {/* Main Bar Chart Container */}
-      <div className="h-[180px] sm:h-[195px] w-full pt-2">
+      <div className="h-[220px] sm:h-[235px] w-full pt-2 flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -281,46 +267,6 @@ export function InventoryOverviewChart({
             />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Micro Metrics Strip */}
-      <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-slate-100 text-center">
-        <div className="p-1 rounded-lg bg-slate-50/70 border border-slate-100">
-          <span className="text-[10px] font-semibold text-slate-400 block leading-tight">
-            Current
-          </span>
-          <span className="text-xs font-bold text-slate-800 tabular-nums">
-            {metric === "value"
-              ? formatCurrency(summaryStats.current, true)
-              : metric === "units"
-              ? formatNumber(summaryStats.current)
-              : `${summaryStats.current} SKUs`}
-          </span>
-        </div>
-        <div className="p-1 rounded-lg bg-slate-50/70 border border-slate-100">
-          <span className="text-[10px] font-semibold text-slate-400 block leading-tight">
-            Average
-          </span>
-          <span className="text-xs font-bold text-slate-800 tabular-nums">
-            {metric === "value"
-              ? formatCurrency(summaryStats.average, true)
-              : metric === "units"
-              ? formatNumber(summaryStats.average)
-              : `${summaryStats.average} SKUs`}
-          </span>
-        </div>
-        <div className="p-1 rounded-lg bg-slate-50/70 border border-slate-100">
-          <span className="text-[10px] font-semibold text-slate-400 block leading-tight">
-            Peak
-          </span>
-          <span className="text-xs font-bold text-emerald-600 tabular-nums">
-            {metric === "value"
-              ? formatCurrency(summaryStats.peak, true)
-              : metric === "units"
-              ? formatNumber(summaryStats.peak)
-              : `${summaryStats.peak} SKUs`}
-          </span>
-        </div>
       </div>
     </div>
   );

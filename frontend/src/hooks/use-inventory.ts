@@ -32,12 +32,12 @@ export function useInventory(params?: InventoryQueryParams) {
   });
 }
 
-export function useInventoryDetail(id: string | null) {
+export function useInventoryDetail(id: string | null, storeId?: string) {
   return useQuery<InventoryDetailData>({
-    queryKey: ["inventory", "detail", id],
+    queryKey: ["inventory", "detail", id, storeId || "ALL"],
     queryFn: async () => {
       if (!id) throw new Error("Inventory ID is required");
-      const response = await apiClient.getInventoryDetail(id);
+      const response = await apiClient.getInventoryDetail(id, storeId);
       return response.data;
     },
     enabled: Boolean(id),

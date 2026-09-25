@@ -40,7 +40,10 @@ export async function inventoryRoutes(app: FastifyInstance, _opts: FastifyPlugin
       });
     }
 
-    const data = await getInventoryById(inventoryId);
+    const query = (request.query || {}) as Record<string, string | undefined>;
+    const storeId = query.storeId;
+
+    const data = await getInventoryById(inventoryId, storeId);
     return reply.status(200).send({
       success: true,
       data

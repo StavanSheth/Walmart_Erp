@@ -184,8 +184,9 @@ export class ApiClient {
   /**
    * Phase 6 Inventory Detail with recent movements
    */
-  public async getInventoryDetail(id: string): Promise<InventoryDetailResponse> {
-    return this.request<InventoryDetailResponse>(`/inventory/${encodeURIComponent(id)}`);
+  public async getInventoryDetail(id: string, storeId?: string): Promise<InventoryDetailResponse> {
+    const qs = storeId ? `?storeId=${encodeURIComponent(storeId)}` : "";
+    return this.request<InventoryDetailResponse>(`/inventory/${encodeURIComponent(id)}${qs}`);
   }
 }
 

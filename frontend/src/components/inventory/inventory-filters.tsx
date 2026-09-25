@@ -233,7 +233,7 @@ export function InventoryFilters({
                 size="sm"
                 onClick={onMobileClose}
               >
-                Apply Filters
+                Done
               </Button>
             </div>
           </div>

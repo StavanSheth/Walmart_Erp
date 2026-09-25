@@ -109,7 +109,7 @@ export function InventoryStoreSummary({
                     <td className="py-2.5 px-2 text-right font-bold text-slate-900 tabular-nums">
                       {formatNumber(store.totalStock)}
                     </td>
-                    <td className="py-2.5 px-2 text-right font-bold text-rose-600 tabular-nums">
+                    <td className="py-2.5 px-2 text-right font-bold text-amber-600 tabular-nums">
                       {formatNumber(store.lowStock)}
                     </td>
                     <td className="py-2.5 px-2 text-right font-bold text-rose-600 tabular-nums">

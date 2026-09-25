@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { RefreshCwIcon } from "@/components/ui/icons";
 import { InventoryMovementTable } from "./inventory-movement-table";
