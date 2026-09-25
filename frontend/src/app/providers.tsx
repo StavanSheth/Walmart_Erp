@@ -17,14 +17,21 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    // 1. Auto-reload when chunk hashes are invalidated (e.g. after a rebuild or dev server restart)
+    // 1. Auto-reload when chunk hashes or webpack modules are invalidated
     const handleError = (event: ErrorEvent) => {
-      const message = event.message || "";
+      const message =
+        (event.message || "") +
+        " " +
+        (event.error?.message || "") +
+        " " +
+        (event.error?.stack || "");
+
       if (
         message.includes("ChunkLoadError") ||
         message.includes("Loading chunk") ||
         message.includes("Failed to fetch dynamically imported module") ||
-        message.includes("__webpack_modules__")
+        message.includes("__webpack_modules__") ||
+        (message.includes("is not a function") && (message.includes("webpack") || message.includes("moduleId")))
       ) {
         event.preventDefault();
         console.warn("Webpack module cache mismatch detected, refreshing page for updated assets...");
@@ -34,12 +41,17 @@ export function Providers({ children }: { children: ReactNode }) {
 
     // 2. Intercept and swallow unhandled rejections caused by DOM Event objects or chunk load failures
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reasonMsg =
+        (typeof event.reason?.message === "string" ? event.reason.message : "") +
+        " " +
+        (typeof event.reason?.stack === "string" ? event.reason.stack : "");
+
       if (
         event.reason?.name === "ChunkLoadError" ||
-        (typeof event.reason?.message === "string" &&
-          (event.reason.message.includes("ChunkLoadError") ||
-            event.reason.message.includes("Loading chunk") ||
-            event.reason.message.includes("Failed to fetch dynamically imported module")))
+        reasonMsg.includes("ChunkLoadError") ||
+        reasonMsg.includes("Loading chunk") ||
+        reasonMsg.includes("Failed to fetch dynamically imported module") ||
+        reasonMsg.includes("__webpack_modules__")
       ) {
         event.preventDefault();
         console.warn("ChunkLoadError detected in promise rejection, refreshing page...");

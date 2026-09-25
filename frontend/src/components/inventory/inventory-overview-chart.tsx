@@ -138,8 +138,12 @@ export function InventoryOverviewChart({
   }
 
   const formatYAxis = (val: number) => {
+    if (val === 0) return "₹0";
     if (metric === "value") {
-      return formatCurrency(val, true);
+      if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
+      if (val >= 100000) return `₹${(val / 100000).toFixed(0)}L`;
+      if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
+      return `₹${val}`;
     }
     if (metric === "units") {
       if (val >= 1000) return `${(val / 1000).toFixed(0)}K`;
@@ -241,7 +245,7 @@ export function InventoryOverviewChart({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
+            margin={{ top: 8, right: 12, left: -4, bottom: 0 }}
             barSize={period === "1y" ? 14 : 26}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -257,7 +261,8 @@ export function InventoryOverviewChart({
               tickLine={false}
               tick={{ fontSize: 10, fill: "#64748B", fontWeight: 500 }}
               tickFormatter={formatYAxis}
-              dx={-4}
+              width={46}
+              dx={-2}
             />
             <Tooltip
               content={<CustomTooltip metricType={metric} />}
