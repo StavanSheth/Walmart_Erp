@@ -31,7 +31,7 @@ export function Sidebar({ className }: SidebarProps) {
       className={cn(
         "relative flex-col h-screen transition-all duration-200 z-header select-none shrink-0",
         "bg-[#0B1E36] text-white border-r border-slate-800/80 shadow-xl",
-        sidebarCollapsed ? "md:w-20 lg:w-20" : "md:w-20 lg:w-64",
+        sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         className
       )}
     >

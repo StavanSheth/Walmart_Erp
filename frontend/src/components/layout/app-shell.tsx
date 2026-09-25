@@ -17,8 +17,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ShellProvider>
       <div className="min-h-screen flex antialiased bg-[#F4F6F9] text-slate-900">
-        {/* Desktop / Tablet Sidebar (hidden on mobile) - solid navy, NO banner image */}
-        <Sidebar className="hidden md:flex shrink-0 sticky top-0" />
+        {/* Laptop / Desktop Sidebar (hidden on mobile and tablet) - solid navy, NO banner image */}
+        <Sidebar className="hidden lg:flex shrink-0 sticky top-0" />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">

@@ -40,14 +40,14 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
         className
       )}
     >
-      {/* Left: Mobile hamburger & Brand / Desktop Search */}
+      {/* Left: Mobile & Tablet hamburger & Brand / Desktop Search */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
           onClick={() => setMobileDrawerOpen(true)}
-          aria-label="Open mobile navigation menu"
+          aria-label="Open navigation menu"
           className={cn(
-            "flex md:hidden items-center justify-center p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+            "flex lg:hidden items-center justify-center p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
             isDashboard
               ? "text-white/80 hover:bg-white/10"
               : "text-slate-600 hover:bg-surface-muted"
@@ -56,8 +56,8 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           <MenuIcon className="w-5 h-5" />
         </button>
 
-        {/* Mobile brand spark logo */}
-        <div className="flex md:hidden items-center gap-2 shrink-0">
+        {/* Mobile & Tablet brand spark logo */}
+        <div className="flex lg:hidden items-center gap-2 shrink-0">
           <SparkIcon className="w-5 h-5" />
           <span
             className={cn(
