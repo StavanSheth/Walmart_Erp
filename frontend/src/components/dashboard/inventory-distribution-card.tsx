@@ -19,7 +19,7 @@ export function InventoryDistributionCard({
     return (
       <div className="p-4 sm:p-5 rounded-2xl glass-card space-y-4 h-full overflow-hidden">
         <Skeleton className="h-5 w-40 rounded" />
-        <Skeleton className="h-[200px] w-full rounded-full" />
+        <Skeleton className="h-[220px] w-[220px] mx-auto rounded-full" />
       </div>
     );
   }
@@ -40,16 +40,16 @@ export function InventoryDistributionCard({
       </div>
 
       <div className="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 my-auto py-1 min-w-0 w-full">
-        {/* Donut Chart with Centered Total Units - Seamless joint ring (paddingAngle=0), sized for 3-column card */}
-        <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-32 md:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 shrink-0">
+        {/* Donut Chart with Centered Total Units - Seamless joint ring (paddingAngle=0), scaled 1.5x */}
+        <div className="relative w-[200px] h-[200px] sm:w-[216px] sm:h-[216px] md:w-[204px] md:h-[204px] lg:w-[216px] lg:h-[216px] xl:w-[240px] xl:h-[240px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={46}
-                outerRadius={66}
+                innerRadius={69}
+                outerRadius={99}
                 paddingAngle={0}
                 dataKey="value"
                 strokeWidth={0}
@@ -65,10 +65,10 @@ export function InventoryDistributionCard({
 
           {/* Donut Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-base sm:text-lg lg:text-xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tabular-nums leading-tight tracking-tight">
               {formatNumber(data.totalUnits)}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5 sm:mt-1">
               Total Units
             </span>
           </div>
