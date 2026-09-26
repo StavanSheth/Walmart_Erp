@@ -394,6 +394,154 @@ export class ApiClient {
       `/stores/${encodeURIComponent(id)}`
     );
   }
+
+  /**
+   * Ledger Overview API
+   */
+  public async getLedgerOverview(): Promise<{ success: boolean; data: import("@/types/ledger").LedgerOverviewData }> {
+    return this.request<{ success: boolean; data: import("@/types/ledger").LedgerOverviewData }>("/ledger/overview");
+  }
+
+  /**
+   * Ledger Transactions API
+   */
+  public async getLedgerTransactions(params?: {
+    q?: string;
+    account?: string;
+    type?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{
+    success: boolean;
+    data: {
+      transactions: import("@/types/ledger").TransactionRow[];
+      total: number;
+      limit: number;
+      offset: number;
+    };
+  }> {
+    const sp = new URLSearchParams();
+    if (params?.q) sp.set("q", params.q);
+    if (params?.account) sp.set("account", params.account);
+    if (params?.type) sp.set("type", params.type);
+    if (params?.status) sp.set("status", params.status);
+    if (params?.limit) sp.set("limit", String(params.limit));
+    if (params?.offset) sp.set("offset", String(params.offset));
+    const qs = sp.toString();
+    return this.request(`/ledger/transactions${qs ? `?${qs}` : ""}`);
+  }
+
+  /**
+   * Ledger Accounts API
+   */
+  public async getLedgerAccounts(): Promise<{ success: boolean; data: import("@/types/ledger").AccountItem[] }> {
+    return this.request<{ success: boolean; data: import("@/types/ledger").AccountItem[] }>("/ledger/accounts");
+  }
+
+  /**
+   * Create Double-Entry Journal Entry
+   */
+  public async createJournalEntry(
+    payload: import("@/types/ledger").CreateJournalEntryInput
+  ): Promise<{ success: boolean; data: import("@/types/ledger").TransactionRow }> {
+    return this.post<import("@/types/ledger").TransactionRow>("/ledger/journal-entries", payload);
+  }
+
+  /**
+   * Batch Upload Transactions
+   */
+  public async uploadTransactions(
+    entries: import("@/types/ledger").CreateJournalEntryInput[]
+  ): Promise<{ success: boolean; data: { count: number; entries: import("@/types/ledger").TransactionRow[] } }> {
+    return this.post<{ count: number; entries: import("@/types/ledger").TransactionRow[] }>("/ledger/upload", { entries });
+  }
+
+  /**
+   * Run Account Reconciliation
+   */
+  public async reconcileLedger(
+    payload?: { accountId?: string }
+  ): Promise<{ success: boolean; data: import("@/types/ledger").ReconcileResult }> {
+    return this.post<import("@/types/ledger").ReconcileResult>("/ledger/reconcile", payload);
+  }
+
+  /**
+   * Generate Ledger Report
+   */
+  public async getLedgerReport(
+    format: "json" | "csv" = "json"
+  ): Promise<string | Record<string, unknown>> {
+    if (format === "csv") {
+      const base = this.getBaseUrl();
+      const res = await fetch(`${base}/ledger/report?format=csv`);
+      return res.text();
+    }
+    return this.request("/ledger/report?format=json");
+  }
+
+  /**
+   * Reports Overview API
+   */
+  public async getReportsOverview(
+    params?: import("@/types/reports").ReportsQueryParams
+  ): Promise<{ success: boolean; data: import("@/types/reports").ReportsOverviewData }> {
+    const sp = new URLSearchParams();
+    if (params?.reportType) sp.set("reportType", params.reportType);
+    if (params?.period) sp.set("period", params.period);
+    if (params?.regionId) sp.set("regionId", params.regionId);
+    if (params?.storeId) sp.set("storeId", params.storeId);
+    if (params?.categoryId) sp.set("categoryId", params.categoryId);
+    if (params?.productId) sp.set("productId", params.productId);
+    if (params?.partnerType) sp.set("partnerType", params.partnerType);
+    if (params?.partnerId) sp.set("partnerId", params.partnerId);
+    if (params?.status) sp.set("status", params.status);
+    if (params?.search) sp.set("search", params.search);
+    if (params?.page) sp.set("page", String(params.page));
+    if (params?.pageSize) sp.set("pageSize", String(params.pageSize));
+    const qs = sp.toString();
+    return this.request(`/reports/overview${qs ? `?${qs}` : ""}`);
+  }
+
+  /**
+   * Generate Report API
+   */
+  public async generateReport(
+    payload: import("@/types/reports").GenerateReportInput
+  ): Promise<{ success: boolean; data: import("@/types/reports").GeneratedReportRecord; message: string }> {
+    return this.request("/reports/generate", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  }
+
+  /**
+   * Toggle Scheduled Report
+   */
+  public async toggleScheduledReport(
+    id: string,
+    enabled?: boolean
+  ): Promise<{ success: boolean; data: import("@/types/reports").ScheduledReportItem }> {
+    return this.request(`/reports/scheduled/${id}/toggle`, {
+      method: "PATCH",
+      body: JSON.stringify({ enabled })
+    });
+  }
+
+  /**
+   * Export Report Data as CSV or JSON
+   */
+  public async exportReportData(
+    reportId?: string,
+    format: "CSV" | "JSON" = "CSV"
+  ): Promise<string> {
+    const base = this.getBaseUrl();
+    const query = new URLSearchParams();
+    if (reportId) query.set("reportId", reportId);
+    query.set("format", format);
+    const res = await fetch(`${base}/reports/export?${query.toString()}`);
+    return res.text();
+  }
 }
 
 export const apiClient = new ApiClient();

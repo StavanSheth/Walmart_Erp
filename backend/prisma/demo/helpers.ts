@@ -19,10 +19,10 @@ export function money(amount: number): Prisma.Decimal {
  * Uses a simple seed-based offset so the same index always gives the same date.
  */
 export function pastDate(daysAgo: number, hourOffset = 0): Date {
-  const now = new Date("2026-09-24T12:00:00+05:30");
+  const now = new Date("2026-09-27T12:00:00+05:30");
   const d = new Date(now);
   d.setDate(d.getDate() - daysAgo);
-  d.setHours(9 + (hourOffset % 12), (hourOffset * 17) % 60, 0, 0);
+  d.setHours(9 + (hourOffset % 12), (hourOffset * 17) % 60, (hourOffset * 31) % 60, 0);
   return d;
 }
 

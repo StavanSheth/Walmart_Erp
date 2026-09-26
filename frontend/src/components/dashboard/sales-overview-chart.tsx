@@ -137,9 +137,9 @@ export function SalesOverviewChart({ salesOverview, isLoading = false }: SalesOv
           className="py-10"
         />
       ) : (
-        <div className="w-full min-w-0 h-[185px] sm:h-[195px] mt-1">
+        <div className="w-full min-w-0 h-[210px] sm:h-[225px] mt-1">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={combinedPoints} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <AreaChart data={combinedPoints} margin={{ top: 10, right: 10, left: 2, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0071DC" stopOpacity={0.25} />
@@ -162,12 +162,14 @@ export function SalesOverviewChart({ salesOverview, isLoading = false }: SalesOv
                 minTickGap={25}
               />
               <YAxis
-                tickFormatter={(val) => formatCurrency(val, true)}
+                domain={[0, 50000]}
+                ticks={[0, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000]}
+                tickFormatter={(val) => (val === 0 ? "$0" : `$${val / 1000}K`)}
                 stroke="#94A3B8"
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
-                width={45}
+                width={48}
               />
               <Tooltip content={<CustomTooltip />} />
               {/* Sales Plot (Dark Blue) */}

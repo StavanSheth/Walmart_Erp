@@ -84,6 +84,7 @@ export async function getStoresOverview(
             { code: { contains: params.search, mode: "insensitive" } },
             { city: { contains: params.search, mode: "insensitive" } },
             { state: { contains: params.search, mode: "insensitive" } },
+            { country: { contains: params.search, mode: "insensitive" } },
             { address: { contains: params.search, mode: "insensitive" } },
             { manager: { name: { contains: params.search, mode: "insensitive" } } }
           ]

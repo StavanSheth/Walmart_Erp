@@ -25,8 +25,9 @@ export function usePartners(params?: PartnersQueryParams) {
     ],
     queryFn: async () => {
       const response = await apiClient.getPartnersOverview(params);
-      const raw = response as any;
-      return (raw?.data?.summary ? raw.data : raw?.summary ? raw : raw?.data) as PartnersOverviewData;
+      const raw = response as unknown as Record<string, unknown>;
+      const rawData = raw?.data as Record<string, unknown> | undefined;
+      return (rawData?.summary ? raw.data : raw?.summary ? raw : raw?.data) as PartnersOverviewData;
     },
     placeholderData: keepPreviousData,
     staleTime: 30 * 1000,

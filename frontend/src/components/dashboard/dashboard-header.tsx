@@ -58,7 +58,7 @@ export function DashboardHeader({
           <div className="flex items-center gap-2">
             <span className="text-2xl sm:text-3xl">👋</span>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">
-              Good Morning, Stavan!
+              Greetings Mr.Steven
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-blue-100 font-medium drop-shadow-xs">

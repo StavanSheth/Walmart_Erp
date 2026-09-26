@@ -122,13 +122,15 @@ function PartnersPageContent() {
         />
       )}
 
-      {/* 2. Top Metric Cards Row: 4 KPI Cards + Promo Card (5 cards in a row matching desktop reference) */}
-      <PartnersKPIGrid
-        summary={data?.summary}
-        isLoading={isLoading}
-        onCardClick={handleCardClick}
-        onAddPartner={() => setIsAddPartnerOpen(true)}
-      />
+      {/* 2. Top Metric Cards Row: 4 KPI Cards + Promo Card (positioned at banner horizon matching dashboard) */}
+      <div className="pt-8 sm:pt-24 lg:pt-44 xl:pt-52">
+        <PartnersKPIGrid
+          summary={data?.summary}
+          isLoading={isLoading}
+          onCardClick={handleCardClick}
+          onAddPartner={() => setIsAddPartnerOpen(true)}
+        />
+      </div>
 
       {/* All sections below the banner image: Pure canvas layout identical to Dashboard */}
       <div className="space-y-4 sm:space-y-5 pt-1 sm:pt-2">
@@ -283,7 +285,7 @@ function PartnersPageContent() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Credit Limit (₹)</label>
+                <label className="text-xs font-semibold text-slate-700">Credit Limit ($)</label>
                 <Input
                   type="number"
                   placeholder="50000"

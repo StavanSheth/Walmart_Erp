@@ -2,175 +2,275 @@
 
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/common/loading-state";
-import { apiClient } from "@/lib/api/client";
-
-interface OrgSettingsData {
-  organization: {
-    id: string;
-    name: string;
-    code: string;
-    currency: string;
-    timezone: string;
-    status: string;
-    createdAt: string;
-  } | null;
-  storeCount: number;
-  productCount: number;
-  userCount: number;
-}
+import { SettingsHero } from "@/components/settings/settings-hero";
+import { SettingsKpiGrid } from "@/components/settings/settings-kpi-grid";
+import { SettingsTabs } from "@/components/settings/settings-tabs";
+import { GeneralSettingsGrid } from "@/components/settings/general-settings-grid";
+import { SystemInfoStatus } from "@/components/settings/system-info-status";
+import { AccessDeniedModal } from "@/components/settings/access-denied-modal";
+import { EditCompanyModal } from "@/components/settings/edit-company-modal";
+import { EditRegionalModal } from "@/components/settings/edit-regional-modal";
+import {
+  useSettingsOverview,
+  useUpdateCompanySettings,
+  useUpdateRegionalSettings,
+  useUpdateAppearancePreferences,
+  ApiError
+} from "@/hooks/use-settings";
+import type { SettingsTabId, CompanyInformation, RegionalSettings } from "@/types/settings";
 
 export default function SettingsPage() {
-  const [data, setData] = React.useState<OrgSettingsData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState<SettingsTabId>("general");
+  const [simulatedRole, setSimulatedRole] = React.useState("Admin");
 
-  React.useEffect(() => {
-    async function loadSettings() {
-      try {
-        const res = await apiClient.get<OrgSettingsData>("/api/settings/organization");
-        if (res.data) {
-          setData(res.data);
-        }
-      } catch (err) {
-        console.error("Failed to load organization settings from API", err);
-      } finally {
-        setIsLoading(false);
+  // Modals state
+  const [isEditCompanyOpen, setIsEditCompanyOpen] = React.useState(false);
+  const [isEditRegionalOpen, setIsEditRegionalOpen] = React.useState(false);
+  const [accessDeniedState, setAccessDeniedState] = React.useState<{
+    isOpen: boolean;
+    message: string;
+    settingName?: string;
+  }>({
+    isOpen: false,
+    message: "You don't have access to change this setting."
+  });
+
+  const [toastMessage, setToastMessage] = React.useState<string | null>(null);
+
+  // Live queries & mutations
+  const { data: overview, isLoading } = useSettingsOverview(simulatedRole);
+  const updateCompanyMutation = useUpdateCompanySettings();
+  const updateRegionalMutation = useUpdateRegionalSettings();
+  const updateAppearanceMutation = useUpdateAppearancePreferences();
+
+  const isAdmin = simulatedRole.toLowerCase().includes("admin");
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Handler for company update
+  const handleUpdateCompany = async (payload: Partial<CompanyInformation>) => {
+    try {
+      await updateCompanyMutation.mutateAsync({ payload, simulatedRole });
+      showToast("Company details updated successfully in database.");
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 403) {
+        const errorData = err.data as { error?: { message?: string } } | undefined;
+        const msg = errorData?.error?.message || "You don't have access to change this setting.";
+        setAccessDeniedState({
+          isOpen: true,
+          message: msg,
+          settingName: "Company Information"
+        });
+      } else {
+        console.error("Failed to update company settings", err);
       }
     }
-    loadSettings();
-  }, []);
+  };
 
-  const org = data?.organization;
+  // Handler for regional update
+  const handleUpdateRegional = async (payload: Partial<RegionalSettings>) => {
+    try {
+      await updateRegionalMutation.mutateAsync({ payload, simulatedRole });
+      setIsEditRegionalOpen(false);
+      showToast("Regional settings updated successfully in database.");
+    } catch (err) {
+      setIsEditRegionalOpen(false);
+      if (err instanceof ApiError && err.statusCode === 403) {
+        const errorData = err.data as { error?: { message?: string } } | undefined;
+        const msg = errorData?.error?.message || "You don't have access to change this setting.";
+        setAccessDeniedState({
+          isOpen: true,
+          message: msg,
+          settingName: "Regional Settings"
+        });
+      } else {
+        console.error("Failed to update regional settings", err);
+      }
+    }
+  };
+
+  // Direct trigger when restricted user clicks a protected setting
+  const handleAttemptChangeRegional = (field: string) => {
+    if (!isAdmin) {
+      setAccessDeniedState({
+        isOpen: true,
+        message: "You don't have access to change this setting.",
+        settingName: field
+      });
+    } else {
+      setIsEditRegionalOpen(true);
+    }
+  };
+
+  // Theme update (personal preference: Light or System)
+  const handleChangeTheme = async (theme: "light" | "system") => {
+    try {
+      await updateAppearanceMutation.mutateAsync({ theme });
+      showToast(`Theme updated to ${theme}.`);
+    } catch (err) {
+      console.error("Failed to update theme", err);
+    }
+  };
 
   return (
-    <PageContainer
-      title="Settings"
-      description="Enterprise organization parameters, tax rules, and local preferences synchronized live with PostgreSQL."
-    >
-      <div className="space-y-6">
-        <Tabs defaultValue="general">
-          <TabsList>
-            <TabsTrigger value="general">Organization</TabsTrigger>
-            <TabsTrigger value="tax">GST & Tax Slabs</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          </TabsList>
+    <PageContainer>
+      {/* Toast notification banner */}
+      {toastMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-in slide-in-from-top-3 duration-200">
+          <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
-          <TabsContent value="general" className="mt-4">
-            <Card className="max-w-2xl">
-              <CardHeader>
-                <CardTitle>Organization Profile</CardTitle>
-                <CardDescription>
-                  Central enterprise identity and database tenancy parameters used on all invoices, POs, and tax filings.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {isLoading ? (
-                  <div className="space-y-4">
-                    <Skeleton className="h-10 w-full rounded-md" />
-                    <Skeleton className="h-10 w-full rounded-md" />
-                    <Skeleton className="h-10 w-full rounded-md" />
-                  </div>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input label="Company Name" defaultValue={org?.name || "Walmart Retail"} readOnly />
-                      <Input label="Tenant Code" defaultValue={org?.code || "WALMART-DEMO"} readOnly className="font-mono tabular-nums" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input label="Organization ID" defaultValue={org?.id || ""} readOnly className="font-mono tabular-nums text-xs" />
-                      <Input label="Primary Currency" defaultValue={org?.currency ? `${org.currency} ($)` : "USD ($)"} readOnly />
-                    </div>
-                    <Input label="Default Timezone" defaultValue={org?.timezone || "UTC"} readOnly />
+      {/* ========================================================================= */}
+      {/* UNIFIED RESPONSIVE SETTINGS LAYOUT (Mobile, Tablet, Desktop matching Dashboard) */}
+      {/* ========================================================================= */}
+      <div className="space-y-5 pb-20 md:pb-8">
+        {/* 1. Hero Section (SETTINGS badge, heading, slogan & liquid glass controls) */}
+        <SettingsHero
+          currentRole={simulatedRole}
+          onToggleRole={() => setSimulatedRole((r) => (r === "Admin" ? "Standard User" : "Admin"))}
+        />
 
-                    <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-center">
-                      <div className="p-3 bg-surface-subtle rounded-xl">
-                        <span className="text-[11px] text-slate-400 uppercase font-semibold">Active Stores</span>
-                        <p className="text-lg font-bold text-slate-900 font-mono mt-0.5">{data?.storeCount ?? 0}</p>
-                      </div>
-                      <div className="p-3 bg-surface-subtle rounded-xl">
-                        <span className="text-[11px] text-slate-400 uppercase font-semibold">Catalog SKUs</span>
-                        <p className="text-lg font-bold text-slate-900 font-mono mt-0.5">{data?.productCount ?? 0}</p>
-                      </div>
-                      <div className="p-3 bg-surface-subtle rounded-xl">
-                        <span className="text-[11px] text-slate-400 uppercase font-semibold">System Users</span>
-                        <p className="text-lg font-bold text-slate-900 font-mono mt-0.5">{data?.userCount ?? 0}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-              <CardFooter className="justify-between">
-                <span className="type-body-secondary text-slate-400">Database Synchronized</span>
-                <Button size="sm">Save Changes</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
+        {/* 2. KPI Cards: Positioned along horizon line of banner transition matching Dashboard & Reports */}
+        <div className="pt-0 sm:pt-14 lg:pt-[137px] xl:pt-[169px]">
+          <SettingsKpiGrid
+            kpis={overview?.kpis}
+            onSelectKpi={(id) => {
+              if (id === "kpi-users" || id === "kpi-roles") setActiveTab("users");
+              else if (id === "kpi-integrations") setActiveTab("integrations");
+              else if (id === "kpi-system-status") setActiveTab("system");
+            }}
+            isLoading={isLoading}
+          />
+        </div>
 
-          <TabsContent value="tax" className="mt-4">
-            <Card className="max-w-2xl">
-              <CardHeader>
-                <CardTitle>Indian GST Tax Configuration</CardTitle>
-                <CardDescription>Standardized goods and services tax rates applied across categories.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Default Intrastate GST Mode"
-                    options={[
-                      { value: "cgst_sgst", label: "CGST (50%) + SGST (50%)" },
-                      { value: "igst", label: "IGST (100% Inter-state)" }
-                    ]}
-                  />
-                  <Select
-                    label="Tax Rounding Convention"
-                    options={[
-                      { value: "half_up", label: "Round Half-Up (Standard)" },
-                      { value: "floor", label: "Floor (Round Down)" }
-                    ]}
-                  />
+        {/* 3. Settings Tabs (~50px horizontal scroll on mobile/tablet) */}
+        <SettingsTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+
+        {/* 4. Tab Content: General Tab -> Responsive Settings Grid (Mobile: 1 col, Tablet: 2 cols, Laptop: 3 cols) */}
+        {activeTab === "general" && (
+          <GeneralSettingsGrid
+            overview={overview}
+            canEditSystemSettings={isAdmin}
+            onEditCompany={() => setIsEditCompanyOpen(true)}
+            onAttemptChangeRegional={handleAttemptChangeRegional}
+            onChangeTheme={handleChangeTheme}
+            onSelectSubcategory={(category) => {
+              if (category === "users") setActiveTab("users");
+              else if (category === "integrations") setActiveTab("integrations");
+              else if (category === "security") setActiveTab("security");
+            }}
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Non-General Tab Previews */}
+        {activeTab !== "general" && (
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 capitalize">
+                  {activeTab.replace("-", " ")} Management
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Granular configuration parameters and live policy enforcement
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab("general")}
+                className="self-start sm:self-auto px-3 py-1.5 rounded-lg text-xs font-bold text-[#0071DC] bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
+              >
+                ← Back to General Overview
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="font-bold text-slate-800 text-sm block">Sub-Module Configuration</span>
+                <p className="text-slate-600 leading-relaxed">
+                  All active policies for {activeTab} are currently operating under production baseline. Changes require administrative clearance.
+                </p>
+                <div className="pt-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Status: Active & Synced
+                  </span>
                 </div>
-              </CardContent>
-              <CardFooter className="justify-end">
-                <Button size="sm">Update Tax Settings</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
+              </div>
 
-          <TabsContent value="preferences" className="mt-4">
-            <Card className="max-w-2xl">
-              <CardHeader>
-                <CardTitle>User Interface Preferences</CardTitle>
-                <CardDescription>Customize navigation and display behavior.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-700">Dense Table Layout</label>
-                  <p className="type-body-secondary text-slate-500">Show compact row padding on desktop screens.</p>
-                </div>
-              </CardContent>
-              <CardFooter className="justify-end">
-                <Button size="sm">Save Preferences</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="font-bold text-slate-800 text-sm block">Audit & Governance</span>
+                <p className="text-slate-600 leading-relaxed">
+                  Every policy evaluation, user delegation, and integration handshake in this section is logged immutably in the PostgreSQL audit log ledger.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isAdmin) {
+                      setAccessDeniedState({
+                        isOpen: true,
+                        message: "You don't have access to change this setting.",
+                        settingName: `${activeTab} Configuration`
+                      });
+                    } else {
+                      showToast(`Configured ${activeTab} parameters.`);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition cursor-pointer"
+                >
+                  Configure {activeTab}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <Card className="border-dashed border-border bg-surface-subtle">
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-900">
-              Settings Module Scope
-            </CardTitle>
-            <CardDescription className="mt-1">
-              Multi-tenant settings, custom role permissions, API keys, and notification channels are synchronized with PostgreSQL.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        {/* 5. Bottom System Information + System Status */}
+        <SystemInfoStatus
+          systemInfo={overview?.systemInfo}
+          systemStatus={overview?.systemStatus}
+          onViewStatus={() => setActiveTab("system")}
+          isLoading={isLoading}
+        />
       </div>
+
+      {/* ========================================================================= */}
+      {/* MODALS */}
+      {/* ========================================================================= */}
+
+      {/* 1. Access Denied Modal (Critical 403 Forbidden Access Control UX) */}
+      <AccessDeniedModal
+        isOpen={accessDeniedState.isOpen}
+        onClose={() => setAccessDeniedState((prev) => ({ ...prev, isOpen: false }))}
+        message={accessDeniedState.message}
+        settingName={accessDeniedState.settingName}
+      />
+
+      {/* 2. Edit Company Details Modal */}
+      <EditCompanyModal
+        isOpen={isEditCompanyOpen}
+        onClose={() => setIsEditCompanyOpen(false)}
+        company={overview?.company}
+        onSubmit={handleUpdateCompany}
+        isSubmitting={updateCompanyMutation.isPending}
+      />
+
+      {/* 3. Edit Regional Settings Modal */}
+      <EditRegionalModal
+        isOpen={isEditRegionalOpen}
+        onClose={() => setIsEditRegionalOpen(false)}
+        regional={overview?.regional}
+        onSubmit={handleUpdateRegional}
+        isSubmitting={updateRegionalMutation.isPending}
+      />
     </PageContainer>
   );
 }

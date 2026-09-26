@@ -40,3 +40,4 @@ postgres-data/
 .vscode/
 *.tsbuildinfo
 next-env.d.ts
+database/walmart_erp_dump.sql

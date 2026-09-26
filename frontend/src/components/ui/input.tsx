@@ -126,7 +126,7 @@ NumberInput.displayName = "NumberInput";
 export const CurrencyInput = React.forwardRef<
   HTMLInputElement,
   Omit<InputProps, "startIcon"> & { currencySymbol?: string }
->(({ currencySymbol = "₹", className, ...props }, ref) => {
+>(({ currencySymbol = "$", className, ...props }, ref) => {
   return (
     <Input
       ref={ref}

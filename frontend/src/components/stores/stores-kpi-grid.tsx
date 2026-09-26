@@ -116,7 +116,7 @@ export function StoresKPIGrid({
             sparklineColor={kpi.sparklineColor}
             variant="glass"
             isFilterable={true}
-            isSelected={selectedStatus === kpi.statusKey}
+            isSelected={selectedStatus !== "ALL" && selectedStatus === kpi.statusKey}
             onClick={() => onStatusChange?.(selectedStatus === kpi.statusKey && kpi.statusKey !== "ALL" ? "ALL" : kpi.statusKey)}
           />
         ))}
@@ -139,7 +139,7 @@ export function StoresKPIGrid({
             sparklineColor={kpi.sparklineColor}
             variant="glass-mobile"
             isFilterable={true}
-            isSelected={selectedStatus === kpi.statusKey}
+            isSelected={selectedStatus !== "ALL" && selectedStatus === kpi.statusKey}
             onClick={() => onStatusChange?.(selectedStatus === kpi.statusKey && kpi.statusKey !== "ALL" ? "ALL" : kpi.statusKey)}
           />
         ))}

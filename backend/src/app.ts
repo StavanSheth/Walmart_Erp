@@ -12,6 +12,7 @@ import { ledgerRoutes } from "./ledger/ledger.routes.js";
 import { searchRoutes } from "./search/search.routes.js";
 import { notificationsRoutes } from "./notifications/notifications.routes.js";
 import { settingsRoutes } from "./settings/settings.routes.js";
+import { reportsRoutes } from "./reports/reports.routes.js";
 
 export interface HealthResponse {
   success: boolean;
@@ -150,6 +151,9 @@ export function buildApp(options: AppOptions = {}): FastifyInstance {
 
   // Live Database Settings Routes
   app.register(settingsRoutes, { prefix: "/api/settings" });
+
+  // Live Database Reports Routes
+  app.register(reportsRoutes, { prefix: "/api/reports" });
 
   return app;
 }

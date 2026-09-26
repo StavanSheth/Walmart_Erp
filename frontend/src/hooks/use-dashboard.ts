@@ -9,8 +9,9 @@ export function useDashboardOverview(params?: DashboardQueryParams) {
     queryKey: ["dashboard", "overview", params?.storeId || "ALL", params?.period || "30d"],
     queryFn: async () => {
       const response = await apiClient.getDashboardOverview(params);
-      const raw = response as any;
-      const data = raw?.data?.summary
+      const raw = response as unknown as Record<string, unknown>;
+      const rawData = raw?.data as Record<string, unknown> | undefined;
+      const data = rawData?.summary
         ? raw.data
         : raw?.summary
         ? raw

@@ -27,10 +27,12 @@ export function MobileBottomNav({ className }: { className?: string }) {
       <div className="flex items-center justify-around">
         {MOBILE_BOTTOM_NAV_ITEMS.map((item) => {
           const isMore = item.name === "More";
+          const isMoreActive = isMore && (pathname === "/settings" || pathname.startsWith("/settings"));
           const isActive =
-            !isMore &&
-            (pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href)));
+            isMoreActive ||
+            (!isMore &&
+              (pathname === item.href ||
+                (item.href !== "/dashboard" && pathname.startsWith(item.href))));
 
           if (isMore) {
             return (
@@ -38,10 +40,15 @@ export function MobileBottomNav({ className }: { className?: string }) {
                 key={item.name}
                 type="button"
                 onClick={() => setMobileDrawerOpen(true)}
-                className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-slate-500 hover:text-brand-primary transition-all focus-visible:outline-none"
+                className={cn(
+                  "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 focus-visible:outline-none",
+                  isMoreActive
+                    ? "bg-[#EBF5FF] text-[#0071DC] font-bold shadow-xs scale-105"
+                    : "text-slate-500 hover:text-brand-primary"
+                )}
               >
-                <NavIconByName name={item.iconName} className="w-5 h-5 text-slate-600" />
-                <span className="text-[10px] font-medium text-slate-600 mt-0.5">More</span>
+                <NavIconByName name={item.iconName} className={cn("w-5 h-5", isMoreActive ? "text-[#0071DC]" : "text-slate-600")} />
+                <span className={cn("text-[10px] mt-0.5", isMoreActive ? "font-bold text-[#0071DC]" : "font-medium text-slate-600")}>More</span>
               </button>
             );
           }

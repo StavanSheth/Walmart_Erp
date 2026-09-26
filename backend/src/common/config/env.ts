@@ -1,7 +1,19 @@
+import fs from "node:fs";
+import path from "node:path";
 import dotenv from "dotenv";
 import { z } from "zod";
 
 dotenv.config();
+const possibleEnvPaths = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "backend/.env"),
+  path.resolve(process.cwd(), "../backend/.env")
+];
+for (const p of possibleEnvPaths) {
+  if (fs.existsSync(p)) {
+    dotenv.config({ path: p });
+  }
+}
 
 const envSchema = z
   .object({

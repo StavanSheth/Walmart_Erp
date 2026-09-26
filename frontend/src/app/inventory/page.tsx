@@ -122,16 +122,41 @@ function InventoryPageContent() {
 
   return (
     <PageContainer>
-      <div className="space-y-4 sm:space-y-5 pb-16 md:pb-6">
-        {/* 1. Header with live formatted date, refresh sync, and mobile filter trigger */}
+      <div className="space-y-5 pb-20 md:pb-6">
+        {/* 1. Header with live formatted date, refresh sync, store selection, and mobile filter trigger */}
         <InventoryPageHeader
+          selectedStoreId={storeIdParam}
+          onStoreChange={handleStoreChange}
           onRefresh={() => refetch()}
           isFetching={isFetching}
           onOpenMobileFilters={() => setIsMobileFilterOpen(true)}
           activeFilterCount={activeFilterCount}
         />
 
-        {/* 2. Unified Filter Component (desktop bar + mobile drawer) */}
+        {/* Global Error Banner with Retry */}
+        {isError && (
+          <ErrorState
+            title="Failed to load inventory data"
+            message={
+              error instanceof Error
+                ? error.message
+                : "An unexpected error occurred while communicating with the database."
+            }
+            onRetry={() => refetch()}
+          />
+        )}
+
+        {/* 2. KPI Summary (5 Cards: Total Products, Low Stock, Out of Stock, In Transit, Value at banner horizon) */}
+        <div className="pt-[82px] sm:pt-24 lg:pt-[184px] xl:pt-52">
+          <InventoryKPIGrid
+            summary={data?.summary}
+            isLoading={isLoading}
+            selectedStatus={statusParam}
+            onStatusClick={handleStatusChange}
+          />
+        </div>
+
+        {/* 3. Unified Filter Component on canvas (desktop bar + mobile drawer) */}
         <InventoryFilters
           search={searchParam}
           regionId={regionIdParam}
@@ -150,29 +175,6 @@ function InventoryPageContent() {
           isMobileOpen={isMobileFilterOpen}
           onMobileClose={() => setIsMobileFilterOpen(false)}
         />
-
-        {/* Global Error Banner with Retry */}
-        {isError && (
-          <ErrorState
-            title="Failed to load inventory data"
-            message={
-              error instanceof Error
-                ? error.message
-                : "An unexpected error occurred while communicating with the database."
-            }
-            onRetry={() => refetch()}
-          />
-        )}
-
-        {/* 3. KPI Summary (5 Cards: Total Products, Low Stock, Out of Stock, In Transit, Value) */}
-        <div className="mt-2 sm:mt-3">
-          <InventoryKPIGrid
-            summary={data?.summary}
-            isLoading={isLoading}
-            selectedStatus={statusParam}
-            onStatusClick={handleStatusChange}
-          />
-        </div>
 
         {/* 4. Analytics Section (Overview Chart, Donut Category Chart, Stock Status) */}
         <InventoryAnalyticsSection

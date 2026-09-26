@@ -91,7 +91,7 @@ export function MetricCard({
         "rounded-2xl flex flex-col justify-between transition-all duration-200 select-none",
         variantStyles[variant],
         isClickable && "cursor-pointer hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
-        isSelected && "ring-2 ring-white/80 bg-[#051A33]/45 shadow-xl border-white/40",
+        isSelected && "ring-2 ring-blue-400 bg-[#051A33]/50 shadow-xl border-blue-400/60",
         className
       )}
     >

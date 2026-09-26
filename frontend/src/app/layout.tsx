@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   title: "Walmart ERP — Enterprise Retail Operations",
   description: "Walmart India ERP Application Shell and Operations Platform",
   icons: {
-    icon: ASSETS.brand.spark
+    icon: [
+      { url: "/brand/walmart-spark.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" }
+    ],
+    shortcut: "/brand/walmart-spark.svg",
+    apple: "/brand/walmart-spark.svg"
   }
 };
 

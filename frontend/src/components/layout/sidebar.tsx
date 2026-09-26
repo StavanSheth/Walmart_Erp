@@ -79,10 +79,10 @@ export function Sidebar({ className }: SidebarProps) {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150",
+                "group relative flex items-center gap-3 px-3 py-2.5 min-h-[52px] lg:min-h-[58px] rounded-xl text-xs sm:text-sm font-medium transition-all duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
                 isActive
-                  ? "bg-brand-primary text-white shadow-md font-semibold"
+                  ? "bg-gradient-to-r from-[#0071DC] to-[#0050B3] text-white shadow-lg font-semibold border border-white/20"
                   : "text-slate-300 hover:bg-white/10 hover:text-white"
               )}
             >
@@ -103,13 +103,22 @@ export function Sidebar({ className }: SidebarProps) {
                   sidebarCollapsed ? "hidden" : "hidden lg:block"
                 )}
               >
-                <span className="block truncate leading-tight">{item.name}</span>
+                <span className="block truncate text-sm leading-tight font-medium text-white">{item.name}</span>
                 {item.description && (
-                  <span className="block truncate text-[10px] text-slate-400 group-hover:text-slate-300 font-normal leading-tight mt-0.5">
+                  <span className={cn(
+                    "block truncate text-[10px] font-normal leading-tight mt-0.5",
+                    isActive ? "text-blue-100" : "text-slate-400 group-hover:text-slate-300"
+                  )}>
                     {item.description}
                   </span>
                 )}
               </div>
+
+              {isActive && !sidebarCollapsed && (
+                <div className="hidden lg:flex items-center justify-center shrink-0 text-white/80">
+                  <ChevronRightIcon className="w-4 h-4" />
+                </div>
+              )}
             </Link>
           );
 
@@ -148,8 +157,8 @@ export function Sidebar({ className }: SidebarProps) {
             <div className="relative z-10 flex items-center gap-2 min-w-0">
               <SparkIcon className="w-5 h-5 text-emerald-400 shrink-0" />
               <div className="text-[10px] leading-tight text-slate-200">
-                <span className="font-bold text-white block">Stronger</span>
-                Communities Everyday.
+                <span className="font-bold text-white block">Data Drives</span>
+                Brighter Communities.
               </div>
             </div>
             <div className="relative z-10 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors cursor-pointer shrink-0 shadow-xs">

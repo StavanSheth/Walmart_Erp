@@ -114,8 +114,8 @@ export function Header({ className, isDashboard = true }: HeaderProps) {
           <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 rounded-full text-white text-xs backdrop-blur-md bg-white/15 border border-white/20">
             <span className="text-base">☀️</span>
             <div className="leading-tight">
-              <span className="font-bold">26°C</span>
-              <span className="text-blue-100 ml-1">New York, NY</span>
+              <span className="font-bold">28°C</span>
+              <span className="text-blue-100 ml-1">New Delhi, IN</span>
               <p className="text-[10px] text-blue-200">Clear Skies</p>
             </div>
           </div>

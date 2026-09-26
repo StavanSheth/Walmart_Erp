@@ -2,22 +2,15 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { ShellProvider } from "@/context/shell-context";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { MobileBottomNav, MobileDrawer } from "./mobile-nav";
 import { GlobalSearchModal } from "./global-search";
 import { ASSETS } from "@/lib/assets";
-import { cn } from "@/lib/cn";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isDashboard = pathname === "/dashboard" || pathname === "/";
-  const isInventory = pathname === "/inventory";
-  const isPartners = pathname === "/partners" || pathname.startsWith("/partners");
-  const isStores = pathname === "/stores" || pathname.startsWith("/stores");
-  const hasBanner = isDashboard || isInventory || isPartners || isStores;
+  const hasBanner = true;
 
   return (
     <ShellProvider>
@@ -27,18 +20,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 relative">
-          {/* Top Banner Image (Visible behind header and page hero section) */}
+          {/* Top Banner Image (Visible behind header and page hero section across all sections) */}
           {hasBanner && (
-            <div
-              className={cn(
-                "absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0",
-                isDashboard || isStores
-                  ? "h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]"
-                  : isPartners
-                  ? "h-[620px] sm:h-[580px] lg:h-[370px] xl:h-[385px]"
-                  : "h-[480px] sm:h-[440px] lg:h-[355px] xl:h-[365px]"
-              )}
-            >
+            <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0 h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
@@ -52,13 +36,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent" />
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
 
-              {/* Bottom smooth fade into normal #F4F6F9 canvas right where the KPI cards end */}
-              <div
-                className={cn(
-                  "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent",
-                  isDashboard || isStores ? "h-28" : isPartners ? "h-20 sm:h-24" : "h-20"
-                )}
-              />
+              {/* Bottom edge transition into #F4F6F9 canvas */}
+              <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#F4F6F9] to-transparent pointer-events-none" />
             </div>
           )}
 

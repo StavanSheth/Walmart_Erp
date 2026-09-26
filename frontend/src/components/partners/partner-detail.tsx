@@ -88,7 +88,7 @@ export function PartnerDetailModal({
                 {data.entity === "partner" ? "Total Purchase" : "Total Sales"}
               </span>
               <span className="text-sm sm:text-base font-bold text-slate-900 tabular-nums">
-                {data.totalValue > 0 ? formatCurrency(data.totalValue) : "₹0"}
+                {data.totalValue > 0 ? formatCurrency(data.totalValue) : "$0"}
               </span>
             </div>
 
@@ -106,7 +106,7 @@ export function PartnerDetailModal({
                 Avg Order Value
               </span>
               <span className="text-sm sm:text-base font-bold text-slate-900 tabular-nums">
-                {data.averageOrderValue > 0 ? formatCurrency(data.averageOrderValue) : "₹0"}
+                {data.averageOrderValue > 0 ? formatCurrency(data.averageOrderValue) : "$0"}
               </span>
             </div>
 
@@ -115,7 +115,7 @@ export function PartnerDetailModal({
                 Credit Limit
               </span>
               <span className="text-sm sm:text-base font-bold text-slate-900 tabular-nums">
-                {data.creditLimit > 0 ? formatCurrency(data.creditLimit) : "₹0"}
+                {data.creditLimit > 0 ? formatCurrency(data.creditLimit) : "$0"}
               </span>
             </div>
           </div>

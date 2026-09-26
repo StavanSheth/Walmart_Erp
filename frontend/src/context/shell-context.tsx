@@ -23,13 +23,13 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
     async function loadStores() {
       try {
         const res = await apiClient.get<StoreInfo[]>("/api/stores");
-        const raw = res as any;
+        const raw = res as Record<string, unknown>;
         const list: StoreInfo[] = Array.isArray(raw?.data)
-          ? raw.data
-          : Array.isArray(raw?.data?.data)
-          ? raw.data.data
+          ? (raw.data as StoreInfo[])
+          : Array.isArray((raw?.data as Record<string, unknown>)?.data)
+          ? ((raw.data as Record<string, unknown>).data as StoreInfo[])
           : Array.isArray(raw)
-          ? raw
+          ? (raw as StoreInfo[])
           : [];
         if (active && list.length > 0) {
           setStores(list);

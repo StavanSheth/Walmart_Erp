@@ -2,147 +2,256 @@
 
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ReportsIcon, ArrowUpDownIcon } from "@/components/ui/icons";
-import { useDashboardOverview } from "@/hooks/use-dashboard";
-import { Skeleton } from "@/components/common/loading-state";
+import { ReportsHero } from "@/components/reports/reports-hero";
+import { ReportCategoryCardsBar } from "@/components/reports/report-category-cards";
+import { ReportFilterBar } from "@/components/reports/report-filter-bar";
+import { SalesOverviewCard } from "@/components/reports/sales-overview-card";
+import { SalesByCategoryCard } from "@/components/reports/sales-by-category-card";
+import { QuickReportsPanel } from "@/components/reports/quick-reports-panel";
+import { ScheduledReportsPanel } from "@/components/reports/scheduled-reports-panel";
+import { GeneratedReportsTable } from "@/components/reports/generated-reports-table";
+import { ReportsPromoBanner } from "@/components/reports/reports-promo-banner";
+import { GenerateReportModal } from "@/components/reports/generate-report-modal";
+import {
+  useReportsOverview,
+  useGenerateReport,
+  useToggleScheduledReport
+} from "@/hooks/use-reports";
+import { apiClient } from "@/lib/api/client";
+import type {
+  ReportsQueryParams,
+  GenerateReportInput,
+  QuickReportItem,
+  GeneratedReportRecord
+} from "@/types/reports";
 
 export default function ReportsPage() {
-  const { data, isLoading } = useDashboardOverview({ period: "30d" });
+  // Filter state synchronized with backend API
+  const [filters, setFilters] = React.useState<ReportsQueryParams>({
+    reportType: "SALES",
+    period: "30d",
+    regionId: "ALL",
+    storeId: "ALL",
+    categoryId: "ALL",
+    productId: "ALL",
+    partnerType: "ALL",
+    partnerId: "ALL",
+    status: "ALL",
+    search: "",
+    page: 1,
+    pageSize: 10
+  });
 
-  const totalSales = data?.salesOverview?.totalSales ?? 0;
-  const inventoryValue = data?.mobileSummary?.inventoryValue ?? 0;
-  const orderCount = data?.mobileSummary?.totalOrders ?? 0;
+  // Filter pop-in / pop-out toggle state
+  const [isFiltersOpen, setIsFiltersOpen] = React.useState(false);
 
-  const reports = [
-    {
-      title: "GST GSTR-1 Sales Return",
-      description: "Outward supplies summary categorized by HSN and tax slabs (0%, 5%, 12%, 18%, 28%).",
-      freq: "Monthly",
-      type: "Tax Compliance",
-      liveMetric: totalSales ? `$${totalSales.toLocaleString()} Net Outward Supplies` : null
-    },
-    {
-      title: "Inventory Aging & Stock Valuation",
-      description: "Weighted average stock value, slow-moving items, and stock-out projections.",
-      freq: "Weekly",
-      type: "Operations",
-      liveMetric: inventoryValue ? `$${inventoryValue.toLocaleString()} Current Stock Value` : null
-    },
-    {
-      title: "Store Sales & Margin Breakdown",
-      description: "Gross margin, net revenue, basket size, and tender type distributions.",
-      freq: "Daily",
-      type: "Financial",
-      liveMetric: orderCount ? `${orderCount} Completed Sales Transactions` : null
-    },
-    {
-      title: "System Audit & Security Logs",
-      description: "User login events, inventory adjustments, and administrative overrides.",
-      freq: "Real-time",
-      type: "Security",
-      liveMetric: data?.recentActivity ? `${data.recentActivity.length} Recent Ledger Events` : null
+  // Modal state
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = React.useState(false);
+
+  // React Query hooks
+  const { data, isLoading, refetch, isFetching } = useReportsOverview(filters);
+  const generateMutation = useGenerateReport();
+  const toggleMutation = useToggleScheduledReport();
+
+  // Active filter count for header pill
+  const activeFiltersCount = React.useMemo(() => {
+    let count = 0;
+    if (filters.reportType && filters.reportType !== "SALES") count++;
+    if (filters.period && filters.period !== "30d") count++;
+    if (filters.regionId && filters.regionId !== "ALL") count++;
+    if (filters.storeId && filters.storeId !== "ALL") count++;
+    if (filters.categoryId && filters.categoryId !== "ALL") count++;
+    if (filters.productId && filters.productId !== "ALL") count++;
+    if (filters.partnerType && filters.partnerType !== "ALL") count++;
+    if (filters.partnerId && filters.partnerId !== "ALL") count++;
+    if (filters.status && filters.status !== "ALL") count++;
+    return count;
+  }, [filters]);
+
+  // Handlers
+  const handleFilterChange = (key: keyof ReportsQueryParams, value: string | number) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key !== "page" ? { page: 1 } : {}) // Reset to page 1 only when filters (not page) change
+    }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      reportType: "SALES",
+      period: "30d",
+      regionId: "ALL",
+      storeId: "ALL",
+      categoryId: "ALL",
+      productId: "ALL",
+      partnerType: "ALL",
+      partnerId: "ALL",
+      status: "ALL",
+      search: "",
+      page: 1,
+      pageSize: 10
+    });
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    handleFilterChange("reportType", categoryId);
+  };
+
+  const handleQuickReportSelect = (item: QuickReportItem) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...item.filters,
+      page: 1
+    }));
+  };
+
+  const handleToggleScheduled = (id: string, newEnabled: boolean) => {
+    toggleMutation.mutate({ id, enabled: newEnabled });
+  };
+
+  const handleGenerateReportSubmit = (input: GenerateReportInput) => {
+    generateMutation.mutate(input, {
+      onSuccess: () => {
+        setIsGenerateModalOpen(false);
+      }
+    });
+  };
+
+  // Download logic supporting CSV and JSON download
+  const handleDownloadReports = async (selectedIds?: string[]) => {
+    try {
+      const reportId = selectedIds && selectedIds.length === 1 ? selectedIds[0] : undefined;
+      const csvData = await apiClient.exportReportData(reportId, "CSV");
+
+      // Trigger native browser download
+      const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `walmart_erp_reports_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export report data:", err);
     }
-  ];
+  };
+
+  const handleDownloadSingleReport = (report: GeneratedReportRecord) => {
+    handleDownloadReports([report.id]);
+  };
 
   return (
-    <PageContainer
-      title="Reports & Analytics"
-      description="Standardized retail reports, GST compliance exports, and system audit logs synchronized live from the database."
-      actions={
-        <Button variant="outline" size="sm">
-          <ArrowUpDownIcon className="w-3.5 h-3.5 mr-1" />
-          Schedule Report
-        </Button>
-      }
-    >
-      <div className="space-y-6">
-        {/* Live Database Snapshot Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="p-4 bg-white">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              30-Day Database Revenue
-            </span>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32 mt-1 rounded" />
-            ) : (
-              <p className="text-2xl font-bold font-mono text-slate-900 mt-1">
-                ${totalSales.toLocaleString()}
-              </p>
-            )}
-            <span className="text-[11px] text-emerald-600 font-medium">PostgreSQL Live Record</span>
-          </Card>
+    <PageContainer>
+      <div className="space-y-5 pb-20 md:pb-6">
+        {/* 1. Hero Section (REPORTS badge, heading, slogan & liquid glass header controls) */}
+        <ReportsHero
+          isFiltersOpen={isFiltersOpen}
+          onToggleFilters={() => setIsFiltersOpen((prev) => !prev)}
+          onRefresh={() => refetch()}
+          isFetching={isFetching}
+          activeFiltersCount={activeFiltersCount}
+        />
 
-          <Card className="p-4 bg-white">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              Total Inventory Valuation
-            </span>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32 mt-1 rounded" />
-            ) : (
-              <p className="text-2xl font-bold font-mono text-slate-900 mt-1">
-                ${inventoryValue.toLocaleString()}
-              </p>
-            )}
-            <span className="text-[11px] text-emerald-600 font-medium">PostgreSQL Live Valuation</span>
-          </Card>
-
-          <Card className="p-4 bg-white">
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              Audited Order Count
-            </span>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32 mt-1 rounded" />
-            ) : (
-              <p className="text-2xl font-bold font-mono text-slate-900 mt-1">
-                {orderCount} Orders
-              </p>
-            )}
-            <span className="text-[11px] text-emerald-600 font-medium">PostgreSQL Live Ledger</span>
-          </Card>
+        {/* 2. 7 Report Category Cards (Sales, Inventory, Store, Partner, Financial, Operational, Custom) */}
+        <div className="pt-0 sm:pt-14 lg:pt-[137px] xl:pt-[169px]">
+          <ReportCategoryCardsBar
+            items={data?.categoryCards}
+            selectedCategory={filters.reportType || "SALES"}
+            onSelectCategory={handleCategorySelect}
+            onBuildReportClick={() => setIsGenerateModalOpen(true)}
+            isLoading={isLoading}
+          />
         </div>
 
-        {/* Report Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {reports.map((rep, idx) => (
-            <Card key={idx}>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <Badge variant="neutral">{rep.type}</Badge>
-                  <span className="text-[11px] font-medium text-slate-400">{rep.freq}</span>
-                </div>
-                <CardTitle className="mt-2">{rep.title}</CardTitle>
-                <CardDescription>{rep.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-2 space-y-3">
-                {rep.liveMetric && (
-                  <div className="p-2.5 rounded-lg bg-surface-subtle border border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Live Database Value:</span>
-                    <span className="font-mono font-semibold text-slate-900">{rep.liveMetric}</span>
-                  </div>
-                )}
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  <ReportsIcon className="w-3.5 h-3.5 mr-1.5" />
-                  Export Report (Live DB)
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* 3. Main 2-Column Grid (Left Column: Filters, Sales Analytics, Generated Reports Table; Right Column: Quick Reports, Scheduled Reports, Promo Banner) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_295px] xl:grid-cols-[minmax(0,1fr)_300px] gap-4 sm:gap-4.5 items-start">
+          {/* Main Left Column (~930–950px usable width) */}
+          <div className="space-y-4 sm:space-y-4.5 min-w-0">
+            {/* Pop-in / Pop-out Report Filters Panel (positioned cleanly at top of main column) */}
+            <ReportFilterBar
+              filters={filters}
+              filterOptions={data?.filterOptions}
+              onChangeFilter={handleFilterChange}
+              onResetFilters={handleResetFilters}
+              onGenerateReportClick={() => setIsGenerateModalOpen(true)}
+              isOpen={isFiltersOpen}
+              onToggleOpen={() => setIsFiltersOpen((prev) => !prev)}
+            />
 
-        <Card className="border-dashed border-border bg-surface-subtle">
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-900">
-              Reports & Compliance Live Data Status
-            </CardTitle>
-            <CardDescription className="mt-1">
-              All financial summaries, outward GST transactions, stock valuation, and audit trail metrics are computed directly from the PostgreSQL database in real time.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+            {/* Sales Overview (68%) + Sales by Category (32%) */}
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,67%)_minmax(0,33%)] xl:grid-cols-[minmax(0,68%)_minmax(0,32%)] gap-4 sm:gap-4.5 items-stretch">
+              {/* Sales Overview Report with 5 KPIs and Multi-line Area Chart */}
+              <SalesOverviewCard
+                kpis={data?.kpis}
+                salesTrend={data?.salesTrend}
+                period={filters.period || "30d"}
+                onPeriodChange={(p) => handleFilterChange("period", p)}
+                isLoading={isLoading}
+              />
+
+              {/* Sales by Category Donut Chart */}
+              <SalesByCategoryCard
+                items={data?.categoryDistribution?.items}
+                totalSalesFormatted={data?.categoryDistribution?.formattedTotalSales}
+                isLoading={isLoading}
+              />
+            </div>
+
+            {/* Generated Reports Table (Full width of the left column) */}
+            <GeneratedReportsTable
+              reports={data?.generatedReports?.items}
+              totalReports={data?.generatedReports?.total}
+              page={filters.page || 1}
+              pageSize={filters.pageSize || 10}
+              totalPages={data?.generatedReports?.totalPages || 1}
+              onPageChange={handlePageChange}
+              onSearchChange={(q) => handleFilterChange("search", q)}
+              onDownloadReports={handleDownloadReports}
+              onDownloadSingleReport={handleDownloadSingleReport}
+              isLoading={isLoading}
+            />
+          </div>
+
+          {/* Right Column (~295–300px fixed width, continuously stacked) */}
+          <div className="space-y-4 sm:space-y-4.5 shrink-0">
+            {/* Quick Reports Panel */}
+            <QuickReportsPanel
+              items={data?.quickReports}
+              onSelectQuickReport={handleQuickReportSelect}
+              isLoading={isLoading}
+            />
+
+            {/* Scheduled Reports Panel */}
+            <ScheduledReportsPanel
+              items={data?.scheduledReports}
+              onToggleReport={handleToggleScheduled}
+              isLoading={isLoading}
+              compact
+            />
+
+            {/* Promotional Banner: "From Data to a Brighter Tomorrow" */}
+            <ReportsPromoBanner />
+          </div>
+        </div>
       </div>
+
+      {/* Generate Report Modal Dialog */}
+      <GenerateReportModal
+        isOpen={isGenerateModalOpen}
+        onClose={() => setIsGenerateModalOpen(false)}
+        onSubmit={handleGenerateReportSubmit}
+        isSubmitting={generateMutation.isPending}
+      />
     </PageContainer>
   );
 }
