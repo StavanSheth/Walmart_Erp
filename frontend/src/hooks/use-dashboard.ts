@@ -6,12 +6,19 @@ import type { DashboardQueryParams, DashboardOverviewData } from "@/types/dashbo
 
 export function useDashboardOverview(params?: DashboardQueryParams) {
   return useQuery<DashboardOverviewData>({
-    queryKey: ["dashboard", "overview", params?.storeId, params?.period],
+    queryKey: ["dashboard", "overview", params?.storeId || "ALL", params?.period || "30d"],
     queryFn: async () => {
       const response = await apiClient.getDashboardOverview(params);
-      return response.data;
+      const raw = response as any;
+      const data = raw?.data?.summary
+        ? raw.data
+        : raw?.summary
+        ? raw
+        : raw?.data;
+      return data as DashboardOverviewData;
     },
     staleTime: 60 * 1000,
     retry: 2
   });
 }
+

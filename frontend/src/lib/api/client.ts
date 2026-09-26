@@ -1,4 +1,3 @@
-import { env } from "../config/env";
 import type { HealthResponse } from "@/types/api";
 import type { DashboardOverviewResponse, DashboardQueryParams } from "@/types/dashboard";
 import type {
@@ -20,40 +19,49 @@ export class ApiError extends Error {
 }
 
 export class ApiClient {
-  private readonly baseUrl: string;
+  private customBaseUrl?: string;
 
   constructor(baseUrl?: string) {
     if (baseUrl) {
-      this.baseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
-    } else if (typeof window !== "undefined") {
-      // In the browser, always use same-origin relative /api
-      // This routes through Next.js rewrite proxy, completely avoiding CORS,
-      // port blocking, and IPv4 vs IPv6 [::1] connection issues.
-      const rawUrl = env.NEXT_PUBLIC_API_URL || "/api";
-      this.baseUrl = rawUrl.startsWith("http") ? rawUrl.replace(/\/$/, "") : "/api";
-    } else {
-      // On the server (SSR): connect directly to the Fastify backend on IPv4 loopback
-      const rawUrl = process.env.INTERNAL_API_URL || "http://127.0.0.1:4000/api";
-      this.baseUrl = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+      this.customBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
     }
   }
 
+  public getBaseUrl(): string {
+    if (this.customBaseUrl) return this.customBaseUrl;
+    if (typeof window !== "undefined") {
+      return "/api";
+    }
+    return process.env.INTERNAL_API_URL || "http://127.0.0.1:4000/api";
+  }
+
+  public get baseUrl(): string {
+    return this.getBaseUrl();
+  }
+
+
   public async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const base = this.getBaseUrl();
     let formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-    if (this.baseUrl.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
+    if (base.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
       formattedEndpoint = formattedEndpoint.slice(4);
     }
-    const url = `${this.baseUrl}${formattedEndpoint}`;
+    const url = `${base}${formattedEndpoint}`;
 
     const headers: HeadersInit = {
+      Accept: "application/json",
       ...(options.body ? { "Content-Type": "application/json" } : {}),
       ...options.headers
     };
 
     let response: Response;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       response = await fetch(url, {
         ...options,
+        signal: options.signal || controller.signal,
         headers
       });
     } catch (error) {
@@ -63,9 +71,11 @@ export class ApiClient {
       const rawMessage = error instanceof Error ? error.message : "Network error occurred";
       const message =
         rawMessage === "Failed to fetch"
-          ? `Unable to connect to backend server at ${this.baseUrl}. Please check connection.`
+          ? `Unable to connect to backend server at ${base}. Please check connection.`
           : rawMessage;
       throw new ApiError(message);
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     if (!response.ok) {
@@ -135,7 +145,9 @@ export class ApiClient {
     params?: DashboardQueryParams
   ): Promise<DashboardOverviewResponse> {
     const searchParams = new URLSearchParams();
-    if (params?.storeId) searchParams.set("storeId", params.storeId);
+    if (params?.storeId && params.storeId !== "ALL" && params.storeId !== "all") {
+      searchParams.set("storeId", params.storeId);
+    }
     if (params?.period) searchParams.set("period", params.period);
     const queryString = searchParams.toString();
     const endpoint = queryString
@@ -275,17 +287,112 @@ export class ApiClient {
     const queryString = searchParams.toString();
     const endpoint = queryString ? `/partners/export?${queryString}` : "/partners/export";
 
+    const base = this.getBaseUrl();
     let formattedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-    if (this.baseUrl.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
+    if (base.endsWith("/api") && formattedEndpoint.startsWith("/api/")) {
       formattedEndpoint = formattedEndpoint.slice(4);
     }
-    const url = `${this.baseUrl}${formattedEndpoint}`;
+    const url = `${base}${formattedEndpoint}`;
 
     const response = await fetch(url);
     if (!response.ok) {
       throw new ApiError(`Export failed with status ${response.status}`, response.status);
     }
     return response.text();
+  }
+
+  /**
+   * Phase 8 Stores Overview API
+   */
+  public async getStoresOverview(
+    params?: import("@/types/stores").StoresQueryParams
+  ): Promise<{ success: boolean; data: import("@/types/stores").StoresOverviewData }> {
+    const searchParams = new URLSearchParams();
+    if (params?.search && params.search.trim().length > 0) {
+      searchParams.set("search", params.search.trim());
+    }
+    if (params?.regionId && params.regionId !== "ALL" && params.regionId !== "all") {
+      searchParams.set("regionId", params.regionId);
+    }
+    if (params?.status && params.status !== "ALL") {
+      searchParams.set("status", params.status);
+    }
+    if (params?.period) {
+      searchParams.set("period", params.period);
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/stores/overview?${queryString}` : "/stores/overview";
+    return this.request<{ success: boolean; data: import("@/types/stores").StoresOverviewData }>(endpoint);
+  }
+
+  /**
+   * Phase 8 Stores Network Points API for Interactive Map
+   */
+  public async getStoresNetwork(
+    params?: import("@/types/stores").StoresQueryParams
+  ): Promise<{ success: boolean; data: { stores: import("@/types/stores").StoreNetworkPoint[] } }> {
+    const searchParams = new URLSearchParams();
+    if (params?.search && params.search.trim().length > 0) {
+      searchParams.set("search", params.search.trim());
+    }
+    if (params?.regionId && params.regionId !== "ALL" && params.regionId !== "all") {
+      searchParams.set("regionId", params.regionId);
+    }
+    if (params?.status && params.status !== "ALL") {
+      searchParams.set("status", params.status);
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/stores/network?${queryString}` : "/stores/network";
+    return this.request<{ success: boolean; data: { stores: import("@/types/stores").StoreNetworkPoint[] } }>(endpoint);
+  }
+
+  /**
+   * Phase 8 Stores List API with pagination
+   */
+  public async getStores(
+    params?: import("@/types/stores").StoresQueryParams
+  ): Promise<{
+    success: boolean;
+    data: import("@/types/stores").StoreSummary[];
+    meta: { total: number; page: number; pageSize: number; totalPages: number };
+  }> {
+    const searchParams = new URLSearchParams();
+    if (params?.search && params.search.trim().length > 0) {
+      searchParams.set("search", params.search.trim());
+    }
+    if (params?.regionId && params.regionId !== "ALL" && params.regionId !== "all") {
+      searchParams.set("regionId", params.regionId);
+    }
+    if (params?.status && params.status !== "ALL") {
+      searchParams.set("status", params.status);
+    }
+    if (params?.page) {
+      searchParams.set("page", String(params.page));
+    }
+    if (params?.pageSize) {
+      searchParams.set("pageSize", String(params.pageSize));
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/stores?${queryString}` : "/stores";
+    return this.request<{
+      success: boolean;
+      data: import("@/types/stores").StoreSummary[];
+      meta: { total: number; page: number; pageSize: number; totalPages: number };
+    }>(endpoint);
+  }
+
+  /**
+   * Phase 8 Store Detail API
+   */
+  public async getStoreDetail(
+    id: string
+  ): Promise<{ success: boolean; data: import("@/types/stores").StoreDetailData }> {
+    return this.request<{ success: boolean; data: import("@/types/stores").StoreDetailData }>(
+      `/stores/${encodeURIComponent(id)}`
+    );
   }
 }
 

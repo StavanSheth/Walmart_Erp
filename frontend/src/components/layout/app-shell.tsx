@@ -16,7 +16,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isDashboard = pathname === "/dashboard" || pathname === "/";
   const isInventory = pathname === "/inventory";
   const isPartners = pathname === "/partners" || pathname.startsWith("/partners");
-  const hasBanner = isDashboard || isInventory || isPartners;
+  const isStores = pathname === "/stores" || pathname.startsWith("/stores");
+  const hasBanner = isDashboard || isInventory || isPartners || isStores;
 
   return (
     <ShellProvider>
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div
               className={cn(
                 "absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0",
-                isDashboard
+                isDashboard || isStores
                   ? "h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]"
                   : isPartners
                   ? "h-[620px] sm:h-[580px] lg:h-[370px] xl:h-[385px]"
@@ -55,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div
                 className={cn(
                   "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/85 to-transparent",
-                  isDashboard ? "h-28" : isPartners ? "h-20 sm:h-24" : "h-20"
+                  isDashboard || isStores ? "h-28" : isPartners ? "h-20 sm:h-24" : "h-20"
                 )}
               />
             </div>

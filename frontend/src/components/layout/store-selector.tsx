@@ -32,7 +32,7 @@ export function StoreSelector({
         trigger={
           isDashboard ? (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/15 hover:bg-white/25 text-white backdrop-blur-md transition-colors shadow-xs cursor-pointer text-xs font-medium">
-              <StoreIcon className="w-3.5 h-3.5 text-white/90" />
+              <StoreIcon className="w-4 h-4 rounded-full object-cover shrink-0" />
               <span className="truncate max-w-[130px] font-semibold">{currentStore.name}</span>
               <ChevronDownIcon
                 className={cn(
@@ -43,8 +43,8 @@ export function StoreSelector({
             </div>
           ) : (
             <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-md border border-border bg-surface hover:bg-surface-subtle transition-colors shadow-xs text-left">
-              <div className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-sky text-brand-primary shrink-0">
-                <StoreIcon className="w-4 h-4" />
+              <div className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-sky text-brand-primary shrink-0 overflow-hidden">
+                <StoreIcon className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col min-w-0 pr-1 text-left">
                 <div className="flex items-center gap-1.5">

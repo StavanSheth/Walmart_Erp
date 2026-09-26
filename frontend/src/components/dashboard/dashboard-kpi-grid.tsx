@@ -16,29 +16,21 @@ export function DashboardKPIGrid({
   mobileSummary,
   isLoading = false
 }: DashboardKPIGridProps) {
-  if (isLoading || !summary || !mobileSummary) {
-    return (
-      <div>
-        {/* Desktop Skeleton */}
+  const showDesktopSkeleton = isLoading || !summary;
+  const showMobileSkeleton = isLoading || !mobileSummary;
+
+  return (
+    <div>
+      {/* Desktop: 5 Glass Metric Cards or Skeleton */}
+      {showDesktopSkeleton ? (
         <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
           {[1, 2, 3, 4, 5].map((i) => (
             <MetricCard key={i} label="" value="" isLoading variant="glass" />
           ))}
         </div>
-        {/* Mobile Skeleton */}
-        <div className="grid grid-cols-2 gap-3 md:hidden">
-          {[1, 2, 3, 4].map((i) => (
-            <MetricCard key={i} label="" value="" isLoading variant="glass-mobile" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+      ) : (
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
 
-  return (
-    <div>
-      {/* Desktop: 5 Glass Metric Cards */}
-      <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* 1. Total Products */}
         <MetricCard
           id="products"
@@ -133,82 +125,91 @@ export function DashboardKPIGrid({
           sparklineColor="#38BDF8"
           variant="glass"
         />
-      </div>
+        </div>
+      )}
 
-      {/* Mobile: 2 × 2 Glass Metric Cards */}
-      <div className="grid grid-cols-2 gap-3 md:hidden">
-        {/* 1. Total Sales (Today) */}
-        <MetricCard
-          id="m-sales"
-          label="Total Sales (Today)"
-          value={formatCurrency(mobileSummary.totalSalesToday)}
-          subLabel=""
-          trendText="↑ 12%"
-          trendPositive={true}
-          icon={
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          }
-          iconContainerClassName="bg-emerald-500/30 border-emerald-400/40 text-emerald-300 w-8 h-8 rounded-lg mb-2"
-          sparklineTrend="surge"
-          sparklineColor="#34D399"
-          variant="glass-mobile"
-        />
+      {/* Mobile: 2 × 2 Glass Metric Cards or Skeleton */}
+      {showMobileSkeleton ? (
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          {[1, 2, 3, 4].map((i) => (
+            <MetricCard key={i} label="" value="" isLoading variant="glass-mobile" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          {/* 1. Total Sales (Today) */}
+          <MetricCard
+            id="m-sales"
+            label="Total Sales (Today)"
+            value={formatCurrency(mobileSummary.totalSalesToday)}
+            subLabel=""
+            trendText="↑ 12%"
+            trendPositive={true}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            }
+            iconContainerClassName="bg-emerald-500/30 border-emerald-400/40 text-emerald-300 w-8 h-8 rounded-lg mb-2"
+            sparklineTrend="surge"
+            sparklineColor="#34D399"
+            variant="glass-mobile"
+          />
 
-        {/* 2. Total Orders */}
-        <MetricCard
-          id="m-orders"
-          label="Total Orders"
-          value={formatNumber(mobileSummary.totalOrders)}
-          subLabel=""
-          trendText="↑ 8%"
-          trendPositive={true}
-          icon={
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          }
-          iconContainerClassName="bg-blue-500/30 border-blue-400/40 text-blue-300 w-8 h-8 rounded-lg mb-2"
-          sparklineTrend="up"
-          sparklineColor="#38BDF8"
-          variant="glass-mobile"
-        />
+          {/* 2. Total Orders */}
+          <MetricCard
+            id="m-orders"
+            label="Total Orders"
+            value={formatNumber(mobileSummary.totalOrders)}
+            subLabel=""
+            trendText="↑ 8%"
+            trendPositive={true}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            }
+            iconContainerClassName="bg-blue-500/30 border-blue-400/40 text-blue-300 w-8 h-8 rounded-lg mb-2"
+            sparklineTrend="up"
+            sparklineColor="#38BDF8"
+            variant="glass-mobile"
+          />
 
-        {/* 3. Active Stores */}
-        <MetricCard
-          id="m-stores"
-          label="Active Stores"
-          value={formatNumber(mobileSummary.activeStores)}
-          subLabel="100% operational"
-          icon={
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          }
-          iconContainerClassName="bg-purple-500/30 border-purple-400/40 text-purple-300 w-8 h-8 rounded-lg mb-2"
-          variant="glass-mobile"
-        />
+          {/* 3. Active Stores */}
+          <MetricCard
+            id="m-stores"
+            label="Active Stores"
+            value={formatNumber(mobileSummary.activeStores)}
+            subLabel="100% operational"
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            }
+            iconContainerClassName="bg-purple-500/30 border-purple-400/40 text-purple-300 w-8 h-8 rounded-lg mb-2"
+            variant="glass-mobile"
+          />
 
-        {/* 4. Total Inventory Value */}
-        <MetricCard
-          id="m-val"
-          label="Inventory Value"
-          value={formatCurrency(mobileSummary.inventoryValue, true)}
-          subLabel=""
-          trendText="↓ 3%"
-          trendPositive={false}
-          icon={
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          }
-          iconContainerClassName="bg-rose-500/30 border-rose-400/40 text-rose-300 w-8 h-8 rounded-lg mb-2"
-          sparklineTrend="down"
-          sparklineColor="#FB7185"
-          variant="glass-mobile"
-        />
-      </div>
+          {/* 4. Total Inventory Value */}
+          <MetricCard
+            id="m-val"
+            label="Inventory Value"
+            value={formatCurrency(mobileSummary.inventoryValue, true)}
+            subLabel=""
+            trendText="↓ 3%"
+            trendPositive={false}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            }
+            iconContainerClassName="bg-rose-500/30 border-rose-400/40 text-rose-300 w-8 h-8 rounded-lg mb-2"
+            sparklineTrend="down"
+            sparklineColor="#FB7185"
+            variant="glass-mobile"
+          />
+        </div>
+      )}
     </div>
   );
 }

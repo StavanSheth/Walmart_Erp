@@ -46,6 +46,9 @@ export const STORES = [
     phone: "+91 11 23456701",
     email: "delhi.cp@walmart-demo.in",
     image: "/images/stores/store-delhi.webp",
+    latitude: 28.6315,
+    longitude: 77.2167,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-jpr-001",
@@ -59,6 +62,9 @@ export const STORES = [
     phone: "+91 141 2345672",
     email: "jaipur.mi@walmart-demo.in",
     image: "/images/stores/store-jaipur.webp",
+    latitude: 26.9157,
+    longitude: 75.8189,
+    status: "MAINTENANCE" as const,
   },
   {
     id: "store-mum-001",
@@ -72,6 +78,9 @@ export const STORES = [
     phone: "+91 22 23456703",
     email: "mumbai.andheri@walmart-demo.in",
     image: "/images/stores/store-mumbai.webp",
+    latitude: 19.1363,
+    longitude: 72.8277,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-pun-001",
@@ -85,6 +94,9 @@ export const STORES = [
     phone: "+91 20 23456704",
     email: "pune.fc@walmart-demo.in",
     image: "/images/stores/store-pune.webp",
+    latitude: 18.5284,
+    longitude: 73.8443,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-blr-001",
@@ -98,6 +110,9 @@ export const STORES = [
     phone: "+91 80 23456705",
     email: "blr.koramangala@walmart-demo.in",
     image: "/images/stores/store-bangalore.webp",
+    latitude: 12.9352,
+    longitude: 77.6245,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-chn-001",
@@ -111,6 +126,9 @@ export const STORES = [
     phone: "+91 44 23456706",
     email: "chennai.tnagar@walmart-demo.in",
     image: "/images/stores/store-chennai.webp",
+    latitude: 13.0418,
+    longitude: 80.2341,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-kol-001",
@@ -124,6 +142,9 @@ export const STORES = [
     phone: "+91 33 23456707",
     email: "kolkata.park@walmart-demo.in",
     image: "/images/stores/store-kolkata.webp",
+    latitude: 22.5512,
+    longitude: 88.3526,
+    status: "ACTIVE" as const,
   },
   {
     id: "store-gwh-001",
@@ -137,6 +158,9 @@ export const STORES = [
     phone: "+91 361 2345608",
     email: "guwahati.gs@walmart-demo.in",
     image: "/images/stores/store-guwahati.webp",
+    latitude: null,
+    longitude: null,
+    status: "ACTIVE" as const,
   },
 ] as const;
 

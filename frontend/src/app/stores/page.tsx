@@ -2,161 +2,241 @@
 
 import * as React from "react";
 import { PageContainer } from "@/components/common/page-container";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/common/loading-state";
+import { ErrorState } from "@/components/common/error-state";
 import { useShell } from "@/context/shell-context";
-import { StoreIcon, CheckIcon, PlusIcon } from "@/components/ui/icons";
-import { apiClient } from "@/lib/api/client";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import { useStoresOverview } from "@/hooks/use-stores";
+import { StoresHeader } from "@/components/stores/stores-header";
+import { StoresKPIGrid } from "@/components/stores/stores-kpi-grid";
+import { StoresTabs, type StoresTab } from "@/components/stores/stores-tabs";
+import { StoreNetworkMap } from "@/components/stores/store-network-map";
+import { TopPerformingStores } from "@/components/stores/top-performing-stores";
+import { StorePerformancePanel } from "@/components/stores/store-performance-panel";
+import { StoresAlerts } from "@/components/stores/stores-alerts";
+import { StoreNetworkBanner } from "@/components/stores/store-network-banner";
+import { StoreDetailModal } from "@/components/stores/store-detail";
+import { PerformanceView } from "@/components/stores/performance-view";
+import { OperationsView } from "@/components/stores/operations-view";
+import { ExpansionView } from "@/components/stores/expansion-view";
+import type { StorePeriod, StoresQueryParams } from "@/types/stores";
 
-interface StoreItem {
-  id: string;
-  name: string;
-  code: string;
-  address: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-  phone: string;
-  email: string;
-  status: string;
-  region?: {
-    id: string;
-    name: string;
-    code: string;
-  } | null;
+function StoresPageContent() {
+  const { currentStore, setCurrentStore } = useShell();
+  const { get, setFilters } = useUrlFilters();
+
+  // URL-backed filter states
+  const activeTab = (get("tab", "network") as StoresTab) || "network";
+  const search = get("search", "");
+  const regionId = get("regionId", "ALL");
+  const status = get("status", "ALL");
+  const period = (get("period", "30d") as StorePeriod) || "30d";
+
+  // Local selection and modal states
+  const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
+  const [detailStoreId, setDetailStoreId] = React.useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+
+  // Memoized query parameters for stable React Query caching
+  const overviewParams = React.useMemo<StoresQueryParams>(
+    () => ({
+      search: search.trim() ? search.trim() : undefined,
+      regionId: regionId !== "ALL" ? regionId : undefined,
+      status: status !== "ALL" ? status : undefined,
+      period
+    }),
+    [search, regionId, status, period]
+  );
+
+  // Fetch overview data from backend
+  const { data, isLoading, isError, error, refetch } = useStoresOverview(overviewParams);
+
+  const handleSelectStore = React.useCallback((id: string) => {
+    setSelectedStoreId(id);
+  }, []);
+
+  const handleViewDetail = React.useCallback((id: string) => {
+    setDetailStoreId(id);
+    setIsDetailOpen(true);
+  }, []);
+
+  const handleSwitchStore = React.useCallback(
+    (store: {
+      id: string;
+      name: string;
+      code: string;
+      city: string;
+      state: string;
+      region: string;
+      address?: string | null;
+      phone?: string | null;
+    }) => {
+      setCurrentStore({
+        id: store.id,
+        name: store.name,
+        code: store.code,
+        city: store.city,
+        state: store.state,
+        region: store.region,
+        address: store.address || "",
+        phone: store.phone || ""
+      });
+    },
+    [setCurrentStore]
+  );
+
+  return (
+    <PageContainer>
+      <div className="space-y-5 pb-20 md:pb-6">
+        {/* 1. Header with Dark Navy Curved Banner, Region Dropdown, and Glass Search Bar */}
+        <StoresHeader
+          regions={data?.regions || []}
+          selectedRegion={regionId}
+          onSelectRegion={(reg) => setFilters({ regionId: reg, page: 1 })}
+          searchValue={search}
+          onSearchChange={(newSearch) => setFilters({ search: newSearch, page: 1 })}
+        />
+
+        {/* 2. Database-derived KPI Cards with Status Filter click interaction */}
+        <div className="pt-8 sm:pt-24 lg:pt-44 xl:pt-52">
+          <StoresKPIGrid
+            summary={data?.summary}
+            selectedStatus={status}
+            onStatusChange={(newStatus) => setFilters({ status: newStatus, page: 1 })}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* 3. Tab Navigation */}
+        <StoresTabs
+          activeTab={activeTab}
+          onTabChange={(newTab) => setFilters({ tab: newTab })}
+        />
+
+        {/* 4. Error State */}
+        {isError && (
+          <ErrorState
+            title="Failed to load stores data"
+            message={error?.message || "Could not retrieve store network telemetry from server."}
+            onRetry={() => refetch()}
+          />
+        )}
+
+        {/* 5. Tab Content */}
+        {!isError && (
+          <>
+            {/* TAB A: Store Network (Main Reference View) */}
+            {activeTab === "network" && (
+              <div className="space-y-4 sm:space-y-5">
+                {/* Store Locations Map */}
+                <StoreNetworkMap
+                  stores={data?.network || []}
+                  geoQuality={data?.geoQuality}
+                  selectedStoreId={selectedStoreId}
+                  onSelectStore={handleSelectStore}
+                  onViewDetail={handleViewDetail}
+                  onViewAll={() => setFilters({ tab: "expansion" })}
+                  onSwitchStore={handleSwitchStore}
+                  isLoading={isLoading}
+                />
+
+                {/* Top Performing Stores */}
+                <TopPerformingStores
+                  stores={data?.topPerformers || []}
+                  selectedStoreId={selectedStoreId}
+                  onSelectStore={handleSelectStore}
+                  onViewDetail={handleViewDetail}
+                  onViewAll={() => setFilters({ tab: "performance" })}
+                  onSwitchStore={handleSwitchStore}
+                  currentStoreCode={currentStore?.code}
+                  isLoading={isLoading}
+                />
+
+                {/* Two-Column Area: Store Performance & Recent Alerts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 items-stretch">
+                  <StorePerformancePanel
+                    performance={data?.performance}
+                    selectedPeriod={period}
+                    onPeriodChange={(p) => setFilters({ period: p })}
+                    isLoading={isLoading}
+                  />
+
+                  <StoresAlerts
+                    alerts={data?.alerts || []}
+                    onSelectStore={handleSelectStore}
+                    onViewDetail={handleViewDetail}
+                    onViewAll={() => setFilters({ tab: "operations" })}
+                    isLoading={isLoading}
+                  />
+                </div>
+
+                {/* Stronger Stores Banner */}
+                <StoreNetworkBanner
+                  onActionClick={() => setFilters({ tab: "operations" })}
+                />
+              </div>
+            )}
+
+            {/* TAB B: Performance Tab */}
+            {activeTab === "performance" && data && (
+              <PerformanceView
+                stores={data.network}
+                performance={data.performance}
+                selectedPeriod={period}
+                onPeriodChange={(p) => setFilters({ period: p })}
+                onSelectStore={handleSelectStore}
+                onViewDetail={handleViewDetail}
+              />
+            )}
+
+            {/* TAB C: Operations Tab */}
+            {activeTab === "operations" && data && (
+              <OperationsView
+                stores={data.network}
+                alerts={data.alerts}
+                onSelectStore={handleSelectStore}
+                onViewDetail={handleViewDetail}
+              />
+            )}
+
+            {/* TAB D: Expansion Tab */}
+            {activeTab === "expansion" && data && (
+              <ExpansionView
+                stores={data.network}
+                regions={data.regions}
+                geoQuality={data.geoQuality}
+                onSelectStore={handleSelectStore}
+                onViewDetail={handleViewDetail}
+              />
+            )}
+          </>
+        )}
+
+        {/* 6. Store Detail Modal */}
+        <StoreDetailModal
+          storeId={detailStoreId}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setDetailStoreId(null);
+          }}
+          onSwitchStore={handleSwitchStore}
+          isCurrentStore={detailStoreId === currentStore?.id}
+        />
+      </div>
+    </PageContainer>
+  );
 }
 
 export default function StoresPage() {
-  const { currentStore, setCurrentStore } = useShell();
-  const [stores, setStores] = React.useState<StoreItem[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function loadStores() {
-      try {
-        const res = await apiClient.get<StoreItem[]>("/api/stores");
-        if (res.data) {
-          setStores(res.data);
-        }
-      } catch (err) {
-        console.error("Failed to load stores from database", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadStores();
-  }, []);
-
   return (
-    <PageContainer
-      title="Store Network"
-      description="Retail store network, regional hierarchy, and active branch operations."
-      actions={
-        <Button size="sm">
-          <PlusIcon className="w-3.5 h-3.5 mr-1" />
-          Add Store
-        </Button>
+    <React.Suspense
+      fallback={
+        <div className="p-8 text-center text-slate-400 font-medium">
+          Loading stores workspace...
+        </div>
       }
     >
-      <div className="space-y-6">
-        {/* Responsive Store Grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3">
-                <Skeleton className="h-5 w-20 rounded" />
-                <Skeleton className="h-6 w-40 rounded" />
-                <Skeleton className="h-4 w-28 rounded" />
-                <Skeleton className="h-8 w-full rounded-xl mt-4" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {stores.map((store) => {
-              const isSelected = store.code === currentStore?.code;
-              return (
-
-                <Card
-                  key={store.code}
-                  variant={isSelected ? "selected" : "default"}
-                  className="flex flex-col justify-between h-full"
-                >
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface-muted text-slate-700 tabular-nums">
-                        {store.code}
-                      </span>
-                      {isSelected ? (
-                        <Badge variant="spark">Active Outlet</Badge>
-                      ) : (
-                        <Badge variant="neutral">{store.region?.name || "Supercenter"}</Badge>
-                      )}
-                    </div>
-                    <CardTitle className="mt-2 truncate">
-                      {store.name}
-                    </CardTitle>
-                    <CardDescription>
-                      {store.city}, {store.state}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="space-y-3 pt-2">
-                    <div className="type-body-secondary space-y-1">
-                      <p className="truncate text-slate-500">{store.address}</p>
-                      <p className="font-mono tabular-nums text-slate-400">{store.phone}</p>
-                    </div>
-
-                    <Button
-                      variant={isSelected ? "secondary" : "outline"}
-                      size="sm"
-                      className="w-full text-xs"
-                      onClick={() =>
-                        setCurrentStore({
-                          id: store.id,
-                          name: store.name,
-                          code: store.code,
-                          city: store.city,
-                          state: store.state,
-                          region: store.region?.name || "General",
-                          address: store.address,
-                          phone: store.phone
-                        })
-                      }
-                    >
-                      {isSelected ? (
-                        <>
-                          <CheckIcon className="w-3.5 h-3.5 mr-1 text-brand-primary" />
-                          Selected Store
-                        </>
-                      ) : (
-                        <>
-                          <StoreIcon className="w-3.5 h-3.5 mr-1" />
-                          Switch to Store
-                        </>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-
-        <Card className="border-dashed border-border bg-surface-subtle">
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold text-slate-900">
-              Stores Module Operations
-            </CardTitle>
-            <CardDescription className="mt-1">
-              Store configuration, POS registers, and region management are live and synchronized with the PostgreSQL database.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    </PageContainer>
+      <StoresPageContent />
+    </React.Suspense>
   );
 }

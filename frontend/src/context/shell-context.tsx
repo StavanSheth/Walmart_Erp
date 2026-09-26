@@ -5,15 +5,7 @@ import type { StoreInfo } from "@/types/store";
 import type { ShellContextType } from "@/types/navigation";
 import { apiClient } from "@/lib/api/client";
 
-const INITIAL_STORE: StoreInfo = {
-  id: "store-del-001",
-  code: "WAL-DEL-001",
-  name: "Walmart Delhi Connaught Place",
-  city: "New Delhi",
-  state: "Delhi",
-  address: "Block A, Connaught Place, New Delhi 110001",
-  phone: "+91 11 23456701"
-};
+import { DEMO_STORES, DEFAULT_STORE } from "@/lib/config/stores";
 
 const ShellContext = React.createContext<ShellContextType | null>(null);
 
@@ -22,8 +14,8 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState<boolean>(false);
   const [searchOpen, setSearchOpen] = React.useState<boolean>(false);
   const [notificationsOpen, setNotificationsOpen] = React.useState<boolean>(false);
-  const [stores, setStores] = React.useState<StoreInfo[]>([]);
-  const [currentStore, setCurrentStore] = React.useState<StoreInfo>(INITIAL_STORE);
+  const [stores, setStores] = React.useState<StoreInfo[]>(DEMO_STORES);
+  const [currentStore, setCurrentStore] = React.useState<StoreInfo>(DEFAULT_STORE);
 
   // Fetch real stores live from PostgreSQL database
   React.useEffect(() => {
@@ -31,11 +23,19 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
     async function loadStores() {
       try {
         const res = await apiClient.get<StoreInfo[]>("/api/stores");
-        if (active && res.data && res.data.length > 0) {
-          setStores(res.data);
+        const raw = res as any;
+        const list: StoreInfo[] = Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw?.data?.data)
+          ? raw.data.data
+          : Array.isArray(raw)
+          ? raw
+          : [];
+        if (active && list.length > 0) {
+          setStores(list);
           setCurrentStore((prev) => {
-            const exists = res.data?.find((s: StoreInfo) => s.id === prev.id || s.code === prev.code);
-            return exists || res.data![0];
+            const exists = list.find((s: StoreInfo) => s.id === prev.id || s.code === prev.code);
+            return exists || list[0];
           });
         }
       } catch (err) {
@@ -45,6 +45,7 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
       }
     }
     void loadStores();
+
     return () => {
       active = false;
     };

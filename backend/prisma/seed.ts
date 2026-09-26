@@ -84,12 +84,21 @@ async function main() {
   for (const s of STORES) {
     await prisma.store.upsert({
       where: { organizationId_code: { organizationId: ORG_ID, code: s.code } },
-      update: {},
+      update: {
+        latitude: s.latitude != null ? D(s.latitude) : null,
+        longitude: s.longitude != null ? D(s.longitude) : null,
+        status: s.status,
+        managerId: ADMIN_USER_ID,
+      },
       create: {
         id: s.id, organizationId: ORG_ID, regionId: s.regionId,
         name: s.name, code: s.code, address: s.address, city: s.city,
         state: s.state, country: "India", pincode: s.pincode,
-        phone: s.phone, email: s.email, image: s.image, status: "ACTIVE",
+        phone: s.phone, email: s.email, image: s.image,
+        status: s.status,
+        managerId: ADMIN_USER_ID,
+        latitude: s.latitude != null ? D(s.latitude) : null,
+        longitude: s.longitude != null ? D(s.longitude) : null,
       },
     });
   }

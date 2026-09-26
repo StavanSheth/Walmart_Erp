@@ -15,8 +15,8 @@ export function PartnerPromoCard({ className, onAddPartner }: PartnerPromoCardPr
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/25 shadow-lg select-none p-4 sm:p-5 flex flex-col justify-between transition-all duration-200",
-        "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md text-white h-full min-h-[145px]",
+        "relative overflow-hidden rounded-2xl border border-white/25 shadow-lg select-none p-4 flex flex-col justify-between transition-all duration-200",
+        "bg-[#051A33]/25 hover:bg-[#051A33]/35 backdrop-blur-md text-white min-h-[136px]",
         className
       )}
     >

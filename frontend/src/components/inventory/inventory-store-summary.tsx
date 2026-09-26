@@ -35,8 +35,8 @@ export function InventoryStoreSummary({
       {/* Header with Title & Region Selector */}
       <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 gap-2">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
-            <StoreIcon className="w-4 h-4" />
+          <div className="w-7 h-7 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center shrink-0 overflow-hidden">
+            <StoreIcon className="w-full h-full object-cover" />
           </div>
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none">
             Store-wise Inventory

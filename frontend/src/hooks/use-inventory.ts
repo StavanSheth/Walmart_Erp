@@ -24,7 +24,8 @@ export function useInventory(params?: InventoryQueryParams) {
     ],
     queryFn: async () => {
       const response = await apiClient.getInventory(params);
-      return response.data;
+      const raw = response as any;
+      return (raw?.data?.summary ? raw.data : raw?.summary ? raw : raw?.data) as InventoryListData;
     },
     placeholderData: keepPreviousData,
     staleTime: 30 * 1000,

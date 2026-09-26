@@ -113,7 +113,7 @@ export function DashboardHeader({
 
               {/* Store Filter Control (placed below Last 30 Days button in phone view) */}
               <div className="relative inline-flex items-center h-8 shrink-0">
-                <StoreIcon className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/80 pointer-events-none z-10 shrink-0" />
+                <StoreIcon className="w-3.5 h-3.5 rounded-full object-cover absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10 shrink-0" />
                 <select
                   aria-label="Filter store"
                   value={selectedStoreId || ""}
