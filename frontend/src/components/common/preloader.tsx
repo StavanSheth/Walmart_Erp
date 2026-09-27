@@ -2,59 +2,28 @@
 
 import * as React from "react";
 
-interface PreloaderProps {
+export interface PreloaderProps {
   /** Minimum display duration in milliseconds. Defaults to 4000ms (4 seconds). */
   minDurationMs?: number;
 }
-
-const PHASES = [
-  { threshold: 0, text: "Initializing Walmart Enterprise Core..." },
-  { threshold: 25, text: "Connecting to Multi-Store Grid (120 Global Locations)..." },
-  { threshold: 55, text: "Synchronizing General Ledger & Real-Time Inventory..." },
-  { threshold: 85, text: "Establishing High-Availability Session..." },
-  { threshold: 98, text: "Workspace Ready. Launching..." }
-];
 
 export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
   const [mounted, setMounted] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(true);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
-  const [progress, setProgress] = React.useState(0);
-  const [statusText, setStatusText] = React.useState(PHASES[0].text);
 
   React.useEffect(() => {
     setMounted(true);
 
-    const startTime = Date.now();
-    const intervalMs = 25; // Smooth 40fps progress tick
+    const timer = setTimeout(() => {
+      setIsFadingOut(true);
+      const unmountTimer = setTimeout(() => {
+        setIsVisible(false);
+      }, 700);
+      return () => clearTimeout(unmountTimer);
+    }, minDurationMs);
 
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const rawPct = Math.min(100, Math.floor((elapsed / minDurationMs) * 100));
-      setProgress(rawPct);
-
-      // Determine active status message based on current percentage
-      for (let i = PHASES.length - 1; i >= 0; i--) {
-        if (rawPct >= PHASES[i].threshold) {
-          setStatusText(PHASES[i].text);
-          break;
-        }
-      }
-
-      if (elapsed >= minDurationMs) {
-        clearInterval(timer);
-        setProgress(100);
-        setStatusText("Workspace Ready. Launching...");
-        setIsFadingOut(true);
-
-        const unmountTimer = setTimeout(() => {
-          setIsVisible(false);
-        }, 700);
-        return () => clearTimeout(unmountTimer);
-      }
-    }, intervalMs);
-
-    return () => clearInterval(timer);
+    return () => clearTimeout(timer);
   }, [minDurationMs]);
 
   if (!mounted || !isVisible) {
@@ -66,12 +35,52 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
       role="status"
       aria-live="polite"
       aria-label="Application loading"
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white text-slate-800 transition-all duration-700 select-none ${
-        isFadingOut ? "opacity-0 scale-[1.02] pointer-events-none" : "opacity-100 scale-100"
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white transition-opacity duration-700 select-none ${
+        isFadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
+      <div className="earth">
+        <div className="earth-loader">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <path
+              transform="translate(100 100)"
+              d="M29.4,-17.4C33.1,1.8,27.6,16.1,11.5,31.6C-4.7,47,-31.5,63.6,-43,56C-54.5,48.4,-50.7,16.6,-41,-10.9C-31.3,-38.4,-15.6,-61.5,-1.4,-61C12.8,-60.5,25.7,-36.5,29.4,-17.4Z"
+              fill="#7CC133"
+            />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <path
+              transform="translate(100 100)"
+              d="M31.7,-55.8C40.3,-50,45.9,-39.9,49.7,-29.8C53.5,-19.8,55.5,-9.9,53.1,-1.4C50.6,7.1,43.6,14.1,41.8,27.6C40.1,41.1,43.4,61.1,37.3,67C31.2,72.9,15.6,64.8,1.5,62.2C-12.5,59.5,-25,62.3,-31.8,56.7C-38.5,51.1,-39.4,37.2,-49.3,26.3C-59.1,15.5,-78,7.7,-77.6,0.2C-77.2,-7.2,-57.4,-14.5,-49.3,-28.4C-41.2,-42.4,-44.7,-63,-38.5,-70.1C-32.2,-77.2,-16.1,-70.8,-2.3,-66.9C11.6,-63,23.1,-61.5,31.7,-55.8Z"
+              fill="#7CC133"
+            />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <path
+              transform="translate(100 100)"
+              d="M30.6,-49.2C42.5,-46.1,57.1,-43.7,67.6,-35.7C78.1,-27.6,84.6,-13.8,80.3,-2.4C76.1,8.9,61.2,17.8,52.5,29.1C43.8,40.3,41.4,53.9,33.7,64C26,74.1,13,80.6,2.2,76.9C-8.6,73.1,-17.3,59,-30.6,52.1C-43.9,45.3,-61.9,45.7,-74.1,38.2C-86.4,30.7,-92.9,15.4,-88.6,2.5C-84.4,-10.5,-69.4,-20.9,-60.7,-34.6C-52.1,-48.3,-49.8,-65.3,-40.7,-70C-31.6,-74.8,-15.8,-67.4,-3.2,-61.8C9.3,-56.1,18.6,-52.3,30.6,-49.2Z"
+              fill="#7CC133"
+            />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+            <path
+              transform="translate(100 100)"
+              d="M39.4,-66C48.6,-62.9,51.9,-47.4,52.9,-34.3C53.8,-21.3,52.4,-10.6,54.4,1.1C56.3,12.9,61.7,25.8,57.5,33.2C53.2,40.5,39.3,42.3,28.2,46C17,49.6,8.5,55.1,1.3,52.8C-5.9,50.5,-11.7,40.5,-23.6,37.2C-35.4,34,-53.3,37.5,-62,32.4C-70.7,27.4,-70.4,13.7,-72.4,-1.1C-74.3,-15.9,-78.6,-31.9,-73.3,-43C-68.1,-54.2,-53.3,-60.5,-39.5,-60.9C-25.7,-61.4,-12.9,-56,1.1,-58C15.1,-59.9,30.2,-69.2,39.4,-66Z"
+              fill="#7CC133"
+            />
+          </svg>
+        </div>
+        <p>Connecting...</p>
+      </div>
+
       <style>{`
-        /* From Uiverse.io by Novaxlo */ 
+        .earth {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
         .earth-loader {
           --watercolor: #3344c1;
           --landcolor: #7cc133;
@@ -82,10 +91,10 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           overflow: hidden;
           border-radius: 50%;
           box-shadow:
+            0 12px 32px rgba(51, 68, 193, 0.22),
             inset 0em 0.5em rgb(255, 255, 255, 0.25),
-            inset 0em -0.5em rgb(0, 0, 0, 0.25),
-            0 12px 30px -4px rgba(51, 68, 193, 0.28);
-          border: solid 0.15em white;
+            inset 0em -0.5em rgb(0, 0, 0, 0.25);
+          border: solid 0.15em #ffffff;
           animation: startround 1s;
           animation-iteration-count: 1;
         }
@@ -95,42 +104,42 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding-top: 0.25em;
-          font-size: 1.25em;
-          font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-        }
-
-        .earth-loader svg {
-          max-width: none !important;
+          padding-top: 0.85em;
+          font-size: 1.15em;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          font-family: inherit;
         }
 
         .earth-loader svg:nth-child(1) {
           position: absolute;
           bottom: -2em;
-          width: 7em;
-          height: auto;
+          width: 7em !important;
+          height: auto !important;
           animation: round1 5s infinite linear 0.75s;
         }
 
         .earth-loader svg:nth-child(2) {
           position: absolute;
           top: -3em;
-          width: 7em;
-          height: auto;
+          width: 7em !important;
+          height: auto !important;
           animation: round1 5s infinite linear;
         }
+
         .earth-loader svg:nth-child(3) {
           position: absolute;
           top: -2.5em;
-          width: 7em;
-          height: auto;
+          width: 7em !important;
+          height: auto !important;
           animation: round2 5s infinite linear;
         }
+
         .earth-loader svg:nth-child(4) {
           position: absolute;
           bottom: -2.2em;
-          width: 7em;
-          height: auto;
+          width: 7em !important;
+          height: auto !important;
           animation: round2 5s infinite linear 0.75s;
         }
 
@@ -146,9 +155,9 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           100% {
             filter: brightness(100%);
             box-shadow:
+              0 12px 32px rgba(51, 68, 193, 0.22),
               inset 0em 0.5em rgb(255, 255, 255, 0.25),
-              inset 0em -0.5em rgb(0, 0, 0, 0.25),
-              0 12px 30px -4px rgba(51, 68, 193, 0.28);
+              inset 0em -0.5em rgb(0, 0, 0, 0.25);
           }
         }
 
@@ -218,65 +227,9 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           }
         }
       `}</style>
-
-      {/* Gentle ambient background backdrop */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-white pointer-events-none" />
-
-      {/* Earth Loader Centerpiece */}
-      <div className="relative z-10 flex flex-col items-center max-w-sm w-full px-6 text-center">
-        <div className="earth flex flex-col items-center justify-center">
-          <div className="earth-loader mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-              <path
-                transform="translate(100 100)"
-                d="M29.4,-17.4C33.1,1.8,27.6,16.1,11.5,31.6C-4.7,47,-31.5,63.6,-43,56C-54.5,48.4,-50.7,16.6,-41,-10.9C-31.3,-38.4,-15.6,-61.5,-1.4,-61C12.8,-60.5,25.7,-36.5,29.4,-17.4Z"
-                fill="#7CC133"
-              />
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-              <path
-                transform="translate(100 100)"
-                d="M31.7,-55.8C40.3,-50,45.9,-39.9,49.7,-29.8C53.5,-19.8,55.5,-9.9,53.1,-1.4C50.6,7.1,43.6,14.1,41.8,27.6C40.1,41.1,43.4,61.1,37.3,67C31.2,72.9,15.6,64.8,1.5,62.2C-12.5,59.5,-25,62.3,-31.8,56.7C-38.5,51.1,-39.4,37.2,-49.3,26.3C-59.1,15.5,-78,7.7,-77.6,0.2C-77.2,-7.2,-57.4,-14.5,-49.3,-28.4C-41.2,-42.4,-44.7,-63,-38.5,-70.1C-32.2,-77.2,-16.1,-70.8,-2.3,-66.9C11.6,-63,23.1,-61.5,31.7,-55.8Z"
-                fill="#7CC133"
-              />
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-              <path
-                transform="translate(100 100)"
-                d="M30.6,-49.2C42.5,-46.1,57.1,-43.7,67.6,-35.7C78.1,-27.6,84.6,-13.8,80.3,-2.4C76.1,8.9,61.2,17.8,52.5,29.1C43.8,40.3,41.4,53.9,33.7,64C26,74.1,13,80.6,2.2,76.9C-8.6,73.1,-17.3,59,-30.6,52.1C-43.9,45.3,-61.9,45.7,-74.1,38.2C-86.4,30.7,-92.9,15.4,-88.6,2.5C-84.4,-10.5,-69.4,-20.9,-60.7,-34.6C-52.1,-48.3,-49.8,-65.3,-40.7,-70C-31.6,-74.8,-15.8,-67.4,-3.2,-61.8C9.3,-56.1,18.6,-52.3,30.6,-49.2Z"
-                fill="#7CC133"
-              />
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-              <path
-                transform="translate(100 100)"
-                d="M39.4,-66C48.6,-62.9,51.9,-47.4,52.9,-34.3C53.8,-21.3,52.4,-10.6,54.4,1.1C56.3,12.9,61.7,25.8,57.5,33.2C53.2,40.5,39.3,42.3,28.2,46C17,49.6,8.5,55.1,1.3,52.8C-5.9,50.5,-11.7,40.5,-23.6,37.2C-35.4,34,-53.3,37.5,-62,32.4C-70.7,27.4,-70.4,13.7,-72.4,-1.1C-74.3,-15.9,-78.6,-31.9,-73.3,-43C-68.1,-54.2,-53.3,-60.5,-39.5,-60.9C-25.7,-61.4,-12.9,-56,1.1,-58C15.1,-59.9,30.2,-69.2,39.4,-66Z"
-                fill="#7CC133"
-              />
-            </svg>
-          </div>
-          <p className="font-semibold tracking-tight text-slate-800">
-            Walmart Enterprise ERP
-          </p>
-        </div>
-
-        {/* Phase subtitle */}
-        <p className="text-xs text-slate-500 font-medium tracking-wide mt-1 mb-5">
-          {statusText}
-        </p>
-
-        {/* Minimal clean progress bar */}
-        <div className="w-56 bg-slate-100 rounded-full h-1.5 overflow-hidden mb-2 border border-slate-200 shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-[#3344c1] via-[#0071CE] to-[#7cc133] transition-all duration-75 ease-out rounded-full"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        <div className="text-[11px] font-mono text-slate-400 font-medium">
-          {progress}%
-        </div>
-      </div>
     </div>
   );
 }
+
+export const Loader = Preloader;
+export default Preloader;
