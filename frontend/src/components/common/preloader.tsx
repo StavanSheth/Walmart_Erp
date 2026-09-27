@@ -10,32 +10,59 @@ export interface PreloaderProps {
 export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
   const [isVisible, setIsVisible] = React.useState(true);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
-  const [progress, setProgress] = React.useState(0);
+  const percentRef = React.useRef<HTMLSpanElement>(null);
+  const barRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const startTime = Date.now();
-    const intervalMs = 25; // 40 updates per second for smooth progress
+    let animId: number;
+    let unmountTimer: NodeJS.Timeout;
+    let fadeTimer: NodeJS.Timeout;
+    const startTime = performance.now();
 
-    // Ensure we start cleanly at 0%
-    setProgress(0);
+    const update = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(100, Math.floor((elapsed / minDurationMs) * 100));
 
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.min(100, Math.floor((elapsed / minDurationMs) * 100));
-      setProgress(pct);
+      if (percentRef.current) {
+        percentRef.current.textContent = `${progress}%`;
+      }
+      if (barRef.current) {
+        barRef.current.style.width = `${progress}%`;
+      }
 
-      if (elapsed >= minDurationMs) {
-        clearInterval(timer);
-        setProgress(100);
+      if (elapsed < minDurationMs) {
+        animId = requestAnimationFrame(update);
+      } else {
+        if (percentRef.current) {
+          percentRef.current.textContent = "100%";
+        }
+        if (barRef.current) {
+          barRef.current.style.width = "100%";
+        }
         setIsFadingOut(true);
-        const unmountTimer = setTimeout(() => {
+        unmountTimer = setTimeout(() => {
           setIsVisible(false);
         }, 700);
-        return () => clearTimeout(unmountTimer);
       }
-    }, intervalMs);
+    };
 
-    return () => clearInterval(timer);
+    // Fallback timer ensuring completion even in throttled background tabs
+    fadeTimer = setTimeout(() => {
+      if (percentRef.current) percentRef.current.textContent = "100%";
+      if (barRef.current) barRef.current.style.width = "100%";
+      setIsFadingOut(true);
+      unmountTimer = setTimeout(() => {
+        setIsVisible(false);
+      }, 700);
+    }, minDurationMs);
+
+    animId = requestAnimationFrame(update);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      clearTimeout(fadeTimer);
+      clearTimeout(unmountTimer);
+    };
   }, [minDurationMs]);
 
   if (!isVisible) {
@@ -47,7 +74,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
       role="status"
       aria-live="polite"
       aria-label="Application loading"
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white transition-opacity duration-700 select-none ${
+      className={`earth-preloader-root fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white select-none ${
         isFadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
@@ -88,18 +115,25 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
         <div className="earth-progress-box">
           <div className="earth-status-row">
             <span className="earth-status-text">Connecting...</span>
-            <span className="earth-progress-value">{progress}%</span>
+            <span ref={percentRef} className="earth-progress-value">
+              0%
+            </span>
           </div>
           <div className="earth-progress-track">
             <div
+              ref={barRef}
               className="earth-progress-fill"
-              style={{ width: `${progress}%` }}
+              style={{ width: "0%" }}
             />
           </div>
         </div>
       </div>
 
       <style>{`
+        .earth-preloader-root {
+          transition: opacity 0.7s ease-out;
+        }
+
         .earth {
           display: flex;
           flex-direction: column;
@@ -173,7 +207,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           min-width: 0;
           background: linear-gradient(90deg, #3344c1 0%, #0071CE 50%, #7cc133 100%);
           border-radius: 9999px;
-          transition: width 40ms linear;
+          transition: width 35ms linear;
         }
 
         .earth-loader svg {
