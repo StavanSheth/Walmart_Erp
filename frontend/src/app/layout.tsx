@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppShell } from "@/components/layout/app-shell";
-import { ASSETS } from "@/lib/assets";
 
 export const metadata: Metadata = {
   title: "Walmart ERP — Enterprise Retail Operations",
