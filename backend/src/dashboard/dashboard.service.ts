@@ -20,12 +20,12 @@ function getFallbackDashboardData(_params?: DashboardQueryParams): DashboardOver
       inStockUnits: 1892450,
       lowStockItems: 412,
       outOfStockItems: 128,
-      totalStores: 532
+      totalStores: 120
     },
     mobileSummary: {
       totalSalesToday: 12456230,
       totalOrders: 82400,
-      activeStores: 532,
+      activeStores: 120,
       inventoryValue: 189245000
     },
     salesOverview: {
@@ -93,7 +93,7 @@ export async function getDashboardOverview(
   try {
     const isOnline = await Promise.race([
       checkDatabaseConnection(),
-      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 200))
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
     ]);
 
     if (!isOnline) {

@@ -11,7 +11,7 @@ const possibleEnvPaths = [
 ];
 for (const p of possibleEnvPaths) {
   if (fs.existsSync(p)) {
-    dotenv.config({ path: p });
+    dotenv.config({ path: p, override: true });
   }
 }
 

@@ -356,7 +356,7 @@ export async function getReportsOverview(params: ReportsQueryParams): Promise<Re
   try {
     const isOnline = await Promise.race([
       checkDatabaseConnection(),
-      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 200))
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000))
     ]);
 
     if (isOnline) {
@@ -456,7 +456,7 @@ export async function getReportsOverview(params: ReportsQueryParams): Promise<Re
   const baseMonthlySales = 12_500_000;
   const baseMonthlyOrders = 1_200;
   const baseAvgOrder = 10_416;
-  const baseStores = regionId !== "ALL" ? 3 : storeId !== "ALL" ? 1 : 12;
+  const baseStores = regionId !== "ALL" ? 12 : storeId !== "ALL" ? 1 : 120;
   const baseProductsSold = 2_850;
 
   const totalSalesVal = dbConnected && dbSalesTotal > 0

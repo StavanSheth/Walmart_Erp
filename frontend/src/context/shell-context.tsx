@@ -22,7 +22,7 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
     let active = true;
     async function loadStores() {
       try {
-        const res = await apiClient.get<StoreInfo[]>("/api/stores");
+        const res = await apiClient.get<StoreInfo[]>("/api/stores?pageSize=200");
         const raw = res as Record<string, unknown>;
         const list: StoreInfo[] = Array.isArray(raw?.data)
           ? (raw.data as StoreInfo[])

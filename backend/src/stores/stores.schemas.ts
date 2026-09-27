@@ -11,7 +11,7 @@ export const StoresQueryParamsSchema = z.object({
   regionId: z.string().optional(),
   status: StoreStatusFilterEnum.optional().default("ALL"),
   page: z.coerce.number().int().positive().optional().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).optional().default(20)
+  pageSize: z.coerce.number().int().positive().max(500).optional().default(20)
 });
 export type StoresQueryParams = z.infer<typeof StoresQueryParamsSchema>;
 
