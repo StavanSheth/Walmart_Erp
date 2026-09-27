@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col min-w-0 relative">
           {/* Top Banner Image (Visible behind header and page hero section across all sections) */}
           {hasBanner && (
-            <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0 h-[560px] sm:h-[600px] lg:h-[640px] xl:h-[660px]">
+            <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0 h-[340px] sm:h-[370px] lg:h-[400px] xl:h-[420px]">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
 
               {/* Bottom edge transition into #F4F6F9 canvas */}
-              <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#F4F6F9] to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#F4F6F9] via-[#F4F6F9]/60 to-transparent pointer-events-none" />
             </div>
           )}
 

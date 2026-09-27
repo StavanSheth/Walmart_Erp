@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { ASSETS } from "@/lib/assets";
 
 interface StoreNetworkBannerProps {
   onActionClick?: () => void;
@@ -15,12 +16,12 @@ export function StoreNetworkBanner({
 }: StoreNetworkBannerProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs flex flex-row items-stretch bg-gradient-to-r from-[#17488B] via-[#0E356C] to-[#0A2958] min-h-[105px] sm:min-h-[130px] ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-slate-200/80 shadow-xs flex flex-row items-stretch bg-gradient-to-r from-[#17488B] via-[#0E356C] to-[#0A2958] min-h-[115px] sm:min-h-[140px] ${className}`}
     >
       {/* Left Image of Walmart Supercenter */}
-      <div className="relative w-[42%] sm:w-1/2 shrink-0 overflow-hidden">
+      <div className="relative w-[40%] sm:w-[45%] shrink-0 overflow-hidden">
         <Image
-          src="/images/banners/walmart-supercenter-twilight.webp"
+          src={ASSETS.banners.twilight}
           alt="Walmart Supercenter at Twilight"
           fill
           className="object-cover"

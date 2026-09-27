@@ -147,7 +147,7 @@ function InventoryPageContent() {
         )}
 
         {/* 2. KPI Summary (5 Cards: Total Products, Low Stock, Out of Stock, In Transit, Value at banner horizon) */}
-        <div className="pt-[82px] sm:pt-24 lg:pt-[184px] xl:pt-52">
+        <div className="pt-2 sm:pt-3">
           <InventoryKPIGrid
             summary={data?.summary}
             isLoading={isLoading}
