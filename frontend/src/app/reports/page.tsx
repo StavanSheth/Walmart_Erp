@@ -163,7 +163,7 @@ export default function ReportsPage() {
         />
 
         {/* 2. 7 Report Category Cards (Sales, Inventory, Store, Partner, Financial, Operational, Custom) */}
-        <div className="pt-2 sm:pt-3">
+        <div className="pt-8 sm:pt-10 lg:pt-14">
           <ReportCategoryCardsBar
             items={data?.categoryCards}
             selectedCategory={filters.reportType || "SALES"}

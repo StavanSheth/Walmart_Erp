@@ -136,7 +136,7 @@ export default function SettingsPage() {
         />
 
         {/* 2. KPI Cards: Positioned along horizon line of banner transition matching Dashboard & Reports */}
-        <div className="pt-2 sm:pt-3">
+        <div className="pt-8 sm:pt-10 lg:pt-14">
           <SettingsKpiGrid
             kpis={overview?.kpis}
             onSelectKpi={(id) => {
