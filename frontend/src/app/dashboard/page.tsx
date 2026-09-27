@@ -60,7 +60,7 @@ export default function DashboardPage() {
         )}
 
         {/* 2. KPI Grid (5 liquid glass cards on Desktop, 2x2 cards on Mobile) */}
-        <div className="pt-12 sm:pt-16 lg:pt-28 xl:pt-32">
+        <div className="pt-14 sm:pt-16 lg:pt-20 xl:pt-24">
           <DashboardKPIGrid
             summary={data?.summary}
             mobileSummary={data?.mobileSummary}

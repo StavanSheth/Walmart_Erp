@@ -123,7 +123,7 @@ function PartnersPageContent() {
       )}
 
       {/* 2. Top Metric Cards Row: 4 KPI Cards + Promo Card (positioned at banner horizon matching dashboard) */}
-      <div className="pt-12 sm:pt-16 lg:pt-28 xl:pt-32">
+      <div className="pt-14 sm:pt-16 lg:pt-20 xl:pt-24">
         <PartnersKPIGrid
           summary={data?.summary}
           isLoading={isLoading}

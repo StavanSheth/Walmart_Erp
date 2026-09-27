@@ -92,7 +92,7 @@ export default function LedgerPage() {
 
         {/* 3. KPI Cards — 4: Total Transactions, Total Debits, Total Credits, Account Balance with Sparklines */}
         {/* Horizon spacing matching Dashboard layout */}
-        <div className="pt-12 sm:pt-16 lg:pt-28 xl:pt-32">
+        <div className="pt-14 sm:pt-16 lg:pt-20 xl:pt-24">
           <LedgerKpiGrid
             kpis={overview?.kpis}
             isLoading={isOverviewLoading}

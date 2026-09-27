@@ -97,7 +97,7 @@ function StoresPageContent() {
         />
 
         {/* 2. Database-derived KPI Cards with Status Filter click interaction */}
-        <div className="pt-12 sm:pt-16 lg:pt-28 xl:pt-32">
+        <div className="pt-14 sm:pt-16 lg:pt-20 xl:pt-24">
           <StoresKPIGrid
             summary={data?.summary}
             selectedStatus={status}
