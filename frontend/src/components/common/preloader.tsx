@@ -8,16 +8,16 @@ export interface PreloaderProps {
 }
 
 export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
-  const [mounted, setMounted] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(true);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
-    setMounted(true);
-
     const startTime = Date.now();
     const intervalMs = 25; // 40 updates per second for smooth progress
+
+    // Ensure we start cleanly at 0%
+    setProgress(0);
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -38,7 +38,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
     return () => clearInterval(timer);
   }, [minDurationMs]);
 
-  if (!mounted || !isVisible) {
+  if (!isVisible) {
     return null;
   }
 
@@ -106,7 +106,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           justify-content: center;
         }
 
-        /* Scaled-up Earth Globe */
+        /* Scaled-up Earth Globe with 0% Entrance */
         .earth-loader {
           --watercolor: #3344c1;
           --landcolor: #7cc133;
@@ -122,8 +122,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
             inset 0em 0.5em rgb(255, 255, 255, 0.25),
             inset 0em -0.5em rgb(0, 0, 0, 0.25);
           border: solid 0.15em #ffffff;
-          animation: startround 1s;
-          animation-iteration-count: 1;
+          animation: startround 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .earth p {
@@ -158,6 +157,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
 
         .earth-progress-bar {
           height: 100%;
+          min-width: 0;
           background: linear-gradient(90deg, #3344c1 0%, #0071CE 50%, #7cc133 100%);
           border-radius: 9999px;
           transition: width 50ms linear;
@@ -211,15 +211,16 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
 
         @keyframes startround {
           0% {
-            filter: brightness(500%);
+            transform: scale(0);
+            opacity: 0;
             box-shadow: none;
           }
-          75% {
-            filter: brightness(500%);
-            box-shadow: none;
+          30% {
+            opacity: 1;
           }
           100% {
-            filter: brightness(100%);
+            transform: scale(1);
+            opacity: 1;
             box-shadow:
               0 18px 48px rgba(51, 68, 193, 0.28),
               inset 0em 0.5em rgb(255, 255, 255, 0.25),
