@@ -11,19 +11,31 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
   const [mounted, setMounted] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(true);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
     setMounted(true);
 
-    const timer = setTimeout(() => {
-      setIsFadingOut(true);
-      const unmountTimer = setTimeout(() => {
-        setIsVisible(false);
-      }, 700);
-      return () => clearTimeout(unmountTimer);
-    }, minDurationMs);
+    const startTime = Date.now();
+    const intervalMs = 25; // 40 updates per second for smooth progress
 
-    return () => clearTimeout(timer);
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, Math.floor((elapsed / minDurationMs) * 100));
+      setProgress(pct);
+
+      if (elapsed >= minDurationMs) {
+        clearInterval(timer);
+        setProgress(100);
+        setIsFadingOut(true);
+        const unmountTimer = setTimeout(() => {
+          setIsVisible(false);
+        }, 700);
+        return () => clearTimeout(unmountTimer);
+      }
+    }, intervalMs);
+
+    return () => clearInterval(timer);
   }, [minDurationMs]);
 
   if (!mounted || !isVisible) {
@@ -71,6 +83,21 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           </svg>
         </div>
         <p>Connecting...</p>
+
+        {/* 0-100% Horizontal Line & Progress Counter */}
+        <div className="earth-progress-container">
+          <div className="earth-progress-track">
+            <div
+              className="earth-progress-bar"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="earth-progress-meta">
+            <span className="earth-progress-edge">0%</span>
+            <span className="earth-progress-current">{progress}%</span>
+            <span className="earth-progress-edge">100%</span>
+          </div>
+        </div>
       </div>
 
       <style>{`
@@ -109,6 +136,51 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           font-weight: 600;
           letter-spacing: 0.03em;
           font-family: inherit;
+        }
+
+        /* 0-100% Horizontal Line Styling */
+        .earth-progress-container {
+          width: 14em;
+          margin-top: 1.15em;
+          display: flex;
+          flex-direction: column;
+          gap: 0.45em;
+        }
+
+        .earth-progress-track {
+          width: 100%;
+          height: 5px;
+          background-color: #e2e8f0;
+          border-radius: 9999px;
+          overflow: hidden;
+          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        .earth-progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #3344c1 0%, #0071CE 50%, #7cc133 100%);
+          border-radius: 9999px;
+          transition: width 50ms linear;
+        }
+
+        .earth-progress-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.75rem;
+          font-family: inherit;
+        }
+
+        .earth-progress-edge {
+          color: #94a3b8;
+          font-weight: 500;
+        }
+
+        .earth-progress-current {
+          color: #1e293b;
+          font-weight: 700;
+          font-feature-settings: "tnum";
+          font-variant-numeric: tabular-nums;
         }
 
         .earth-loader svg:nth-child(1) {
