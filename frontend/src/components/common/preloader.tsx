@@ -26,7 +26,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
     setMounted(true);
 
     const startTime = Date.now();
-    const intervalMs = 25; // 40 updates per second for super smooth progress
+    const intervalMs = 25; // Smooth 40fps progress tick
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -45,9 +45,8 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
         clearInterval(timer);
         setProgress(100);
         setStatusText("Workspace Ready. Launching...");
-        // Start smooth fade-out
         setIsFadingOut(true);
-        // Unmount after fade-out transition finishes
+
         const unmountTimer = setTimeout(() => {
           setIsVisible(false);
         }, 700);
@@ -67,85 +66,215 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
       role="status"
       aria-live="polite"
       aria-label="Application loading"
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#071120] text-white transition-all duration-700 select-none ${
-        isFadingOut ? "opacity-0 scale-[1.03] pointer-events-none" : "opacity-100 scale-100"
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white text-slate-800 transition-all duration-700 select-none ${
+        isFadingOut ? "opacity-0 scale-[1.02] pointer-events-none" : "opacity-100 scale-100"
       }`}
     >
-      {/* Background Ambient Radial Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-[#0071CE]/25 to-[#FFC220]/20 rounded-full blur-[140px] animate-pulse" />
-      </div>
+      <style>{`
+        /* From Uiverse.io by Novaxlo */ 
+        .earth-loader {
+          --watercolor: #3344c1;
+          --landcolor: #7cc133;
+          width: 7.5em;
+          height: 7.5em;
+          background-color: var(--watercolor);
+          position: relative;
+          overflow: hidden;
+          border-radius: 50%;
+          box-shadow:
+            inset 0em 0.5em rgb(255, 255, 255, 0.25),
+            inset 0em -0.5em rgb(0, 0, 0, 0.25),
+            0 12px 30px -4px rgba(51, 68, 193, 0.28);
+          border: solid 0.15em white;
+          animation: startround 1s;
+          animation-iteration-count: 1;
+        }
 
+        .earth p {
+          color: #1e293b;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-top: 0.25em;
+          font-size: 1.25em;
+          font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+        }
+
+        .earth-loader svg {
+          max-width: none !important;
+        }
+
+        .earth-loader svg:nth-child(1) {
+          position: absolute;
+          bottom: -2em;
+          width: 7em;
+          height: auto;
+          animation: round1 5s infinite linear 0.75s;
+        }
+
+        .earth-loader svg:nth-child(2) {
+          position: absolute;
+          top: -3em;
+          width: 7em;
+          height: auto;
+          animation: round1 5s infinite linear;
+        }
+        .earth-loader svg:nth-child(3) {
+          position: absolute;
+          top: -2.5em;
+          width: 7em;
+          height: auto;
+          animation: round2 5s infinite linear;
+        }
+        .earth-loader svg:nth-child(4) {
+          position: absolute;
+          bottom: -2.2em;
+          width: 7em;
+          height: auto;
+          animation: round2 5s infinite linear 0.75s;
+        }
+
+        @keyframes startround {
+          0% {
+            filter: brightness(500%);
+            box-shadow: none;
+          }
+          75% {
+            filter: brightness(500%);
+            box-shadow: none;
+          }
+          100% {
+            filter: brightness(100%);
+            box-shadow:
+              inset 0em 0.5em rgb(255, 255, 255, 0.25),
+              inset 0em -0.5em rgb(0, 0, 0, 0.25),
+              0 12px 30px -4px rgba(51, 68, 193, 0.28);
+          }
+        }
+
+        @keyframes round1 {
+          0% {
+            left: -2em;
+            opacity: 100%;
+            transform: skewX(0deg) rotate(0deg);
+          }
+          30% {
+            left: -6em;
+            opacity: 100%;
+            transform: skewX(-25deg) rotate(25deg);
+          }
+          31% {
+            left: -6em;
+            opacity: 0%;
+            transform: skewX(-25deg) rotate(25deg);
+          }
+          35% {
+            left: 7em;
+            opacity: 0%;
+            transform: skewX(25deg) rotate(-25deg);
+          }
+          45% {
+            left: 7em;
+            opacity: 100%;
+            transform: skewX(25deg) rotate(-25deg);
+          }
+          100% {
+            left: -2em;
+            opacity: 100%;
+            transform: skewX(0deg) rotate(0deg);
+          }
+        }
+
+        @keyframes round2 {
+          0% {
+            left: 5em;
+            opacity: 100%;
+            transform: skewX(0deg) rotate(0deg);
+          }
+          75% {
+            left: -7em;
+            opacity: 100%;
+            transform: skewX(-25deg) rotate(25deg);
+          }
+          76% {
+            left: -7em;
+            opacity: 0%;
+            transform: skewX(-25deg) rotate(25deg);
+          }
+          77% {
+            left: 8em;
+            opacity: 0%;
+            transform: skewX(25deg) rotate(-25deg);
+          }
+          80% {
+            left: 8em;
+            opacity: 100%;
+            transform: skewX(25deg) rotate(-25deg);
+          }
+          100% {
+            left: 5em;
+            opacity: 100%;
+            transform: skewX(0deg) rotate(0deg);
+          }
+        }
+      `}</style>
+
+      {/* Gentle ambient background backdrop */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-white to-white pointer-events-none" />
+
+      {/* Earth Loader Centerpiece */}
       <div className="relative z-10 flex flex-col items-center max-w-sm w-full px-6 text-center">
-        {/* Walmart Spark Logo with Breathing & Rotation Aura */}
-        <div className="relative w-24 h-24 mb-8 flex items-center justify-center">
-          {/* Outer Rotating Glow Ring */}
-          <div className="absolute inset-0 rounded-full border border-[#FFC220]/30 animate-[spin_10s_linear_infinite]" />
-          <div className="absolute -inset-2 rounded-full border border-dashed border-[#0071CE]/40 animate-[spin_20s_linear_infinite_reverse]" />
-
-          {/* Glowing Walmart Spark SVG */}
-          <div className="relative w-16 h-16 transition-transform duration-500 hover:scale-105 animate-[pulse_2s_ease-in-out_infinite]">
-            <svg
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-full h-full drop-shadow-[0_0_24px_rgba(255,194,32,0.85)]"
-            >
-              <g fill="#FFC220">
-                {/* Top */}
-                <path d="M44.5 4 C44.5 1.8 46.3 0 48.5 0 L51.5 0 C53.7 0 55.5 1.8 55.5 4 L55.5 30 C55.5 32.2 53.7 34 51.5 34 L48.5 34 C46.3 34 44.5 32.2 44.5 30 Z" />
-                {/* Bottom */}
-                <path d="M44.5 70 C44.5 67.8 46.3 66 48.5 66 L51.5 66 C53.7 66 55.5 67.8 55.5 70 L55.5 96 C55.5 98.2 53.7 100 51.5 100 L48.5 100 C46.3 100 44.5 98.2 44.5 96 Z" />
-                {/* Top-Right (60 deg) */}
-                <g transform="rotate(60 50 50)">
-                  <path d="M44.5 4 C44.5 1.8 46.3 0 48.5 0 L51.5 0 C53.7 0 55.5 1.8 55.5 4 L55.5 30 C55.5 32.2 53.7 34 51.5 34 L48.5 34 C46.3 34 44.5 32.2 44.5 30 Z" />
-                </g>
-                {/* Bottom-Right (120 deg) */}
-                <g transform="rotate(120 50 50)">
-                  <path d="M44.5 4 C44.5 1.8 46.3 0 48.5 0 L51.5 0 C53.7 0 55.5 1.8 55.5 4 L55.5 30 C55.5 32.2 53.7 34 51.5 34 L48.5 34 C46.3 34 44.5 32.2 44.5 30 Z" />
-                </g>
-                {/* Bottom-Left (240 deg) */}
-                <g transform="rotate(240 50 50)">
-                  <path d="M44.5 4 C44.5 1.8 46.3 0 48.5 0 L51.5 0 C53.7 0 55.5 1.8 55.5 4 L55.5 30 C55.5 32.2 53.7 34 51.5 34 L48.5 34 C46.3 34 44.5 32.2 44.5 30 Z" />
-                </g>
-                {/* Top-Left (300 deg) */}
-                <g transform="rotate(300 50 50)">
-                  <path d="M44.5 4 C44.5 1.8 46.3 0 48.5 0 L51.5 0 C53.7 0 55.5 1.8 55.5 4 L55.5 30 C55.5 32.2 53.7 34 51.5 34 L48.5 34 C46.3 34 44.5 32.2 44.5 30 Z" />
-                </g>
-              </g>
+        <div className="earth flex flex-col items-center justify-center">
+          <div className="earth-loader mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+              <path
+                transform="translate(100 100)"
+                d="M29.4,-17.4C33.1,1.8,27.6,16.1,11.5,31.6C-4.7,47,-31.5,63.6,-43,56C-54.5,48.4,-50.7,16.6,-41,-10.9C-31.3,-38.4,-15.6,-61.5,-1.4,-61C12.8,-60.5,25.7,-36.5,29.4,-17.4Z"
+                fill="#7CC133"
+              />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+              <path
+                transform="translate(100 100)"
+                d="M31.7,-55.8C40.3,-50,45.9,-39.9,49.7,-29.8C53.5,-19.8,55.5,-9.9,53.1,-1.4C50.6,7.1,43.6,14.1,41.8,27.6C40.1,41.1,43.4,61.1,37.3,67C31.2,72.9,15.6,64.8,1.5,62.2C-12.5,59.5,-25,62.3,-31.8,56.7C-38.5,51.1,-39.4,37.2,-49.3,26.3C-59.1,15.5,-78,7.7,-77.6,0.2C-77.2,-7.2,-57.4,-14.5,-49.3,-28.4C-41.2,-42.4,-44.7,-63,-38.5,-70.1C-32.2,-77.2,-16.1,-70.8,-2.3,-66.9C11.6,-63,23.1,-61.5,31.7,-55.8Z"
+                fill="#7CC133"
+              />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+              <path
+                transform="translate(100 100)"
+                d="M30.6,-49.2C42.5,-46.1,57.1,-43.7,67.6,-35.7C78.1,-27.6,84.6,-13.8,80.3,-2.4C76.1,8.9,61.2,17.8,52.5,29.1C43.8,40.3,41.4,53.9,33.7,64C26,74.1,13,80.6,2.2,76.9C-8.6,73.1,-17.3,59,-30.6,52.1C-43.9,45.3,-61.9,45.7,-74.1,38.2C-86.4,30.7,-92.9,15.4,-88.6,2.5C-84.4,-10.5,-69.4,-20.9,-60.7,-34.6C-52.1,-48.3,-49.8,-65.3,-40.7,-70C-31.6,-74.8,-15.8,-67.4,-3.2,-61.8C9.3,-56.1,18.6,-52.3,30.6,-49.2Z"
+                fill="#7CC133"
+              />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+              <path
+                transform="translate(100 100)"
+                d="M39.4,-66C48.6,-62.9,51.9,-47.4,52.9,-34.3C53.8,-21.3,52.4,-10.6,54.4,1.1C56.3,12.9,61.7,25.8,57.5,33.2C53.2,40.5,39.3,42.3,28.2,46C17,49.6,8.5,55.1,1.3,52.8C-5.9,50.5,-11.7,40.5,-23.6,37.2C-35.4,34,-53.3,37.5,-62,32.4C-70.7,27.4,-70.4,13.7,-72.4,-1.1C-74.3,-15.9,-78.6,-31.9,-73.3,-43C-68.1,-54.2,-53.3,-60.5,-39.5,-60.9C-25.7,-61.4,-12.9,-56,1.1,-58C15.1,-59.9,30.2,-69.2,39.4,-66Z"
+                fill="#7CC133"
+              />
             </svg>
           </div>
-        </div>
-
-        {/* Enterprise Brand Header */}
-        <div className="space-y-1 mb-8">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-xl font-bold tracking-tight text-white font-sans">
-              Walmart
-            </span>
-            <span className="text-xs px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-[#0071CE]/30 border border-[#0071CE]/60 text-[#71C5FF]">
-              Enterprise ERP
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 font-medium tracking-wide">
-            Global Retail Operations Platform
+          <p className="font-semibold tracking-tight text-slate-800">
+            Walmart Enterprise ERP
           </p>
         </div>
 
-        {/* Sleek Progress Bar */}
-        <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden mb-3 border border-slate-700/50 shadow-inner">
+        {/* Phase subtitle */}
+        <p className="text-xs text-slate-500 font-medium tracking-wide mt-1 mb-5">
+          {statusText}
+        </p>
+
+        {/* Minimal clean progress bar */}
+        <div className="w-56 bg-slate-100 rounded-full h-1.5 overflow-hidden mb-2 border border-slate-200 shadow-inner">
           <div
-            className="h-full bg-gradient-to-r from-[#0071CE] via-[#2F93ED] to-[#FFC220] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(0,113,206,0.8)]"
+            className="h-full bg-gradient-to-r from-[#3344c1] via-[#0071CE] to-[#7cc133] transition-all duration-75 ease-out rounded-full"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        {/* Status Text & Percentage */}
-        <div className="flex items-center justify-between w-full text-[11px] text-slate-400 font-mono">
-          <span className="truncate pr-2 text-left font-sans text-slate-300">
-            {statusText}
-          </span>
-          <span className="shrink-0 font-bold text-[#FFC220]">{progress}%</span>
+        <div className="text-[11px] font-mono text-slate-400 font-medium">
+          {progress}%
         </div>
       </div>
     </div>
