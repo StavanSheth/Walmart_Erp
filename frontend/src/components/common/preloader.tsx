@@ -93,9 +93,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
             />
           </div>
           <div className="earth-progress-meta">
-            <span className="earth-progress-edge">0%</span>
             <span className="earth-progress-current">{progress}%</span>
-            <span className="earth-progress-edge">100%</span>
           </div>
         </div>
       </div>
@@ -108,9 +106,11 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           justify-content: center;
         }
 
+        /* Scaled-up Earth Globe */
         .earth-loader {
           --watercolor: #3344c1;
           --landcolor: #7cc133;
+          font-size: 24px;
           width: 7.5em;
           height: 7.5em;
           background-color: var(--watercolor);
@@ -118,7 +118,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           overflow: hidden;
           border-radius: 50%;
           box-shadow:
-            0 12px 32px rgba(51, 68, 193, 0.22),
+            0 18px 48px rgba(51, 68, 193, 0.28),
             inset 0em 0.5em rgb(255, 255, 255, 0.25),
             inset 0em -0.5em rgb(0, 0, 0, 0.25);
           border: solid 0.15em #ffffff;
@@ -131,25 +131,25 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding-top: 0.85em;
-          font-size: 1.15em;
+          padding-top: 1rem;
+          font-size: 1.25rem;
           font-weight: 600;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.02em;
           font-family: inherit;
         }
 
         /* 0-100% Horizontal Line Styling */
         .earth-progress-container {
-          width: 14em;
-          margin-top: 1.15em;
+          width: 14rem;
+          margin-top: 0.85rem;
           display: flex;
           flex-direction: column;
-          gap: 0.45em;
+          gap: 0.45rem;
         }
 
         .earth-progress-track {
           width: 100%;
-          height: 5px;
+          height: 6px;
           background-color: #e2e8f0;
           border-radius: 9999px;
           overflow: hidden;
@@ -165,20 +165,14 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
 
         .earth-progress-meta {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          font-size: 0.75rem;
-          font-family: inherit;
-        }
-
-        .earth-progress-edge {
-          color: #94a3b8;
-          font-weight: 500;
         }
 
         .earth-progress-current {
-          color: #1e293b;
-          font-weight: 700;
+          color: #475569;
+          font-size: 0.875rem;
+          font-weight: 600;
           font-feature-settings: "tnum";
           font-variant-numeric: tabular-nums;
         }
@@ -227,7 +221,7 @@ export function Preloader({ minDurationMs = 4000 }: PreloaderProps) {
           100% {
             filter: brightness(100%);
             box-shadow:
-              0 12px 32px rgba(51, 68, 193, 0.22),
+              0 18px 48px rgba(51, 68, 193, 0.28),
               inset 0em 0.5em rgb(255, 255, 255, 0.25),
               inset 0em -0.5em rgb(0, 0, 0, 0.25);
           }
