@@ -11,14 +11,14 @@ export const ASSETS = {
     sparkWhite: "/brand/logo/walmart-spark-white.svg"
   },
   dashboard: {
-    background: "/images/banners/walmart-supercenter-twilight.png",
-    banner: "/images/banners/walmart-supercenter-twilight.png",
-    promo: "/images/banners/walmart-supercenter-twilight.png"
+    background: "/images/banners/walmart-supercenter-twilight.webp",
+    banner: "/images/banners/walmart-supercenter-twilight.webp",
+    promo: "/images/banners/walmart-supercenter-twilight.webp"
   },
   banners: {
     store: "/images/banners/store-banner.webp",
-    twilight: "/images/banners/walmart-supercenter-twilight.png",
-    associates: "/images/banners/walmart-associates-promo.jpg"
+    twilight: "/images/banners/walmart-supercenter-twilight.webp",
+    associates: "/images/banners/walmart-associates-promo.webp"
   },
   stores: {
     main: "/images/stores/store-main.webp",

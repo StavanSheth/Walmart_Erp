@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AppShell } from "@/components/layout/app-shell";
+import { Preloader } from "@/components/common/preloader";
 
 export const metadata: Metadata = {
   title: "Walmart ERP — Enterprise Retail Operations",
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-surface-page text-slate-900" suppressHydrationWarning>
+        <Preloader minDurationMs={4000} />
         <Providers>
           <AppShell>
             <React.Suspense fallback={null}>

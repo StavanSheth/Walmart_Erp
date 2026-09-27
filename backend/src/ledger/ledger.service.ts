@@ -254,8 +254,30 @@ export async function ensureCanonicalLedgerData() {
   }
 }
 
+export interface JournalLineLike {
+  debit?: number | Prisma.Decimal | string | null;
+  credit?: number | Prisma.Decimal | string | null;
+  account?: {
+    code?: string | null;
+    name?: string | null;
+  } | null;
+}
+
+export interface JournalEntryLike {
+  id: string;
+  entryNumber?: string | null;
+  referenceType?: string | null;
+  referenceId?: string | null;
+  description?: string | null;
+  createdAt?: string | Date;
+  date?: string | Date;
+  entryDate?: string | Date;
+  postedAt?: string | Date | null;
+  lines?: JournalLineLike[];
+}
+
 // Convert a JournalEntry to a rich conceptual TransactionRow
-export function mapJournalEntryToTransaction(je: any): TransactionRow {
+export function mapJournalEntryToTransaction(je: JournalEntryLike): TransactionRow {
   const isPending = je.referenceType?.includes("PENDING") || false;
   const status: "Posted" | "Pending" = isPending ? "Pending" : "Posted";
 
@@ -268,17 +290,17 @@ export function mapJournalEntryToTransaction(je: any): TransactionRow {
   let icon: "document" | "cart" | "bank" | "truck" | "chart" = "document";
 
   const lines = je.lines || [];
-  const totalDebit = lines.reduce((acc: number, l: any) => acc + Number(l.debit || 0), 0);
-  const totalCredit = lines.reduce((acc: number, l: any) => acc + Number(l.credit || 0), 0);
+  const totalDebit = lines.reduce((acc: number, l: JournalLineLike) => acc + Number(l.debit || 0), 0);
+  const totalCredit = lines.reduce((acc: number, l: JournalLineLike) => acc + Number(l.credit || 0), 0);
   amount = Math.max(totalDebit, totalCredit);
 
   // Categorize based on lines and descriptions
-  const hasInventory = lines.some((l: any) => l.account?.code === "1200" || l.account?.name?.toLowerCase().includes("inventory"));
-  const hasPayable = lines.some((l: any) => l.account?.code === "2000" || l.account?.name?.toLowerCase().includes("payable"));
-  const hasReceivable = lines.some((l: any) => l.account?.code === "1100" || l.account?.name?.toLowerCase().includes("receivable"));
-  const hasRevenue = lines.some((l: any) => l.account?.code === "4000" || l.account?.name?.toLowerCase().includes("revenue"));
-  const hasMisc = lines.some((l: any) => l.account?.code === "5200" || l.account?.name?.toLowerCase().includes("miscellaneous"));
-  const hasTransport = lines.some((l: any) => l.account?.code === "5300" || l.account?.name?.toLowerCase().includes("transportation"));
+  const hasInventory = lines.some((l: JournalLineLike) => l.account?.code === "1200" || l.account?.name?.toLowerCase().includes("inventory"));
+  const hasPayable = lines.some((l: JournalLineLike) => l.account?.code === "2000" || l.account?.name?.toLowerCase().includes("payable"));
+  const hasReceivable = lines.some((l: JournalLineLike) => l.account?.code === "1100" || l.account?.name?.toLowerCase().includes("receivable"));
+  const hasRevenue = lines.some((l: JournalLineLike) => l.account?.code === "4000" || l.account?.name?.toLowerCase().includes("revenue"));
+  const hasMisc = lines.some((l: JournalLineLike) => l.account?.code === "5200" || l.account?.name?.toLowerCase().includes("miscellaneous"));
+  const hasTransport = lines.some((l: JournalLineLike) => l.account?.code === "5300" || l.account?.name?.toLowerCase().includes("transportation"));
 
   if (hasRevenue || je.description?.toLowerCase().includes("sale")) {
     primaryCategory = "Sales Revenue";
@@ -344,7 +366,7 @@ export function mapJournalEntryToTransaction(je: any): TransactionRow {
   return {
     transactionId: je.id,
     transactionType: je.referenceType?.split(":")[0] || "JOURNAL",
-    title: je.description,
+    title: je.description || "General Entry",
     reference: je.referenceId || je.entryNumber || je.id.slice(0, 8),
     account: primaryCategory,
     category: primaryCategory,

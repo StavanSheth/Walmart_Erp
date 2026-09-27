@@ -123,7 +123,7 @@ function StoreCardItem({
   const imageSrc =
     !imgError && store.image
       ? store.image
-      : "/images/banners/walmart-supercenter-twilight.png";
+      : "/images/banners/walmart-supercenter-twilight.webp";
 
   return (
     <div

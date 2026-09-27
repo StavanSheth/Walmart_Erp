@@ -20,7 +20,7 @@ export function StoreNetworkBanner({
       {/* Left Image of Walmart Supercenter */}
       <div className="relative w-[42%] sm:w-1/2 shrink-0 overflow-hidden">
         <Image
-          src="/images/banners/walmart-supercenter-twilight.png"
+          src="/images/banners/walmart-supercenter-twilight.webp"
           alt="Walmart Supercenter at Twilight"
           fill
           className="object-cover"

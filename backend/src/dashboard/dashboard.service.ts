@@ -389,7 +389,6 @@ export async function getDashboardOverview(
   let totalUnits = 0;
   let inStockUnits = 0;
   let lowStockUnits = 0;
-  let outOfStockUnits = 0;
   let lowStockItemCount = 0;
   let outOfStockItemCount = 0;
   let totalInventoryValue = 0;
@@ -414,7 +413,6 @@ export async function getDashboardOverview(
     const available = inv.onHand - inv.reserved;
     if (available <= 0) {
       outOfStockItemCount++;
-      outOfStockUnits += Math.max(0, inv.onHand);
       outOfStockRecords.push(inv);
     } else if (available <= inv.product.reorderLevel) {
       lowStockItemCount++;
