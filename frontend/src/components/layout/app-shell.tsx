@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col min-w-0 relative">
           {/* Top Banner Image (Visible behind header and page hero section across all sections) */}
           {hasBanner && (
-            <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0 h-[380px] sm:h-[420px] lg:h-[460px] xl:h-[480px]">
+            <div className="absolute top-0 left-0 right-0 overflow-hidden pointer-events-none z-0 h-[460px] sm:h-[500px] lg:h-[540px] xl:h-[560px]">
               <Image
                 src={ASSETS.dashboard.banner}
                 alt="Walmart Supercenter Twilight Banner"
